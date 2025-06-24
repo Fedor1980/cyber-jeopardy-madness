@@ -1,0 +1,11 @@
+{
+  "questions": [
+    {
+      "category": "Phishing",
+      "points": 100,
+      "question": "You get an email asking to reset your password. What should you do?",
+      "options": ["Click link", "Ignore", "Call IT", "Forward to coworker"],
+      "answer": "Call IT"
+    }
+  ]
+}

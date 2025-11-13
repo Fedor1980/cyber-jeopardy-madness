@@ -6,17 +6,21 @@
 }
 
 :root {
-    --jeopardy-blue: #060CE9;
-    --jeopardy-gold: #FFD700;
-    --dark-bg: #0a0a2e;
-    --darker-bg: #050517;
-    --card-bg: #1a1a3e;
+    /* Capital Technology Group Brand Colors */
+    --captg-blue: #005487;
+    --captg-green: #72bd44;
+    --captg-purple: #431560;
+    --jeopardy-blue: #005487;
+    --jeopardy-gold: #72bd44;
+    --dark-bg: #001a2e;
+    --darker-bg: #000f1a;
+    --card-bg: #002a42;
     --text-light: #ffffff;
     --text-dark: #000000;
-    --success-green: #10b981;
+    --success-green: #72bd44;
     --error-red: #ef4444;
-    --border-color: #3a3a5e;
-    --hover-color: #2a2a4e;
+    --border-color: #005487;
+    --hover-color: #003d5f;
 }
 
 body {
@@ -46,18 +50,18 @@ body {
     max-width: 700px;
     width: 100%;
     background: var(--card-bg);
-    border: 3px solid var(--jeopardy-gold);
+    border: 3px solid var(--captg-blue);
     border-radius: 15px;
     padding: 3rem;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 60px rgba(0, 84, 135, 0.3), 0 0 40px rgba(114, 189, 68, 0.1);
     animation: fadeIn 0.5s ease-in;
 }
 
 .game-title {
     font-size: 3rem;
     text-align: center;
-    color: var(--jeopardy-gold);
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    color: var(--captg-green);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7), 0 0 20px rgba(114, 189, 68, 0.3);
     margin-bottom: 0.5rem;
 }
 
@@ -73,7 +77,7 @@ body {
 }
 
 .setup-section h2 {
-    color: var(--jeopardy-gold);
+    color: var(--captg-purple);
     margin-bottom: 1.5rem;
     font-size: 1.5rem;
 }
@@ -161,11 +165,11 @@ body {
     padding: 1.5rem;
     background: var(--darker-bg);
     border-radius: 8px;
-    border-left: 4px solid var(--jeopardy-gold);
+    border-left: 4px solid var(--captg-green);
 }
 
 .game-rules h3 {
-    color: var(--jeopardy-gold);
+    color: var(--captg-purple);
     margin-bottom: 1rem;
 }
 
@@ -192,15 +196,17 @@ body {
 }
 
 .btn-primary {
-    background: var(--jeopardy-gold);
-    color: var(--text-dark);
+    background: var(--captg-green);
+    color: var(--text-light);
     width: 100%;
     margin-top: 1rem;
+    font-weight: 700;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 10px 25px rgba(114, 189, 68, 0.5);
+    background: #81cc53;
 }
 
 .btn-primary:disabled {
@@ -248,7 +254,8 @@ body {
 
 .game-logo {
     font-size: 2rem;
-    color: var(--jeopardy-gold);
+    color: var(--captg-green);
+    text-shadow: 0 0 15px rgba(114, 189, 68, 0.3);
 }
 
 .scoreboard {
@@ -266,8 +273,8 @@ body {
 }
 
 .team-score.active {
-    border-color: var(--jeopardy-gold);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    border-color: var(--captg-green);
+    box-shadow: 0 0 20px rgba(114, 189, 68, 0.4);
 }
 
 .team-score .team-name {
@@ -278,7 +285,7 @@ body {
 
 .team-score .score {
     font-size: 1.5rem;
-    color: var(--jeopardy-gold);
+    color: var(--captg-green);
     font-weight: bold;
 }
 
@@ -335,7 +342,7 @@ body {
 
 .question-card:hover {
     transform: scale(1.05);
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 10px 30px rgba(114, 189, 68, 0.5);
 }
 
 .question-card.answered {
@@ -364,11 +371,12 @@ body {
     padding: 1rem 2rem;
     background: var(--card-bg);
     border-radius: 8px;
-    border: 2px solid var(--jeopardy-gold);
+    border: 2px solid var(--captg-green);
 }
 
 .current-team span {
-    color: var(--jeopardy-gold);
+    color: var(--captg-green);
+    font-weight: 700;
 }
 
 /* Modal Styles */
@@ -393,7 +401,7 @@ body {
 
 .modal-content {
     background: var(--card-bg);
-    border: 3px solid var(--jeopardy-gold);
+    border: 3px solid var(--captg-blue);
     border-radius: 15px;
     padding: 2.5rem;
     max-width: 700px;
@@ -401,6 +409,7 @@ body {
     max-height: 90vh;
     overflow-y: auto;
     animation: slideIn 0.3s ease;
+    box-shadow: 0 0 40px rgba(114, 189, 68, 0.2);
 }
 
 .question-header {
@@ -415,14 +424,14 @@ body {
 .category-display {
     font-size: 1.3rem;
     font-weight: 600;
-    color: var(--jeopardy-gold);
+    color: var(--captg-purple);
     text-transform: uppercase;
 }
 
 .points-display {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--jeopardy-gold);
+    color: var(--captg-green);
 }
 
 .question-text {
@@ -455,14 +464,15 @@ body {
 
 .option-btn:hover {
     background: var(--hover-color);
-    border-color: var(--jeopardy-gold);
+    border-color: var(--captg-green);
     transform: translateX(5px);
 }
 
 .option-btn.selected {
-    background: var(--jeopardy-blue);
-    border-color: var(--jeopardy-gold);
+    background: var(--captg-blue);
+    border-color: var(--captg-green);
     font-weight: 600;
+    box-shadow: 0 0 15px rgba(114, 189, 68, 0.3);
 }
 
 .question-actions {
@@ -482,7 +492,7 @@ body {
     padding: 1.5rem;
     background: var(--darker-bg);
     border-radius: 8px;
-    border-left: 4px solid var(--jeopardy-blue);
+    border-left: 4px solid var(--captg-purple);
 }
 
 .hint-display {
@@ -543,10 +553,10 @@ body {
     max-width: 800px;
     width: 100%;
     background: var(--card-bg);
-    border: 3px solid var(--jeopardy-gold);
+    border: 3px solid var(--captg-blue);
     border-radius: 15px;
     padding: 3rem;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 60px rgba(0, 84, 135, 0.3), 0 0 40px rgba(114, 189, 68, 0.2);
     text-align: center;
 }
 
@@ -567,8 +577,9 @@ body {
 }
 
 .final-score-item.winner {
-    border-color: var(--jeopardy-gold);
-    background: linear-gradient(135deg, var(--jeopardy-blue) 0%, var(--dark-bg) 100%);
+    border-color: var(--captg-green);
+    background: linear-gradient(135deg, var(--captg-blue) 0%, var(--dark-bg) 100%);
+    box-shadow: 0 0 20px rgba(114, 189, 68, 0.3);
 }
 
 .final-score-item .team-name {
@@ -577,16 +588,16 @@ body {
 
 .final-score-item .score {
     font-size: 1.5rem;
-    color: var(--jeopardy-gold);
+    color: var(--captg-green);
     font-weight: bold;
 }
 
 .winner-announcement {
     font-size: 2rem;
-    color: var(--jeopardy-gold);
+    color: var(--captg-green);
     margin: 2rem 0;
     font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7), 0 0 20px rgba(114, 189, 68, 0.4);
 }
 
 .gameover-actions {

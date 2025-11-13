@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fedor1980.github.io/cyber-jeopardy-madness/sitemap.xml

@@ -1,0 +1,29 @@
+{
+  "name": "cyber-jeopardy-madness",
+  "version": "1.0.0",
+  "description": "A team-based cybersecurity awareness training game built for Federal Credit Unions",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx http-server public -p 8080 -o",
+    "dev": "npx http-server public -p 8080 -o",
+    "build": "echo 'Static site - no build required'",
+    "test": "echo 'Tests not yet implemented'"
+  },
+  "keywords": [
+    "cybersecurity",
+    "jeopardy",
+    "training",
+    "game",
+    "education"
+  ],
+  "author": "Fedor1980",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fedor1980/cyber-jeopardy-madness.git"
+  }
+}

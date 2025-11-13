@@ -1,244 +1,568 @@
 {
-  "categories": [
+  "rounds": [
     {
-      "name": "Phishing",
-      "questions": [
+      "name": "Jeopardy",
+      "round": 1,
+      "categories": [
         {
-          "points": 100,
-          "question": "You receive an email asking you to reset your password. What should you do first?",
-          "options": ["Click the link immediately", "Ignore it completely", "Contact IT directly", "Forward to a coworker"],
-          "answer": "Contact IT directly",
-          "explanation": "Always verify password reset requests directly with IT, especially if unsolicited. Phishers often impersonate legitimate services."
+          "name": "Phishing",
+          "questions": [
+            {
+              "points": 100,
+              "question": "You receive an email asking you to reset your password. What should you do first?",
+              "options": ["Click the link immediately", "Ignore it completely", "Contact IT directly", "Forward to a coworker"],
+              "answer": "Contact IT directly",
+              "explanation": "Always verify password reset requests directly with IT, especially if unsolicited. Phishers often impersonate legitimate services.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What is a common sign that an email might be a phishing attempt?",
+              "options": ["Generic greetings like 'Dear Customer'", "Proper grammar and spelling", "Company logo present", "Sent during business hours"],
+              "answer": "Generic greetings like 'Dear Customer'",
+              "explanation": "Phishing emails often use generic greetings because they're sent to many people. Legitimate companies typically use your actual name.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What technique do phishers use when they create fake websites that look identical to real ones?",
+              "options": ["URL spoofing", "Email bombing", "Packet sniffing", "Port scanning"],
+              "answer": "URL spoofing",
+              "explanation": "URL spoofing involves creating fake websites with URLs similar to legitimate ones to trick users into entering credentials.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "Spear phishing differs from regular phishing in what way?",
+              "options": ["It targets specific individuals", "It uses spear-shaped malware", "It only targets CEOs", "It's less dangerous"],
+              "answer": "It targets specific individuals",
+              "explanation": "Spear phishing is a targeted attack using personalized information to make the phishing attempt more convincing.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What is 'whaling' in cybersecurity terms?",
+              "options": ["Phishing attacks targeting high-level executives", "Large-scale DDoS attacks", "Capturing network packets", "Data exfiltration technique"],
+              "answer": "Phishing attacks targeting high-level executives",
+              "explanation": "Whaling targets 'big fish' like C-level executives, VPs, and other high-value individuals with access to sensitive data.",
+              "timeLimit": 30
+            }
+          ]
         },
         {
-          "points": 200,
-          "question": "What is a common sign that an email might be a phishing attempt?",
-          "options": ["Generic greetings like 'Dear Customer'", "Proper grammar and spelling", "Company logo present", "Sent during business hours"],
-          "answer": "Generic greetings like 'Dear Customer'",
-          "explanation": "Phishing emails often use generic greetings because they're sent to many people. Legitimate companies typically use your actual name."
+          "name": "Password Security",
+          "questions": [
+            {
+              "points": 100,
+              "question": "What is the minimum recommended length for a strong password?",
+              "options": ["6 characters", "8 characters", "12 characters", "20 characters"],
+              "answer": "12 characters",
+              "explanation": "NIST and most security experts now recommend passwords be at least 12 characters long for adequate security.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What should you do if you suspect your password has been compromised?",
+              "options": ["Wait and see", "Change it immediately", "Add a number to the end", "Tell your coworkers"],
+              "answer": "Change it immediately",
+              "explanation": "If you suspect compromise, change your password immediately and notify IT. Time is critical in preventing unauthorized access.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What is the safest way to store multiple complex passwords?",
+              "options": ["Write them on sticky notes", "Use the same password everywhere", "Use a password manager", "Save in a text file on desktop"],
+              "answer": "Use a password manager",
+              "explanation": "Password managers securely encrypt and store all your passwords, requiring only one master password to access them.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What is multi-factor authentication (MFA)?",
+              "options": ["Using multiple passwords", "Requiring two or more verification methods", "Changing passwords monthly", "Using biometric only"],
+              "answer": "Requiring two or more verification methods",
+              "explanation": "MFA requires multiple forms of verification (something you know, have, or are) to significantly increase security.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What type of attack involves trying many passwords systematically until finding the correct one?",
+              "options": ["Phishing", "Brute force", "Man-in-the-middle", "SQL injection"],
+              "answer": "Brute force",
+              "explanation": "Brute force attacks systematically try all possible password combinations. Strong, long passwords help defend against these.",
+              "timeLimit": 30
+            }
+          ]
         },
         {
-          "points": 300,
-          "question": "What technique do phishers use when they create fake websites that look identical to real ones?",
-          "options": ["URL spoofing", "Email bombing", "Packet sniffing", "Port scanning"],
-          "answer": "URL spoofing",
-          "explanation": "URL spoofing involves creating fake websites with URLs similar to legitimate ones to trick users into entering credentials."
+          "name": "Social Engineering",
+          "questions": [
+            {
+              "points": 100,
+              "question": "A caller claims to be from IT and asks for your password. What should you do?",
+              "options": ["Give them your password", "Hang up and call IT", "Ask for their employee ID", "Give a fake password"],
+              "answer": "Hang up and call IT",
+              "explanation": "Legitimate IT staff will never ask for your password. Always verify by calling IT directly through official channels.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What is 'tailgating' in physical security?",
+              "options": ["Following someone through a secure door", "Hacking from a vehicle", "Trailing network packets", "Copying someone's badge"],
+              "answer": "Following someone through a secure door",
+              "explanation": "Tailgating is when an unauthorized person follows an authorized person through a secure entrance without proper authentication.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What social engineering technique creates a fabricated scenario to obtain information?",
+              "options": ["Phishing", "Pretexting", "Baiting", "Quid pro quo"],
+              "answer": "Pretexting",
+              "explanation": "Pretexting involves creating a false scenario (pretext) to manipulate victims into divulging information or performing actions.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What should you do if you find a USB drive in the parking lot?",
+              "options": ["Plug it in to see what's on it", "Give it to IT/Security", "Keep it", "Throw it away"],
+              "answer": "Give it to IT/Security",
+              "explanation": "Unknown USB drives could contain malware. Never plug them into company computers. Report them to IT or Security.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What principle states employees should only have access to information necessary for their job?",
+              "options": ["Need to know", "Zero trust", "Defense in depth", "Separation of duties"],
+              "answer": "Need to know",
+              "explanation": "The need-to-know principle limits access to sensitive information based on job requirements, reducing potential damage from breaches.",
+              "timeLimit": 30
+            }
+          ]
         },
         {
-          "points": 400,
-          "question": "Spear phishing differs from regular phishing in what way?",
-          "options": ["It targets specific individuals", "It uses spear-shaped malware", "It only targets CEOs", "It's less dangerous"],
-          "answer": "It targets specific individuals",
-          "explanation": "Spear phishing is a targeted attack using personalized information to make the phishing attempt more convincing."
+          "name": "Data Protection",
+          "questions": [
+            {
+              "points": 100,
+              "question": "What should you do before disposing of documents with sensitive information?",
+              "options": ["Throw in regular trash", "Recycle them", "Shred them", "Burn them"],
+              "answer": "Shred them",
+              "explanation": "Shredding ensures sensitive documents cannot be reconstructed and read by unauthorized individuals.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What does encryption do to data?",
+              "options": ["Deletes it permanently", "Converts it to unreadable format", "Backs it up", "Compresses it"],
+              "answer": "Converts it to unreadable format",
+              "explanation": "Encryption transforms data into an unreadable format that can only be decrypted with the proper key.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What is the safest way to send confidential member information externally?",
+              "options": ["Regular email", "Text message", "Encrypted email or secure portal", "Fax"],
+              "answer": "Encrypted email or secure portal",
+              "explanation": "Encrypted communication or secure portals protect sensitive data during transmission from interception.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What is PII?",
+              "options": ["Public Internet Information", "Personally Identifiable Information", "Protected Internal Infrastructure", "Private IP Interface"],
+              "answer": "Personally Identifiable Information",
+              "explanation": "PII is any data that could identify a specific individual, like SSN, address, or account numbers, requiring special protection.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What backup strategy involves keeping copies in multiple locations?",
+              "options": ["Cold backup", "Hot backup", "3-2-1 backup rule", "Incremental backup"],
+              "answer": "3-2-1 backup rule",
+              "explanation": "The 3-2-1 rule: 3 copies of data, on 2 different media types, with 1 copy offsite. This protects against various disaster scenarios.",
+              "timeLimit": 30
+            }
+          ]
         },
         {
-          "points": 500,
-          "question": "What is 'whaling' in cybersecurity terms?",
-          "options": ["Phishing attacks targeting high-level executives", "Large-scale DDoS attacks", "Capturing network packets", "Data exfiltration technique"],
-          "answer": "Phishing attacks targeting high-level executives",
-          "explanation": "Whaling targets 'big fish' like C-level executives, VPs, and other high-value individuals with access to sensitive data."
+          "name": "Compliance & Policy",
+          "questions": [
+            {
+              "points": 100,
+              "question": "What federal regulation protects consumer financial information?",
+              "options": ["HIPAA", "GLBA", "FERPA", "COPPA"],
+              "answer": "GLBA",
+              "explanation": "The Gramm-Leach-Bliley Act (GLBA) requires financial institutions to protect consumer financial information.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "How often should employees complete security awareness training?",
+              "options": ["Never", "Once when hired", "Annually", "Every 5 years"],
+              "answer": "Annually",
+              "explanation": "Annual security training keeps employees informed about evolving threats and reinforces security best practices.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What should you do if you discover a data breach?",
+              "options": ["Fix it yourself quietly", "Report immediately to IT/Security", "Tell coworkers first", "Post on social media"],
+              "answer": "Report immediately to IT/Security",
+              "explanation": "Immediate reporting enables quick response to contain breaches, minimize damage, and meet regulatory notification requirements.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What does the principle of 'least privilege' mean?",
+              "options": ["Everyone has minimal rights", "Users get only access needed for their role", "Privileges expire quickly", "Only executives have privileges"],
+              "answer": "Users get only access needed for their role",
+              "explanation": "Least privilege means granting users the minimum access rights needed to perform their jobs, reducing security risks.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What is required by NCUA regulations for credit union cybersecurity?",
+              "options": ["Annual penetration testing", "Monthly password changes", "Written information security program", "24/7 security monitoring"],
+              "answer": "Written information security program",
+              "explanation": "NCUA requires credit unions to maintain a written information security program addressing administrative, technical, and physical safeguards.",
+              "timeLimit": 30
+            }
+          ]
+        },
+        {
+          "name": "Malware & Threats",
+          "questions": [
+            {
+              "points": 100,
+              "question": "What is malware?",
+              "options": ["Bad hardware", "Malicious software", "Broken network", "Spam email"],
+              "answer": "Malicious software",
+              "explanation": "Malware is any software intentionally designed to cause damage to computers, servers, or networks.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What type of malware encrypts your files and demands payment?",
+              "options": ["Virus", "Worm", "Ransomware", "Spyware"],
+              "answer": "Ransomware",
+              "explanation": "Ransomware encrypts files and demands payment (usually cryptocurrency) for the decryption key. Never pay; report to IT immediately.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What should you do if you accidentally click on a suspicious link?",
+              "options": ["Restart your computer", "Report to IT immediately", "Run a scan later", "Nothing, it's fine"],
+              "answer": "Report to IT immediately",
+              "explanation": "Immediate reporting allows IT to assess and mitigate potential infections before they spread or cause damage.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What is a zero-day exploit?",
+              "options": ["An attack happening at midnight", "An attack on unpatched vulnerabilities", "A 24-hour attack window", "First day employee mistakes"],
+              "answer": "An attack on unpatched vulnerabilities",
+              "explanation": "Zero-day exploits target vulnerabilities unknown to the software vendor, giving them 'zero days' to fix before attacks begin.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What type of attack intercepts communication between two parties?",
+              "options": ["DDoS", "Man-in-the-middle", "Brute force", "SQL injection"],
+              "answer": "Man-in-the-middle",
+              "explanation": "Man-in-the-middle attacks intercept communications to steal data or inject malicious content without the parties knowing.",
+              "timeLimit": 30
+            }
+          ]
         }
       ]
     },
     {
-      "name": "Password Security",
-      "questions": [
+      "name": "Double Jeopardy",
+      "round": 2,
+      "categories": [
         {
-          "points": 100,
-          "question": "What is the minimum recommended length for a strong password?",
-          "options": ["6 characters", "8 characters", "12 characters", "20 characters"],
-          "answer": "12 characters",
-          "explanation": "NIST and most security experts now recommend passwords be at least 12 characters long for adequate security."
+          "name": "Network Security",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What does a firewall do?",
+              "options": ["Prevents fires in servers", "Controls network traffic", "Backs up data", "Encrypts passwords"],
+              "answer": "Controls network traffic",
+              "explanation": "Firewalls monitor and control incoming and outgoing network traffic based on predetermined security rules.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "What is VPN primarily used for?",
+              "options": ["Video production", "Virtual private networking", "Virus protection network", "Visual programming"],
+              "answer": "Virtual private networking",
+              "explanation": "VPNs create secure, encrypted connections over public networks, protecting data in transit and hiding your IP address.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "What port is commonly used for HTTPS connections?",
+              "options": ["80", "443", "8080", "22"],
+              "answer": "443",
+              "explanation": "Port 443 is the standard port for HTTPS (secure HTTP) connections, providing encrypted web traffic.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "What does IDS stand for in network security?",
+              "options": ["Internet Data Service", "Intrusion Detection System", "Internal Directory System", "Integrated Defense Solution"],
+              "answer": "Intrusion Detection System",
+              "explanation": "IDS monitors network traffic for suspicious activity and potential threats, alerting administrators to possible attacks.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What technique analyzes network packets to detect malicious content?",
+              "options": ["Deep packet inspection", "Surface scanning", "Shallow monitoring", "Basic filtering"],
+              "answer": "Deep packet inspection",
+              "explanation": "Deep packet inspection examines packet contents beyond headers to detect malware, intrusions, and policy violations.",
+              "timeLimit": 45
+            }
+          ]
         },
         {
-          "points": 200,
-          "question": "What should you do if you suspect your password has been compromised?",
-          "options": ["Wait and see", "Change it immediately", "Add a number to the end", "Tell your coworkers"],
-          "answer": "Change it immediately",
-          "explanation": "If you suspect compromise, change your password immediately and notify IT. Time is critical in preventing unauthorized access."
+          "name": "Incident Response",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What is the first step in incident response?",
+              "options": ["Delete everything", "Identification", "Recovery", "Prosecution"],
+              "answer": "Identification",
+              "explanation": "Identification involves detecting and determining whether an incident has occurred, which triggers the response process.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "What should you do immediately after discovering a security incident?",
+              "options": ["Try to fix it yourself", "Isolate affected systems", "Announce it company-wide", "Delete all logs"],
+              "answer": "Isolate affected systems",
+              "explanation": "Isolating affected systems prevents the incident from spreading while preserving evidence for investigation.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "What is the purpose of a post-incident review?",
+              "options": ["Assign blame", "Learn and improve", "Punish employees", "Delete records"],
+              "answer": "Learn and improve",
+              "explanation": "Post-incident reviews identify lessons learned and improve processes to prevent similar incidents in the future.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "How long should incident logs typically be retained?",
+              "options": ["1 week", "1 month", "At least 1 year", "Forever"],
+              "answer": "At least 1 year",
+              "explanation": "Most regulations require incident logs be retained for at least one year for compliance and forensic analysis.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What is a tabletop exercise in incident response?",
+              "options": ["Physical training drill", "Discussion-based simulation", "Board game", "Desk organization"],
+              "answer": "Discussion-based simulation",
+              "explanation": "Tabletop exercises simulate incident scenarios through discussion, testing response plans without live systems.",
+              "timeLimit": 45
+            }
+          ]
         },
         {
-          "points": 300,
-          "question": "What is the safest way to store multiple complex passwords?",
-          "options": ["Write them on sticky notes", "Use the same password everywhere", "Use a password manager", "Save in a text file on desktop"],
-          "answer": "Use a password manager",
-          "explanation": "Password managers securely encrypt and store all your passwords, requiring only one master password to access them."
+          "name": "Cloud Security",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What does SaaS stand for?",
+              "options": ["Security as a Service", "Software as a Service", "System and Application Security", "Secure Access Service"],
+              "answer": "Software as a Service",
+              "explanation": "SaaS delivers software applications over the internet, eliminating the need for local installation and maintenance.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "Who is responsible for data security in the cloud?",
+              "options": ["Only the cloud provider", "Only the customer", "Shared responsibility", "No one"],
+              "answer": "Shared responsibility",
+              "explanation": "Cloud security follows a shared responsibility model where both provider and customer have security obligations.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "What is a significant risk of shadow IT?",
+              "options": ["Too much sunlight", "Unmanaged security vulnerabilities", "Increased productivity", "Lower costs"],
+              "answer": "Unmanaged security vulnerabilities",
+              "explanation": "Shadow IT (unauthorized cloud services) bypasses security controls, creating unmanaged vulnerabilities and compliance risks.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "What is encryption at rest in cloud storage?",
+              "options": ["Encrypting data while sleeping", "Encrypting stored data", "Encrypting moving data", "Not encrypting anything"],
+              "answer": "Encrypting stored data",
+              "explanation": "Encryption at rest protects data stored on disks or databases, ensuring it's unreadable if physical media is compromised.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What cloud security tool provides centralized visibility across multiple cloud platforms?",
+              "options": ["CASB", "USB", "DVD", "RAM"],
+              "answer": "CASB",
+              "explanation": "Cloud Access Security Brokers (CASB) provide visibility, compliance, and security across cloud services and platforms.",
+              "timeLimit": 45
+            }
+          ]
         },
         {
-          "points": 400,
-          "question": "What is multi-factor authentication (MFA)?",
-          "options": ["Using multiple passwords", "Requiring two or more verification methods", "Changing passwords monthly", "Using biometric only"],
-          "answer": "Requiring two or more verification methods",
-          "explanation": "MFA requires multiple forms of verification (something you know, have, or are) to significantly increase security."
+          "name": "Mobile Security",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What should you do before disposing of an old mobile device?",
+              "options": ["Sell it immediately", "Factory reset and wipe data", "Just delete contacts", "Remove the SIM card only"],
+              "answer": "Factory reset and wipe data",
+              "explanation": "Factory reset and secure data wiping ensure all personal and company information is permanently removed from the device.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "What is jailbreaking or rooting a mobile device?",
+              "options": ["Charging the battery", "Removing manufacturer restrictions", "Installing apps", "Taking screenshots"],
+              "answer": "Removing manufacturer restrictions",
+              "explanation": "Jailbreaking (iOS) or rooting (Android) removes built-in security restrictions, exposing devices to malware and security risks.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "Why should you avoid public Wi-Fi for sensitive transactions?",
+              "options": ["It's too slow", "It's unencrypted and easily intercepted", "It costs money", "It drains battery"],
+              "answer": "It's unencrypted and easily intercepted",
+              "explanation": "Public Wi-Fi often lacks encryption, allowing attackers to intercept sensitive data like passwords and financial information.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "What is mobile device management (MDM)?",
+              "options": ["Managing phone calls", "Centralized control of mobile devices", "Mobile data monitoring", "Device marketing"],
+              "answer": "Centralized control of mobile devices",
+              "explanation": "MDM solutions allow organizations to remotely manage, secure, and enforce policies on mobile devices accessing company resources.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What should a BYOD policy include?",
+              "options": ["Free devices for all", "Security requirements and acceptable use", "Unlimited data plans", "Game recommendations"],
+              "answer": "Security requirements and acceptable use",
+              "explanation": "Bring Your Own Device policies must define security requirements, acceptable use, and data protection measures.",
+              "timeLimit": 45
+            }
+          ]
         },
         {
-          "points": 500,
-          "question": "What type of attack involves trying many passwords systematically until finding the correct one?",
-          "options": ["Phishing", "Brute force", "Man-in-the-middle", "SQL injection"],
-          "answer": "Brute force",
-          "explanation": "Brute force attacks systematically try all possible password combinations. Strong, long passwords help defend against these."
+          "name": "Cryptography",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What does SSL/TLS provide for web connections?",
+              "options": ["Faster loading", "Encryption and authentication", "Better graphics", "More storage"],
+              "answer": "Encryption and authentication",
+              "explanation": "SSL/TLS protocols encrypt data in transit and authenticate servers, protecting web communications from interception.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "What is the main difference between symmetric and asymmetric encryption?",
+              "options": ["Speed only", "Number of keys used", "Color coding", "File size"],
+              "answer": "Number of keys used",
+              "explanation": "Symmetric encryption uses one shared key, while asymmetric uses a public-private key pair for encryption and decryption.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "What is a hash function used for in security?",
+              "options": ["Making breakfast", "Creating fixed-size data fingerprints", "Deleting files", "Sending emails"],
+              "answer": "Creating fixed-size data fingerprints",
+              "explanation": "Hash functions create unique fixed-size fingerprints of data, useful for integrity verification and password storage.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "What is a digital signature used to verify?",
+              "options": ["File size", "Authenticity and integrity", "Color depth", "Font type"],
+              "answer": "Authenticity and integrity",
+              "explanation": "Digital signatures use asymmetric cryptography to verify that data came from the claimed sender and wasn't modified.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What is perfect forward secrecy in encryption?",
+              "options": ["Never changing keys", "Unique session keys that can't reveal past sessions", "Using the same password forever", "Faster encryption"],
+              "answer": "Unique session keys that can't reveal past sessions",
+              "explanation": "Perfect forward secrecy generates unique session keys, ensuring that compromising one key doesn't expose past communications.",
+              "timeLimit": 45
+            }
+          ]
+        },
+        {
+          "name": "Security Awareness",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What is the human element often called in security?",
+              "options": ["The strongest link", "The weakest link", "The middle link", "The golden link"],
+              "answer": "The weakest link",
+              "explanation": "Humans are often the weakest link because they can be manipulated through social engineering despite technical controls.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "How often should you update your security awareness knowledge?",
+              "options": ["Never", "Only when breached", "Continuously", "Every 10 years"],
+              "answer": "Continuously",
+              "explanation": "Continuous learning is essential as threats evolve constantly, requiring ongoing education and awareness updates.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "What should you do if you receive an unexpected urgent request from your CEO to wire money?",
+              "options": ["Do it immediately", "Verify through a known phone number", "Reply to the email", "Ignore it"],
+              "answer": "Verify through a known phone number",
+              "explanation": "CEO fraud is common. Always verify unusual requests through a known, trusted communication channel before acting.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "What is security culture in an organization?",
+              "options": ["IT department's job only", "Shared values and behaviors around security", "Annual training event", "Firewall settings"],
+              "answer": "Shared values and behaviors around security",
+              "explanation": "Security culture embeds security awareness into daily behaviors and decision-making across the entire organization.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What psychological principle do attackers exploit most in social engineering?",
+              "options": ["Laziness", "Trust and authority", "Intelligence", "Strength"],
+              "answer": "Trust and authority",
+              "explanation": "Social engineers exploit our natural tendency to trust authority figures and help others, bypassing technical security controls.",
+              "timeLimit": 45
+            }
+          ]
         }
       ]
     },
     {
-      "name": "Social Engineering",
-      "questions": [
-        {
-          "points": 100,
-          "question": "A caller claims to be from IT and asks for your password. What should you do?",
-          "options": ["Give them your password", "Hang up and call IT", "Ask for their employee ID", "Give a fake password"],
-          "answer": "Hang up and call IT",
-          "explanation": "Legitimate IT staff will never ask for your password. Always verify by calling IT directly through official channels."
-        },
-        {
-          "points": 200,
-          "question": "What is 'tailgating' in physical security?",
-          "options": ["Following someone through a secure door", "Hacking from a vehicle", "Trailing network packets", "Copying someone's badge"],
-          "answer": "Following someone through a secure door",
-          "explanation": "Tailgating is when an unauthorized person follows an authorized person through a secure entrance without proper authentication."
-        },
-        {
-          "points": 300,
-          "question": "What social engineering technique creates a fabricated scenario to obtain information?",
-          "options": ["Phishing", "Pretexting", "Baiting", "Quid pro quo"],
-          "answer": "Pretexting",
-          "explanation": "Pretexting involves creating a false scenario (pretext) to manipulate victims into divulging information or performing actions."
-        },
-        {
-          "points": 400,
-          "question": "What should you do if you find a USB drive in the parking lot?",
-          "options": ["Plug it in to see what's on it", "Give it to IT/Security", "Keep it", "Throw it away"],
-          "answer": "Give it to IT/Security",
-          "explanation": "Unknown USB drives could contain malware. Never plug them into company computers. Report them to IT or Security."
-        },
-        {
-          "points": 500,
-          "question": "What principle states employees should only have access to information necessary for their job?",
-          "options": ["Need to know", "Zero trust", "Defense in depth", "Separation of duties"],
-          "answer": "Need to know",
-          "explanation": "The need-to-know principle limits access to sensitive information based on job requirements, reducing potential damage from breaches."
-        }
-      ]
-    },
-    {
-      "name": "Data Protection",
-      "questions": [
-        {
-          "points": 100,
-          "question": "What should you do before disposing of documents with sensitive information?",
-          "options": ["Throw in regular trash", "Recycle them", "Shred them", "Burn them"],
-          "answer": "Shred them",
-          "explanation": "Shredding ensures sensitive documents cannot be reconstructed and read by unauthorized individuals."
-        },
-        {
-          "points": 200,
-          "question": "What does encryption do to data?",
-          "options": ["Deletes it permanently", "Converts it to unreadable format", "Backs it up", "Compresses it"],
-          "answer": "Converts it to unreadable format",
-          "explanation": "Encryption transforms data into an unreadable format that can only be decrypted with the proper key."
-        },
-        {
-          "points": 300,
-          "question": "What is the safest way to send confidential member information externally?",
-          "options": ["Regular email", "Text message", "Encrypted email or secure portal", "Fax"],
-          "answer": "Encrypted email or secure portal",
-          "explanation": "Encrypted communication or secure portals protect sensitive data during transmission from interception."
-        },
-        {
-          "points": 400,
-          "question": "What is PII?",
-          "options": ["Public Internet Information", "Personally Identifiable Information", "Protected Internal Infrastructure", "Private IP Interface"],
-          "answer": "Personally Identifiable Information",
-          "explanation": "PII is any data that could identify a specific individual, like SSN, address, or account numbers, requiring special protection."
-        },
-        {
-          "points": 500,
-          "question": "What backup strategy involves keeping copies in multiple locations?",
-          "options": ["Cold backup", "Hot backup", "3-2-1 backup rule", "Incremental backup"],
-          "answer": "3-2-1 backup rule",
-          "explanation": "The 3-2-1 rule: 3 copies of data, on 2 different media types, with 1 copy offsite. This protects against various disaster scenarios."
-        }
-      ]
-    },
-    {
-      "name": "Compliance & Policy",
-      "questions": [
-        {
-          "points": 100,
-          "question": "What federal regulation protects consumer financial information?",
-          "options": ["HIPAA", "GLBA", "FERPA", "COPPA"],
-          "answer": "GLBA",
-          "explanation": "The Gramm-Leach-Bliley Act (GLBA) requires financial institutions to protect consumer financial information."
-        },
-        {
-          "points": 200,
-          "question": "How often should employees complete security awareness training?",
-          "options": ["Never", "Once when hired", "Annually", "Every 5 years"],
-          "answer": "Annually",
-          "explanation": "Annual security training keeps employees informed about evolving threats and reinforces security best practices."
-        },
-        {
-          "points": 300,
-          "question": "What should you do if you discover a data breach?",
-          "options": ["Fix it yourself quietly", "Report immediately to IT/Security", "Tell coworkers first", "Post on social media"],
-          "answer": "Report immediately to IT/Security",
-          "explanation": "Immediate reporting enables quick response to contain breaches, minimize damage, and meet regulatory notification requirements."
-        },
-        {
-          "points": 400,
-          "question": "What does the principle of 'least privilege' mean?",
-          "options": ["Everyone has minimal rights", "Users get only access needed for their role", "Privileges expire quickly", "Only executives have privileges"],
-          "answer": "Users get only access needed for their role",
-          "explanation": "Least privilege means granting users the minimum access rights needed to perform their jobs, reducing security risks."
-        },
-        {
-          "points": 500,
-          "question": "What is required by NCUA regulations for credit union cybersecurity?",
-          "options": ["Annual penetration testing", "Monthly password changes", "Written information security program", "24/7 security monitoring"],
-          "answer": "Written information security program",
-          "explanation": "NCUA requires credit unions to maintain a written information security program addressing administrative, technical, and physical safeguards."
-        }
-      ]
-    },
-    {
-      "name": "Malware & Threats",
-      "questions": [
-        {
-          "points": 100,
-          "question": "What is malware?",
-          "options": ["Bad hardware", "Malicious software", "Broken network", "Spam email"],
-          "answer": "Malicious software",
-          "explanation": "Malware is any software intentionally designed to cause damage to computers, servers, or networks."
-        },
-        {
-          "points": 200,
-          "question": "What type of malware encrypts your files and demands payment?",
-          "options": ["Virus", "Worm", "Ransomware", "Spyware"],
-          "answer": "Ransomware",
-          "explanation": "Ransomware encrypts files and demands payment (usually cryptocurrency) for the decryption key. Never pay; report to IT immediately."
-        },
-        {
-          "points": 300,
-          "question": "What should you do if you accidentally click on a suspicious link?",
-          "options": ["Restart your computer", "Report to IT immediately", "Run a scan later", "Nothing, it's fine"],
-          "answer": "Report to IT immediately",
-          "explanation": "Immediate reporting allows IT to assess and mitigate potential infections before they spread or cause damage."
-        },
-        {
-          "points": 400,
-          "question": "What is a zero-day exploit?",
-          "options": ["An attack happening at midnight", "An attack on unpatched vulnerabilities", "A 24-hour attack window", "First day employee mistakes"],
-          "answer": "An attack on unpatched vulnerabilities",
-          "explanation": "Zero-day exploits target vulnerabilities unknown to the software vendor, giving them 'zero days' to fix before attacks begin."
-        },
-        {
-          "points": 500,
-          "question": "What type of attack intercepts communication between two parties?",
-          "options": ["DDoS", "Man-in-the-middle", "Brute force", "SQL injection"],
-          "answer": "Man-in-the-middle",
-          "explanation": "Man-in-the-middle attacks intercept communications to steal data or inject malicious content without the parties knowing."
-        }
-      ]
+      "name": "Final Jeopardy",
+      "round": 3,
+      "category": "Cybersecurity Strategy",
+      "question": {
+        "question": "This comprehensive security approach assumes that threats exist both inside and outside the network, requiring verification of every access request regardless of location.",
+        "answer": "Zero Trust Architecture",
+        "acceptableAnswers": ["Zero Trust", "Zero Trust Model", "Zero Trust Security"],
+        "explanation": "Zero Trust Architecture operates on the principle 'never trust, always verify.' It assumes no user or system should be automatically trusted, requiring continuous verification of all access requests regardless of whether they originate inside or outside the network perimeter. This modern approach better defends against both external attacks and insider threats.",
+        "timeLimit": 60
+      }
     }
   ]
 }

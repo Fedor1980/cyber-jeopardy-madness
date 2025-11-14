@@ -60,21 +60,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No cookies or persistent storage
 - XSS prevention measures
 
+## [2.0.0] - 2025-11-14
+
+### Complete Professional Game Show Redesign
+
+This is a **GALAXY-TIER UPGRADE** transforming Cyber Jeopardy into a professional, authentic Jeopardy game show experience.
+
+### Added
+- **3 Individual Contestants**: Authentic game show format with individual players (not teams)
+- **Random Starting Player**: Computer randomly selects first contestant
+- **Professional Buzzer System**:
+  - Q/W/E keyboard controls for buzzing in
+  - 7-second buzz-in timer when primary contestant answers incorrectly
+  - Visual buzz indicators on podiums
+  - Multiple contestants can attempt each question
+- **Dual Timer System**:
+  - 15-second primary timer for active contestant
+  - 7-second buzz-in timer for remaining contestants
+  - Visual countdown bar with color-coded warnings
+- **Winner Keeps Picking**: Correct answer = contestant continues selecting questions
+- **Daily Doubles**:
+  - 1 Daily Double in Round 1
+  - 2 Daily Doubles in Round 2
+  - Custom wagering system with max limits
+  - Dramatic reveal animations
+- **Three Complete Rounds**:
+  - Round 1: Jeopardy ($100-$500 values)
+  - Round 2: Double Jeopardy ($200-$1000 values)
+  - Round 3: Final Jeopardy with full wagering system
+- **Industry Vertical Framework**:
+  - Pluggable content system for different industries
+  - Federal Credit Unions as first vertical
+  - Support for Banking, Healthcare, Retail, General Corporate
+- **Professional UI/UX**:
+  - Bebas Neue font for authentic Jeopardy styling
+  - Gold (#ffcc00) question values
+  - Podium displays with live score tracking
+  - Buzz flash animations
+  - Smooth transitions and reveals
+
+### Changed
+- **Complete CSS Rebuild**: 1100+ lines of professional game show styling
+- **Complete JavaScript Rewrite**: 900+ lines of modern ES6+ class-based architecture
+- **UI Completely Redesigned**: From team-based to individual contestant format
+- **Scoring System**: Now tracks negative scores for incorrect answers
+- **Game Flow**: Linear progression through all 3 rounds
+
+### Technical Improvements
+- Class-based architecture (CyberJeopardyGame)
+- Event-driven keyboard handling
+- State management for buzzer, timers, and contestants
+- Responsive grid layouts for game board (6x5 questions)
+- CSS animations for buzz indicators, timers, and reveals
+- Modal system for questions, results, and Daily Doubles
+
+### Visual Enhancements
+- Capital Technology Group brand colors integrated throughout
+- Professional podium displays
+- Timer bar with gradient fill and warning states
+- Buzzer buttons with keyboard key indicators
+- Champion screen with trophy and final standings
+- Daily Double spinning reveal animation
+
+### Game Features
+- Real-time score tracking with positive/negative values
+- Educational explanations for all answers
+- Contestant name customization
+- Active contestant highlighting
+- Round progression with automatic board rebuilding
+- Final Jeopardy wagering and reveal
+- Winner determination and celebration
+
 ## [Unreleased]
 
 ### Planned Features
-- Tournament bracket system
+- Sound effects (Daily Double jingle, buzzer sounds, theme music)
 - Score export and reporting
-- Daily Double special questions
-- Final Jeopardy bonus round
 - Custom question import from CSV
 - Leaderboard persistence
-- Sound effects and background music
+- Additional industry verticals
+- Tournament bracket system
 - Multiplayer online mode
-- Timer for questions
-- Hint system improvements
-- More question categories
-- Difficulty adjustment
 
 ---
 

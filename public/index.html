@@ -3,57 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Jeopardy Madness - Federal Credit Union Security Training</title>
+    <title>Cyber Jeopardy! - Professional Game Show Edition</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="app">
-        <!-- Welcome Screen -->
-        <div id="welcome-screen" class="screen active">
-            <div class="welcome-container">
-                <h1 class="game-title">🔒 Cyber Jeopardy Madness</h1>
-                <p class="subtitle">Cybersecurity Awareness Training for Federal Credit Unions</p>
-
-                <div class="setup-section">
-                    <h2>Game Setup</h2>
-                    <div class="team-setup">
-                        <label for="team-count">Number of Teams (2-6):</label>
-                        <input type="number" id="team-count" min="2" max="6" value="2">
-                    </div>
-
-                    <div id="team-names-container">
-                        <div class="team-name-input">
-                            <label>Team 1 Name:</label>
-                            <input type="text" class="team-name" placeholder="Enter team name" value="Red Team">
-                        </div>
-                        <div class="team-name-input">
-                            <label>Team 2 Name:</label>
-                            <input type="text" class="team-name" placeholder="Enter team name" value="Blue Team">
-                        </div>
-                    </div>
-
-                    <div class="ai-assistant-option">
-                        <label>
-                            <input type="checkbox" id="enable-ai">
-                            Enable AI Assistant (GPT) for hints and explanations
-                        </label>
-                        <div id="ai-key-section" style="display: none;">
-                            <input type="password" id="openai-key" placeholder="Enter OpenAI API Key">
-                            <small>Your key is stored locally and never sent to our servers</small>
-                        </div>
-                    </div>
+        <!-- Contestant Setup Screen -->
+        <div id="setup-screen" class="screen active">
+            <div class="setup-container">
+                <div class="show-title">
+                    <h1 class="jeopardy-title">CYBER JEOPARDY!</h1>
+                    <p class="tagline">Professional Cybersecurity Training Game Show</p>
                 </div>
 
-                <button id="start-game-btn" class="btn-primary">Start Game</button>
+                <div class="contestant-setup">
+                    <h2>CONTESTANT SETUP</h2>
 
-                <div class="game-rules">
-                    <h3>Game Rules</h3>
+                    <div class="contestant-inputs">
+                        <div class="contestant-card">
+                            <div class="podium-number">1</div>
+                            <input type="text" class="contestant-name" placeholder="Contestant 1 Name" maxlength="20" value="Alex">
+                        </div>
+                        <div class="contestant-card">
+                            <div class="podium-number">2</div>
+                            <input type="text" class="contestant-name" placeholder="Contestant 2 Name" maxlength="20" value="Blake">
+                        </div>
+                        <div class="contestant-card">
+                            <div class="podium-number">3</div>
+                            <input type="text" class="contestant-name" placeholder="Contestant 3 Name" maxlength="20" value="Casey">
+                        </div>
+                    </div>
+
+                    <div class="industry-selector">
+                        <label for="industry">Select Industry Vertical:</label>
+                        <select id="industry" class="industry-dropdown">
+                            <option value="fcu">Federal Credit Unions</option>
+                            <option value="banking">Banking & Finance</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="retail">Retail</option>
+                            <option value="general">General Corporate</option>
+                        </select>
+                    </div>
+
+                    <button id="start-show-btn" class="btn-start">START SHOW</button>
+                </div>
+
+                <div class="game-info">
+                    <h3>HOW TO PLAY</h3>
                     <ul>
-                        <li>Teams take turns selecting questions from the board</li>
-                        <li>Choose a category and point value (higher points = harder questions)</li>
-                        <li>Discuss as a team and select your answer</li>
-                        <li>Correct answers add points, incorrect answers deduct points</li>
-                        <li>The team with the most points at the end wins!</li>
+                        <li><strong>Random Start:</strong> Computer selects first contestant</li>
+                        <li><strong>15-Second Timer:</strong> Active contestant has 15s to answer</li>
+                        <li><strong>Buzz-In System:</strong> If wrong, others have 7s to buzz in</li>
+                        <li><strong>Keep Picking:</strong> Correct answer = you pick next question</li>
+                        <li><strong>3 Rounds:</strong> Jeopardy → Double Jeopardy → Final Jeopardy</li>
+                        <li><strong>Daily Doubles:</strong> Hidden questions for wagering</li>
                     </ul>
                 </div>
             </div>
@@ -61,65 +65,128 @@
 
         <!-- Game Board Screen -->
         <div id="game-screen" class="screen">
-            <header class="game-header">
-                <h1 class="game-logo">🔒 Cyber Jeopardy</h1>
-                <div id="round-display" class="round-display">Round 1</div>
-                <div id="scoreboard" class="scoreboard"></div>
-            </header>
-
-            <div id="game-board" class="game-board"></div>
-
-            <div class="game-controls">
-                <div class="current-team">
-                    Current Turn: <span id="current-team-display">Team 1</span>
+            <!-- Contestant Podiums -->
+            <div class="podiums">
+                <div class="podium" id="podium-0">
+                    <div class="contestant-info">
+                        <div class="contestant-name-display">Contestant 1</div>
+                        <div class="contestant-score">$0</div>
+                    </div>
+                    <div class="buzz-indicator"></div>
                 </div>
-                <button id="reset-game-btn" class="btn-secondary">Reset Game</button>
+                <div class="podium" id="podium-1">
+                    <div class="contestant-info">
+                        <div class="contestant-name-display">Contestant 2</div>
+                        <div class="contestant-score">$0</div>
+                    </div>
+                    <div class="buzz-indicator"></div>
+                </div>
+                <div class="podium" id="podium-2">
+                    <div class="contestant-info">
+                        <div class="contestant-name-display">Contestant 3</div>
+                        <div class="contestant-score">$0</div>
+                    </div>
+                    <div class="buzz-indicator"></div>
+                </div>
+            </div>
+
+            <!-- Round Display -->
+            <div class="round-banner">
+                <span id="round-title">JEOPARDY!</span>
+            </div>
+
+            <!-- Game Board -->
+            <div id="game-board" class="jeopardy-board"></div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="current-picker">
+                    <span id="picker-name">Contestant 1</span> - SELECT A CATEGORY
+                </div>
             </div>
         </div>
 
-        <!-- Question Modal -->
+        <!-- Question Display Modal -->
         <div id="question-modal" class="modal">
-            <div class="modal-content">
-                <div class="question-header">
-                    <span class="category-display"></span>
-                    <span class="points-display"></span>
-                </div>
-
+            <div class="question-screen">
+                <div class="question-category"></div>
+                <div class="question-value"></div>
                 <div class="question-text"></div>
 
-                <div class="options-container"></div>
-
-                <div class="question-actions">
-                    <button id="submit-answer-btn" class="btn-primary" disabled>Submit Answer</button>
-                    <button id="skip-question-btn" class="btn-secondary">Skip Question</button>
+                <div id="timer-bar" class="timer-bar">
+                    <div class="timer-fill"></div>
+                    <div class="timer-text">15</div>
                 </div>
 
-                <div id="ai-hint-section" class="ai-hint-section" style="display: none;">
-                    <button id="get-hint-btn" class="btn-hint">💡 Get AI Hint</button>
-                    <div id="hint-display" class="hint-display"></div>
+                <div class="answer-options" id="answer-options"></div>
+
+                <!-- Buzzer Panel -->
+                <div id="buzzer-panel" class="buzzer-panel" style="display: none;">
+                    <div class="buzzer-prompt">BUZZ IN TO ANSWER!</div>
+                    <div class="buzzer-buttons">
+                        <button class="buzz-btn" data-contestant="0">
+                            <span class="buzz-key">Q</span>
+                            <span class="buzz-name"></span>
+                        </button>
+                        <button class="buzz-btn" data-contestant="1">
+                            <span class="buzz-key">W</span>
+                            <span class="buzz-name"></span>
+                        </button>
+                        <button class="buzz-btn" data-contestant="2">
+                            <span class="buzz-key">E</span>
+                            <span class="buzz-name"></span>
+                        </button>
+                    </div>
+                    <div id="buzz-timer" class="buzz-timer">7</div>
                 </div>
             </div>
         </div>
 
         <!-- Answer Result Modal -->
         <div id="result-modal" class="modal">
-            <div class="modal-content result-content">
+            <div class="result-screen">
                 <div class="result-icon"></div>
-                <div class="result-message"></div>
+                <div class="result-status"></div>
+                <div class="result-contestant"></div>
                 <div class="result-explanation"></div>
-                <button id="continue-btn" class="btn-primary">Continue</button>
+                <button id="continue-btn" class="btn-continue">CONTINUE</button>
             </div>
         </div>
 
-        <!-- Game Over Screen -->
-        <div id="gameover-screen" class="screen">
-            <div class="gameover-container">
-                <h1 class="game-title">🏆 Game Over!</h1>
-                <div id="final-scores" class="final-scores"></div>
-                <div id="winner-announcement" class="winner-announcement"></div>
-                <div class="gameover-actions">
-                    <button id="play-again-btn" class="btn-primary">Play Again</button>
-                    <button id="new-teams-btn" class="btn-secondary">New Teams</button>
+        <!-- Daily Double Modal -->
+        <div id="daily-double-modal" class="modal">
+            <div class="daily-double-screen">
+                <div class="dd-announcement">
+                    <h1 class="dd-title">DAILY DOUBLE!</h1>
+                    <audio id="dd-sound" src=""></audio>
+                </div>
+                <div class="dd-wager-section">
+                    <p class="dd-contestant"></p>
+                    <p class="dd-current-score"></p>
+                    <label>ENTER YOUR WAGER:</label>
+                    <input type="number" id="dd-wager-input" class="wager-input" min="5" />
+                    <p class="dd-max-wager"></p>
+                    <button id="submit-wager-btn" class="btn-wager">SUBMIT WAGER</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Jeopardy Screen -->
+        <div id="final-jeopardy-screen" class="screen">
+            <div class="fj-container">
+                <h1 class="fj-title">FINAL JEOPARDY!</h1>
+                <div id="fj-phase" class="fj-phase"></div>
+            </div>
+        </div>
+
+        <!-- Winner Screen -->
+        <div id="winner-screen" class="screen">
+            <div class="winner-container">
+                <h1 class="winner-title">CHAMPION!</h1>
+                <div id="champion-display" class="champion-display"></div>
+                <div id="final-standings" class="final-standings"></div>
+                <div class="winner-actions">
+                    <button id="new-game-btn" class="btn-primary">NEW GAME</button>
                 </div>
             </div>
         </div>

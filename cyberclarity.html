@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberClarity - FCU Cybersecurity Quiz Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #ffffff;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animations-disabled .page {
+            animation: none;
+        }
+
+        .animations-disabled * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-xl);
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 24px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:focus {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+        }
+
+        .player-count-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .player-count-btn {
+            padding: 24px;
+            font-size: 24px;
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .player-count-btn:hover {
+            border-color: #667eea;
+            background: #f3f4f6;
+            transform: scale(1.05);
+        }
+
+        .player-count-btn:focus {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Game Board Styles */
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .game-board {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .category-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 16px 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 8px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-cell {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-cell:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .question-cell:focus {
+            outline: 3px solid #f093fb;
+            outline-offset: 2px;
+        }
+
+        .question-cell.answered {
+            background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .question-cell.answered:hover {
+            transform: none;
+        }
+
+        /* Scoreboard Styles */
+        .scoreboard {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-xl);
+            position: sticky;
+            top: 20px;
+        }
+
+        .scoreboard h3 {
+            margin-bottom: 16px;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+        }
+
+        .player-score {
+            background: var(--bg-light);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .player-score.current-player {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            box-shadow: var(--shadow-md);
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .player-points {
+            font-size: 24px;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .player-stats {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .buzz-in-area {
+            margin: 24px 0;
+        }
+
+        .buzz-timer {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .buzz-timer.warning {
+            color: var(--error-color);
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .buzz-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .buzz-btn {
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .buzz-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .answer-area {
+            display: none;
+        }
+
+        .answer-area.active {
+            display: block;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            margin-bottom: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .feedback-message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .feedback-message.correct {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 2px solid var(--success-color);
+        }
+
+        .feedback-message.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border: 2px solid var(--error-color);
+        }
+
+        .explanation {
+            background: var(--bg-light);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            border-left: 4px solid #667eea;
+        }
+
+        .explanation strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+
+        /* Results Page */
+        .results-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .winner-announcement {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .trophy {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .winner-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .final-scores {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .final-score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 12px;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .rank {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-right: 16px;
+        }
+
+        .score-details {
+            flex: 1;
+        }
+
+        .score-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .score-stats {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .score-points {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        /* Leaderboard Styles */
+        .leaderboard-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .leaderboard-table {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .leaderboard-header {
+            display: grid;
+            grid-template-columns: 60px 1fr 120px 120px 150px;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 120px 120px 150px;
+            gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-row:hover {
+            background: var(--bg-light);
+        }
+
+        .leaderboard-row:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-rank {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Settings Styles */
+        .settings-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .setting-item {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .volume-value {
+            font-weight: 700;
+            color: #667eea;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+
+            .scoreboard {
+                position: static;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .category-header,
+            .question-cell {
+                font-size: 12px;
+                padding: 12px 4px;
+                min-height: 60px;
+            }
+
+            .question-cell {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .leaderboard-header,
+            .leaderboard-row {
+                grid-template-columns: 40px 1fr 80px;
+                font-size: 14px;
+            }
+
+            .leaderboard-header .correct-col,
+            .leaderboard-row .correct-col,
+            .leaderboard-header .date-col,
+            .leaderboard-row .date-col {
+                display: none;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+
+            .question-text {
+                font-size: 18px;
+            }
+
+            .buzz-timer {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-header,
+            .question-cell {
+                font-size: 14px;
+            }
+
+            .winner-announcement {
+                padding: 24px;
+            }
+
+            .trophy {
+                font-size: 60px;
+            }
+
+            .winner-name {
+                font-size: 2rem;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Focus visible for better keyboard navigation */
+        *:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Page -->
+    <div id="welcomePage" class="page active">
+        <div class="container">
+            <h1>CyberClarity</h1>
+            <div class="card">
+                <h2>Federal Credit Union Cybersecurity Quiz</h2>
+                <p style="text-align: center; margin-bottom: 24px; font-size: 18px;">
+                    Test your knowledge of FCU cybersecurity across NCUA compliance, data security, incident response, member privacy, risk assessment, and vendor management!
+                </p>
+                <label class="setting-label" style="text-align: center;">Select Number of Players</label>
+                <div class="player-count-selector">
+                    <button class="player-count-btn" data-count="2" aria-label="2 Players">2</button>
+                    <button class="player-count-btn" data-count="3" aria-label="3 Players">3</button>
+                    <button class="player-count-btn" data-count="4" aria-label="4 Players">4</button>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" id="viewLeaderboardBtn" aria-label="View Leaderboard">
+                        Leaderboard
+                    </button>
+                    <button class="btn btn-secondary" id="viewSettingsBtn" aria-label="View Settings">
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signupPage" class="page">
+        <div class="container">
+            <h1>CyberClarity</h1>
+            <div class="card">
+                <h2 id="signupTitle">Player 1 Registration</h2>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="playerName">Name</label>
+                        <input
+                            type="text"
+                            id="playerName"
+                            name="playerName"
+                            required
+                            aria-required="true"
+                            autocomplete="name"
+                        />
+                        <div class="error-message" id="nameError">Please enter a name</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="playerEmail">Email</label>
+                        <input
+                            type="email"
+                            id="playerEmail"
+                            name="playerEmail"
+                            required
+                            aria-required="true"
+                            autocomplete="email"
+                        />
+                        <div class="error-message" id="emailError">Please enter a valid email</div>
+                    </div>
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button type="button" class="btn btn-secondary" id="backToWelcomeBtn" aria-label="Back to Welcome">
+                            Back
+                        </button>
+                        <button type="submit" class="btn" aria-label="Continue to Next Player">
+                            Continue
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Page -->
+    <div id="gamePage" class="page">
+        <div class="container">
+            <h1>CyberClarity</h1>
+            <div class="game-container">
+                <div class="game-board">
+                    <div class="categories-grid" id="gameBoard">
+                        <!-- Game board will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="scoreboard">
+                    <h3>Scoreboard</h3>
+                    <div id="scoreboardContent">
+                        <!-- Scoreboard will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div id="questionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalCategory">Category</h3>
+                <div id="modalPoints" style="font-size: 18px; color: #667eea; font-weight: 600;"></div>
+            </div>
+            <div class="question-text" id="questionText"></div>
+
+            <div class="buzz-in-area" id="buzzInArea">
+                <div class="buzz-timer" id="buzzTimer">10</div>
+                <div class="buzz-buttons" id="buzzButtons">
+                    <!-- Buzz buttons will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="answer-area" id="answerArea">
+                <label for="answerInput" class="setting-label">Your Answer:</label>
+                <input
+                    type="text"
+                    id="answerInput"
+                    class="answer-input"
+                    placeholder="Enter your answer..."
+                    aria-label="Answer input"
+                />
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button class="btn" id="submitAnswerBtn" aria-label="Submit Answer">
+                        Submit Answer
+                    </button>
+                </div>
+            </div>
+
+            <div id="feedbackArea" style="display: none;">
+                <div class="feedback-message" id="feedbackMessage"></div>
+                <div class="explanation" id="explanationArea"></div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" id="nextQuestionBtn" aria-label="Continue to Next Question">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Page -->
+    <div id="resultsPage" class="page">
+        <div class="container">
+            <h1>CyberClarity</h1>
+            <div class="results-container">
+                <div class="winner-announcement">
+                    <div class="trophy" aria-hidden="true">🏆</div>
+                    <h2>Winner!</h2>
+                    <div class="winner-name" id="winnerName"></div>
+                    <div style="font-size: 18px; color: #6b7280; margin-top: 10px;" id="winnerScore"></div>
+                </div>
+                <div class="final-scores">
+                    <h2>Final Results</h2>
+                    <div id="finalScoresContent">
+                        <!-- Final scores will be populated by JavaScript -->
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn" id="playAgainBtn" aria-label="Play Again">
+                            Play Again
+                        </button>
+                        <button class="btn btn-secondary" id="viewLeaderboardFromResultsBtn" aria-label="View Leaderboard">
+                            View Leaderboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Page -->
+    <div id="leaderboardPage" class="page">
+        <div class="container">
+            <h1>CyberClarity</h1>
+            <div class="leaderboard-container">
+                <div class="leaderboard-table">
+                    <h2>Top 100 Leaderboard</h2>
+                    <div class="leaderboard-header">
+                        <div>Rank</div>
+                        <div>Player</div>
+                        <div>Score</div>
+                        <div class="correct-col">Correct</div>
+                        <div class="date-col">Date</div>
+                    </div>
+                    <div id="leaderboardContent">
+                        <!-- Leaderboard entries will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" id="backToWelcomeFromLeaderboardBtn" aria-label="Back to Welcome">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settingsPage" class="page">
+        <div class="container">
+            <h1>CyberClarity</h1>
+            <div class="settings-container">
+                <div class="settings-card">
+                    <h2>Settings</h2>
+
+                    <div class="setting-item">
+                        <label for="voiceSelect" class="setting-label">Voice Selection</label>
+                        <select id="voiceSelect" aria-label="Select voice for text-to-speech">
+                            <option value="">Loading voices...</option>
+                        </select>
+                        <button class="btn" id="testVoiceBtn" style="margin-top: 12px;" aria-label="Test Voice">
+                            Test Voice
+                        </button>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="volumeControl" class="setting-label">Volume</label>
+                        <div class="volume-control">
+                            <input
+                                type="range"
+                                id="volumeControl"
+                                min="0"
+                                max="100"
+                                value="90"
+                                aria-label="Volume control"
+                            />
+                            <span class="volume-value" id="volumeValue">90%</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">Animations</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="animationsToggle" checked aria-label="Toggle animations">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="margin-left: 16px; color: #6b7280;" id="animationsStatus">Enabled</span>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn btn-secondary" id="backToWelcomeFromSettingsBtn" aria-label="Back to Welcome">
+                            Back to Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Question Database
+        const fcuQuestions = {
+            "NCUA Compliance": {
+                100: {
+                    question: "What federal agency regulates and supervises federal credit unions?",
+                    answer: "NCUA",
+                    acceptableAnswers: ["ncua", "national credit union administration"],
+                    explanation: "The National Credit Union Administration (NCUA) charters, regulates, and supervises federal credit unions.",
+                    difficulty: 1
+                },
+                200: {
+                    question: "What is the minimum net worth ratio for a well-capitalized credit union per NCUA?",
+                    answer: "7%",
+                    acceptableAnswers: ["7%", "7 percent", "0.07", "seven percent"],
+                    explanation: "NCUA's Prompt Corrective Action framework classifies credit unions with net worth ratio of 7% or higher as well-capitalized.",
+                    difficulty: 2
+                },
+                300: {
+                    question: "How often must federal credit unions undergo an NCUA examination at minimum?",
+                    answer: "Every 18 months",
+                    acceptableAnswers: ["18 months", "every 18 months", "1.5 years"],
+                    explanation: "NCUA examines each federally insured credit union at least once every 18 months.",
+                    difficulty: 3
+                },
+                400: {
+                    question: "What form must credit unions file to report suspicious activity to FinCEN?",
+                    answer: "SAR",
+                    acceptableAnswers: ["sar", "suspicious activity report", "fincen sar"],
+                    explanation: "Credit unions must file a Suspicious Activity Report (SAR) within 30 days of detecting suspicious activity.",
+                    difficulty: 4
+                },
+                500: {
+                    question: "Under NCUA Part 748, what is the maximum recovery per account holder from the NCUSIF?",
+                    answer: "$250,000",
+                    acceptableAnswers: ["250000", "$250,000", "250k", "two hundred fifty thousand"],
+                    explanation: "The NCUSIF provides up to $250,000 of federal share insurance per account holder, per insured credit union.",
+                    difficulty: 5
+                }
+            },
+            "Data Security": {
+                100: {
+                    question: "What does AES stand for in encryption?",
+                    answer: "Advanced Encryption Standard",
+                    acceptableAnswers: ["advanced encryption standard", "aes"],
+                    explanation: "AES is the widely adopted symmetric encryption standard used to protect sensitive data.",
+                    difficulty: 1
+                },
+                200: {
+                    question: "What is the minimum recommended password length for financial institution accounts?",
+                    answer: "12 characters",
+                    acceptableAnswers: ["12", "12 characters", "twelve"],
+                    explanation: "FFIEC guidelines recommend minimum 12-character passwords with complexity requirements.",
+                    difficulty: 2
+                },
+                300: {
+                    question: "What security protocol should credit unions use for encrypting data in transit?",
+                    answer: "TLS",
+                    acceptableAnswers: ["tls", "transport layer security", "tls 1.2", "tls 1.3"],
+                    explanation: "Transport Layer Security (TLS) 1.2 or higher should be used to encrypt data transmitted over networks.",
+                    difficulty: 3
+                },
+                400: {
+                    question: "What access control principle states users should have minimum permissions needed for their role?",
+                    answer: "Least Privilege",
+                    acceptableAnswers: ["least privilege", "principle of least privilege", "polp"],
+                    explanation: "Least privilege limits potential damage from compromised accounts by restricting access to only what's necessary.",
+                    difficulty: 4
+                },
+                500: {
+                    question: "What cryptographic key length is the current NIST recommendation for RSA encryption?",
+                    answer: "2048 bits",
+                    acceptableAnswers: ["2048", "2048 bits", "2048-bit"],
+                    explanation: "NIST recommends minimum 2048-bit RSA keys, with 3072-bit or 4096-bit for higher security requirements.",
+                    difficulty: 5
+                }
+            },
+            "Incident Response": {
+                100: {
+                    question: "What is the first phase of an incident response plan?",
+                    answer: "Preparation",
+                    acceptableAnswers: ["preparation", "prepare"],
+                    explanation: "Preparation involves establishing policies, procedures, and tools before an incident occurs.",
+                    difficulty: 1
+                },
+                200: {
+                    question: "How soon must credit unions notify members after discovering a data breach affecting personal information?",
+                    answer: "Without unreasonable delay",
+                    acceptableAnswers: ["without unreasonable delay", "promptly", "immediately"],
+                    explanation: "Various regulations require notification without unreasonable delay, typically interpreted as 30-60 days.",
+                    difficulty: 2
+                },
+                300: {
+                    question: "What does IOC stand for in cybersecurity incident response?",
+                    answer: "Indicator of Compromise",
+                    acceptableAnswers: ["indicator of compromise", "indicators of compromise", "ioc"],
+                    explanation: "IOCs are forensic artifacts that suggest a security breach has occurred.",
+                    difficulty: 3
+                },
+                400: {
+                    question: "Which federal agency must be notified within 72 hours of a significant cyber incident affecting a financial institution?",
+                    answer: "NCUA",
+                    acceptableAnswers: ["ncua", "national credit union administration"],
+                    explanation: "NCUA requires notification within 72 hours of a cyber incident that could materially impact operations.",
+                    difficulty: 4
+                },
+                500: {
+                    question: "What is the term for the practice of preserving digital evidence in a forensically sound manner?",
+                    answer: "Chain of custody",
+                    acceptableAnswers: ["chain of custody", "evidence preservation", "forensic preservation"],
+                    explanation: "Chain of custody maintains evidence integrity through documented handling from collection to presentation.",
+                    difficulty: 5
+                }
+            },
+            "Member Privacy": {
+                100: {
+                    question: "What does GLBA stand for in financial services privacy?",
+                    answer: "Gramm-Leach-Bliley Act",
+                    acceptableAnswers: ["gramm-leach-bliley act", "gramm leach bliley", "glba"],
+                    explanation: "The Gramm-Leach-Bliley Act requires financial institutions to protect consumer financial information.",
+                    difficulty: 1
+                },
+                200: {
+                    question: "How often must credit unions provide privacy notices to members under GLBA?",
+                    answer: "Annually",
+                    acceptableAnswers: ["annually", "every year", "once a year"],
+                    explanation: "GLBA requires annual privacy notices informing members about information sharing practices.",
+                    difficulty: 2
+                },
+                300: {
+                    question: "What right allows consumers to limit certain information sharing under GLBA?",
+                    answer: "Opt-out right",
+                    acceptableAnswers: ["opt-out", "opt out", "right to opt out"],
+                    explanation: "Consumers can opt out of certain types of information sharing with non-affiliated third parties.",
+                    difficulty: 3
+                },
+                400: {
+                    question: "What is the FTC's regulatory rule implementing GLBA's privacy provisions called?",
+                    answer: "Privacy Rule",
+                    acceptableAnswers: ["privacy rule", "ftc privacy rule", "regulation p"],
+                    explanation: "The Privacy Rule requires financial institutions to provide privacy notices and protect consumer information.",
+                    difficulty: 4
+                },
+                500: {
+                    question: "Under GLBA, what specific security standard requires written information security programs?",
+                    answer: "Safeguards Rule",
+                    acceptableAnswers: ["safeguards rule", "ftc safeguards rule", "safeguards"],
+                    explanation: "The Safeguards Rule requires comprehensive written information security programs with administrative, technical, and physical safeguards.",
+                    difficulty: 5
+                }
+            },
+            "Risk Assessment": {
+                100: {
+                    question: "What is the first step in a cybersecurity risk assessment?",
+                    answer: "Asset identification",
+                    acceptableAnswers: ["asset identification", "identify assets", "identification"],
+                    explanation: "Risk assessment begins with identifying and cataloging information assets that need protection.",
+                    difficulty: 1
+                },
+                200: {
+                    question: "What does the 'I' represent in the CIA triad of information security?",
+                    answer: "Integrity",
+                    acceptableAnswers: ["integrity"],
+                    explanation: "The CIA triad consists of Confidentiality, Integrity, and Availability - fundamental security principles.",
+                    difficulty: 2
+                },
+                300: {
+                    question: "What framework published by NIST provides cybersecurity risk management guidance?",
+                    answer: "NIST Cybersecurity Framework",
+                    acceptableAnswers: ["nist cybersecurity framework", "nist csf", "csf", "cybersecurity framework"],
+                    explanation: "The NIST CSF provides a structured approach to managing cybersecurity risks across five core functions.",
+                    difficulty: 3
+                },
+                400: {
+                    question: "What formula calculates risk by multiplying threat likelihood by impact?",
+                    answer: "Risk = Likelihood × Impact",
+                    acceptableAnswers: ["risk equals likelihood times impact", "likelihood times impact", "risk = likelihood * impact"],
+                    explanation: "Quantitative risk assessment uses this formula to prioritize risks based on probability and potential damage.",
+                    difficulty: 4
+                },
+                500: {
+                    question: "What risk treatment option involves purchasing insurance or outsourcing to a third party?",
+                    answer: "Risk transfer",
+                    acceptableAnswers: ["risk transfer", "transfer", "risk transference"],
+                    explanation: "Risk transfer shifts potential impact to another entity through insurance, contracts, or outsourcing.",
+                    difficulty: 5
+                }
+            },
+            "Vendor Management": {
+                100: {
+                    question: "What type of assessment evaluates a vendor's security controls before engagement?",
+                    answer: "Due diligence",
+                    acceptableAnswers: ["due diligence", "vendor due diligence", "due diligence assessment"],
+                    explanation: "Due diligence assessment evaluates vendor security, financial stability, and regulatory compliance.",
+                    difficulty: 1
+                },
+                200: {
+                    question: "What document outlines expectations for vendor information security controls?",
+                    answer: "Service Level Agreement",
+                    acceptableAnswers: ["service level agreement", "sla", "contract"],
+                    explanation: "SLAs define security requirements, performance metrics, and responsibilities for vendor relationships.",
+                    difficulty: 2
+                },
+                300: {
+                    question: "What independent audit report provides assurance about service organization controls?",
+                    answer: "SOC 2",
+                    acceptableAnswers: ["soc 2", "soc2", "soc 2 report", "service organization control 2"],
+                    explanation: "SOC 2 reports assess security, availability, processing integrity, confidentiality, and privacy controls.",
+                    difficulty: 3
+                },
+                400: {
+                    question: "How often should credit unions conduct risk assessments of critical vendors?",
+                    answer: "Annually",
+                    acceptableAnswers: ["annually", "every year", "yearly"],
+                    explanation: "FFIEC guidance recommends annual risk assessments for critical third-party service providers.",
+                    difficulty: 4
+                },
+                500: {
+                    question: "What clause allows credit unions to terminate vendor contracts due to security breaches?",
+                    answer: "Right to audit",
+                    acceptableAnswers: ["right to audit", "audit clause", "audit rights", "termination for cause"],
+                    explanation: "Right to audit clauses permit examination of vendor security controls and termination for non-compliance.",
+                    difficulty: 5
+                }
+            }
+        };
+
+        // Game State
+        const gameState = {
+            players: [],
+            currentPlayerIndex: 0,
+            totalPlayers: 0,
+            currentSignupIndex: 0,
+            answeredQuestions: new Set(),
+            questionsRemaining: 30,
+            currentQuestion: null,
+            gamePhase: 'welcome',
+            settings: { voice: null, volume: 0.9, animations: true }
+        };
+
+        const buzzInState = {
+            active: false,
+            timeRemaining: 10,
+            timer: null,
+            eligiblePlayers: [],
+            currentBuzzedPlayer: null
+        };
+
+        // Available voices for speech synthesis
+        let availableVoices = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            setupEventListeners();
+            initializeVoiceSelection();
+            showWelcomePage();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Welcome page
+            document.querySelectorAll('.player-count-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    gameState.totalPlayers = parseInt(this.dataset.count);
+                    gameState.currentSignupIndex = 0;
+                    gameState.players = [];
+                    showSignupPage();
+                });
+            });
+
+            document.getElementById('viewLeaderboardBtn').addEventListener('click', showLeaderboardPage);
+            document.getElementById('viewSettingsBtn').addEventListener('click', showSettingsPage);
+
+            // Signup page
+            document.getElementById('signupForm').addEventListener('submit', handlePlayerSignup);
+            document.getElementById('backToWelcomeBtn').addEventListener('click', showWelcomePage);
+
+            // Results page
+            document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+            document.getElementById('viewLeaderboardFromResultsBtn').addEventListener('click', showLeaderboardPage);
+
+            // Leaderboard page
+            document.getElementById('backToWelcomeFromLeaderboardBtn').addEventListener('click', showWelcomePage);
+
+            // Settings page
+            document.getElementById('backToWelcomeFromSettingsBtn').addEventListener('click', showWelcomePage);
+            document.getElementById('voiceSelect').addEventListener('change', function() {
+                gameState.settings.voice = this.value;
+                saveSettings();
+            });
+            document.getElementById('volumeControl').addEventListener('input', function() {
+                const volume = parseInt(this.value);
+                gameState.settings.volume = volume / 100;
+                document.getElementById('volumeValue').textContent = volume + '%';
+                saveSettings();
+            });
+            document.getElementById('animationsToggle').addEventListener('change', function() {
+                gameState.settings.animations = this.checked;
+                document.getElementById('animationsStatus').textContent = this.checked ? 'Enabled' : 'Disabled';
+                if (this.checked) {
+                    document.body.classList.remove('animations-disabled');
+                } else {
+                    document.body.classList.add('animations-disabled');
+                }
+                saveSettings();
+            });
+            document.getElementById('testVoiceBtn').addEventListener('click', function() {
+                speakText('Hello! This is a test of the text to speech voice.');
+            });
+
+            // Answer submission
+            document.getElementById('submitAnswerBtn').addEventListener('click', submitAnswer);
+            document.getElementById('answerInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitAnswer();
+                }
+            });
+            document.getElementById('nextQuestionBtn').addEventListener('click', closeQuestionModal);
+
+            // Modal close on escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('questionModal');
+                    if (modal.classList.contains('active') && !buzzInState.active) {
+                        closeQuestionModal();
+                    }
+                }
+            });
+        }
+
+        // Player Signup Handler
+        function handlePlayerSignup(event) {
+            event.preventDefault();
+
+            const nameInput = document.getElementById('playerName');
+            const emailInput = document.getElementById('playerEmail');
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+
+            // Reset error messages
+            nameError.classList.remove('show');
+            emailError.classList.remove('show');
+
+            // Validate
+            let isValid = true;
+
+            if (!name) {
+                nameError.classList.add('show');
+                isValid = false;
+            }
+
+            if (!validateEmail(email)) {
+                emailError.textContent = 'Please enter a valid email';
+                emailError.classList.add('show');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Add player
+            gameState.players.push({
+                name: name,
+                email: email,
+                score: 0,
+                correctAnswers: 0,
+                incorrectAnswers: 0
+            });
+
+            gameState.currentSignupIndex++;
+
+            // Check if all players signed up
+            if (gameState.currentSignupIndex >= gameState.totalPlayers) {
+                startGame();
+            } else {
+                // Next player signup
+                document.getElementById('signupTitle').textContent = `Player ${gameState.currentSignupIndex + 1} Registration`;
+                nameInput.value = '';
+                emailInput.value = '';
+                nameInput.focus();
+            }
+        }
+
+        // Email Validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Show Pages
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function showWelcomePage() {
+            showPage('welcomePage');
+            gameState.gamePhase = 'welcome';
+        }
+
+        function showSignupPage() {
+            showPage('signupPage');
+            document.getElementById('signupTitle').textContent = 'Player 1 Registration';
+            document.getElementById('playerName').value = '';
+            document.getElementById('playerEmail').value = '';
+            document.getElementById('playerName').focus();
+            gameState.gamePhase = 'signup';
+        }
+
+        function showLeaderboardPage() {
+            showPage('leaderboardPage');
+            renderLeaderboard();
+            gameState.gamePhase = 'leaderboard';
+        }
+
+        function showSettingsPage() {
+            showPage('settingsPage');
+            gameState.gamePhase = 'settings';
+        }
+
+        // Start Game
+        function startGame() {
+            gameState.gamePhase = 'game';
+            gameState.currentPlayerIndex = 0;
+            gameState.answeredQuestions = new Set();
+            gameState.questionsRemaining = 30;
+
+            showPage('gamePage');
+            renderGameBoard();
+            updateScoreboard();
+
+            speakText('Welcome to CyberClarity! ' + gameState.players[0].name + ', you may select the first question.');
+        }
+
+        // Render Game Board
+        function renderGameBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+
+            const categories = Object.keys(fcuQuestions);
+            const pointValues = [100, 200, 300, 400, 500];
+
+            // Create category headers
+            categories.forEach(category => {
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.textContent = category;
+                header.setAttribute('aria-label', `Category: ${category}`);
+                gameBoard.appendChild(header);
+            });
+
+            // Create question cells
+            pointValues.forEach(points => {
+                categories.forEach(category => {
+                    const cell = document.createElement('div');
+                    cell.className = 'question-cell';
+                    cell.textContent = points;
+                    cell.dataset.category = category;
+                    cell.dataset.points = points;
+                    cell.setAttribute('tabindex', '0');
+                    cell.setAttribute('role', 'button');
+                    cell.setAttribute('aria-label', `${category} for ${points} points`);
+
+                    const questionKey = `${category}-${points}`;
+                    if (gameState.answeredQuestions.has(questionKey)) {
+                        cell.classList.add('answered');
+                        cell.setAttribute('aria-disabled', 'true');
+                    } else {
+                        cell.addEventListener('click', () => selectQuestion(category, points));
+                        cell.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                selectQuestion(category, points);
+                            }
+                        });
+                    }
+
+                    gameBoard.appendChild(cell);
+                });
+            });
+        }
+
+        // Update Scoreboard
+        function updateScoreboard() {
+            const scoreboard = document.getElementById('scoreboardContent');
+            scoreboard.innerHTML = '';
+
+            gameState.players.forEach((player, index) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player-score';
+                if (index === gameState.currentPlayerIndex) {
+                    playerDiv.classList.add('current-player');
+                }
+
+                playerDiv.innerHTML = `
+                    <div class="player-name">${player.name}</div>
+                    <div class="player-points">${player.score}</div>
+                    <div class="player-stats">Correct: ${player.correctAnswers} | Incorrect: ${player.incorrectAnswers}</div>
+                `;
+
+                scoreboard.appendChild(playerDiv);
+            });
+        }
+
+        // Select Question
+        function selectQuestion(category, points) {
+            const questionKey = `${category}-${points}`;
+            if (gameState.answeredQuestions.has(questionKey)) return;
+
+            gameState.currentQuestion = {
+                category: category,
+                points: points,
+                data: fcuQuestions[category][points],
+                key: questionKey
+            };
+
+            // Show modal
+            document.getElementById('modalCategory').textContent = category;
+            document.getElementById('modalPoints').textContent = `${points} points`;
+            document.getElementById('questionText').textContent = gameState.currentQuestion.data.question;
+
+            // Reset modal state
+            document.getElementById('buzzInArea').style.display = 'block';
+            document.getElementById('answerArea').style.display = 'none';
+            document.getElementById('feedbackArea').style.display = 'none';
+            document.getElementById('answerInput').value = '';
+
+            // Show modal
+            document.getElementById('questionModal').classList.add('active');
+
+            // Start buzz-in period
+            startBuzzInPeriod();
+
+            // Speak question
+            speakText(gameState.currentQuestion.data.question);
+        }
+
+        // Start Buzz-In Period
+        function startBuzzInPeriod() {
+            buzzInState.active = true;
+            buzzInState.timeRemaining = 10;
+            buzzInState.eligiblePlayers = [...Array(gameState.players.length).keys()];
+            buzzInState.currentBuzzedPlayer = null;
+
+            // Update timer display
+            const timerElement = document.getElementById('buzzTimer');
+            timerElement.textContent = buzzInState.timeRemaining;
+            timerElement.classList.remove('warning');
+
+            // Create buzz buttons
+            const buzzButtons = document.getElementById('buzzButtons');
+            buzzButtons.innerHTML = '';
+
+            gameState.players.forEach((player, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn buzz-btn';
+                btn.textContent = `${player.name} - Buzz In!`;
+                btn.dataset.playerIndex = index;
+                btn.setAttribute('aria-label', `${player.name} buzz in`);
+                btn.addEventListener('click', () => buzzIn(index));
+
+                // Disable if not eligible
+                if (!buzzInState.eligiblePlayers.includes(index)) {
+                    btn.disabled = true;
+                }
+
+                buzzButtons.appendChild(btn);
+            });
+
+            // Start countdown timer
+            buzzInState.timer = setInterval(() => {
+                buzzInState.timeRemaining--;
+                timerElement.textContent = buzzInState.timeRemaining;
+
+                if (buzzInState.timeRemaining <= 3) {
+                    timerElement.classList.add('warning');
+                }
+
+                if (buzzInState.timeRemaining <= 0) {
+                    clearInterval(buzzInState.timer);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        // Handle Buzz In
+        function buzzIn(playerIndex) {
+            if (!buzzInState.active) return;
+            if (!buzzInState.eligiblePlayers.includes(playerIndex)) return;
+
+            // Stop timer
+            clearInterval(buzzInState.timer);
+            buzzInState.active = false;
+            buzzInState.currentBuzzedPlayer = playerIndex;
+
+            // Hide buzz-in area, show answer area
+            document.getElementById('buzzInArea').style.display = 'none';
+            document.getElementById('answerArea').style.display = 'block';
+            document.getElementById('answerArea').classList.add('active');
+
+            // Focus on answer input
+            const answerInput = document.getElementById('answerInput');
+            answerInput.focus();
+
+            speakText(gameState.players[playerIndex].name + ', please answer.');
+        }
+
+        // Submit Answer
+        function submitAnswer() {
+            const answerInput = document.getElementById('answerInput');
+            const userAnswer = answerInput.value.trim();
+
+            if (!userAnswer) return;
+
+            const playerIndex = buzzInState.currentBuzzedPlayer;
+            const isCorrect = checkAnswer(userAnswer, gameState.currentQuestion.data.acceptableAnswers);
+
+            // Hide answer area
+            document.getElementById('answerArea').style.display = 'none';
+            document.getElementById('answerArea').classList.remove('active');
+
+            // Show feedback
+            const feedbackArea = document.getElementById('feedbackArea');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const explanationArea = document.getElementById('explanationArea');
+
+            feedbackArea.style.display = 'block';
+
+            if (isCorrect) {
+                // Correct answer
+                feedbackMessage.className = 'feedback-message correct';
+                feedbackMessage.textContent = `✓ Correct! ${gameState.players[playerIndex].name} earned ${gameState.currentQuestion.points} points!`;
+
+                // Update score
+                gameState.players[playerIndex].score += gameState.currentQuestion.points;
+                gameState.players[playerIndex].correctAnswers++;
+
+                // Next player's turn
+                gameState.currentPlayerIndex = playerIndex;
+
+                speakText('Correct!');
+            } else {
+                // Incorrect answer
+                feedbackMessage.className = 'feedback-message incorrect';
+                feedbackMessage.textContent = `✗ Incorrect. The correct answer was: ${gameState.currentQuestion.data.answer}`;
+
+                gameState.players[playerIndex].incorrectAnswers++;
+
+                // Remove player from eligible players
+                buzzInState.eligiblePlayers = buzzInState.eligiblePlayers.filter(i => i !== playerIndex);
+
+                speakText('Incorrect.');
+
+                // If other players can still answer
+                if (buzzInState.eligiblePlayers.length > 0) {
+                    // Show explanation briefly, then restart buzz-in
+                    explanationArea.innerHTML = `<strong>Explanation:</strong> ${gameState.currentQuestion.data.explanation}`;
+
+                    setTimeout(() => {
+                        feedbackArea.style.display = 'none';
+                        document.getElementById('answerInput').value = '';
+                        startBuzzInPeriod();
+                    }, 3000);
+                    return;
+                }
+            }
+
+            // Show explanation
+            explanationArea.innerHTML = `<strong>Explanation:</strong> ${gameState.currentQuestion.data.explanation}`;
+            speakText(gameState.currentQuestion.data.explanation);
+
+            // Mark question as answered
+            markQuestionAnswered();
+            updateScoreboard();
+        }
+
+        // Check Answer
+        function checkAnswer(userAnswer, acceptableAnswers) {
+            const normalized = normalizeAnswer(userAnswer);
+            return acceptableAnswers.some(acceptable => {
+                return normalizeAnswer(acceptable) === normalized;
+            });
+        }
+
+        // Normalize Answer
+        function normalizeAnswer(answer) {
+            return answer
+                .toLowerCase()
+                .trim()
+                .replace(/[^\w\s]/g, '') // Remove punctuation
+                .replace(/\s+/g, ' '); // Normalize whitespace
+        }
+
+        // Handle Time Out
+        function handleTimeOut() {
+            buzzInState.active = false;
+
+            // Hide buzz-in area
+            document.getElementById('buzzInArea').style.display = 'none';
+
+            // Show feedback
+            const feedbackArea = document.getElementById('feedbackArea');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const explanationArea = document.getElementById('explanationArea');
+
+            feedbackArea.style.display = 'block';
+            feedbackMessage.className = 'feedback-message incorrect';
+            feedbackMessage.textContent = `Time's up! The correct answer was: ${gameState.currentQuestion.data.answer}`;
+
+            explanationArea.innerHTML = `<strong>Explanation:</strong> ${gameState.currentQuestion.data.explanation}`;
+
+            speakText("Time's up!");
+            speakText(gameState.currentQuestion.data.explanation);
+
+            // Mark question as answered
+            markQuestionAnswered();
+
+            // Next player's turn
+            nextTurn();
+            updateScoreboard();
+        }
+
+        // Mark Question Answered
+        function markQuestionAnswered() {
+            gameState.answeredQuestions.add(gameState.currentQuestion.key);
+            gameState.questionsRemaining--;
+        }
+
+        // Next Turn
+        function nextTurn() {
+            gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+        }
+
+        // Close Question Modal
+        function closeQuestionModal() {
+            document.getElementById('questionModal').classList.remove('active');
+
+            // Check if game is over
+            if (checkGameEnd()) {
+                showResults();
+            } else {
+                // Update board
+                renderGameBoard();
+                updateScoreboard();
+
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                speakText(currentPlayer.name + ', select a question.');
+            }
+        }
+
+        // Check Game End
+        function checkGameEnd() {
+            return gameState.questionsRemaining === 0;
+        }
+
+        // Show Results
+        function showResults() {
+            gameState.gamePhase = 'results';
+
+            // Sort players by score
+            const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
+
+            // Winner
+            const winner = sortedPlayers[0];
+            document.getElementById('winnerName').textContent = winner.name;
+            document.getElementById('winnerScore').textContent = `${winner.score} points • ${winner.correctAnswers} correct answers`;
+
+            // Final scores
+            const finalScoresContent = document.getElementById('finalScoresContent');
+            finalScoresContent.innerHTML = '';
+
+            sortedPlayers.forEach((player, index) => {
+                const scoreItem = document.createElement('div');
+                scoreItem.className = 'final-score-item';
+                scoreItem.innerHTML = `
+                    <div class="rank">#${index + 1}</div>
+                    <div class="score-details">
+                        <div class="score-name">${player.name}</div>
+                        <div class="score-stats">${player.correctAnswers} correct • ${player.incorrectAnswers} incorrect</div>
+                    </div>
+                    <div class="score-points">${player.score}</div>
+                `;
+                finalScoresContent.appendChild(scoreItem);
+            });
+
+            // Save to leaderboard
+            sortedPlayers.forEach(player => {
+                saveToLeaderboard(player);
+            });
+
+            // Show results page
+            showPage('resultsPage');
+
+            // Speak winner announcement
+            speakText(`Congratulations ${winner.name}! You won with ${winner.score} points!`);
+        }
+
+        // LocalStorage - Leaderboard
+        function loadLeaderboard() {
+            try {
+                const data = localStorage.getItem('cyberclarity_leaderboard');
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                return [];
+            }
+        }
+
+        function saveToLeaderboard(player) {
+            try {
+                let leaderboard = loadLeaderboard();
+
+                leaderboard.push({
+                    name: player.name,
+                    email: player.email,
+                    score: player.score,
+                    correctAnswers: player.correctAnswers,
+                    date: new Date().toISOString()
+                });
+
+                // Sort by score (descending) and keep top 100
+                leaderboard.sort((a, b) => b.score - a.score);
+                leaderboard = leaderboard.slice(0, 100);
+
+                localStorage.setItem('cyberclarity_leaderboard', JSON.stringify(leaderboard));
+            } catch (error) {
+                console.error('Error saving to leaderboard:', error);
+                if (error.name === 'QuotaExceededError') {
+                    alert('Leaderboard storage is full. Unable to save score.');
+                }
+            }
+        }
+
+        function renderLeaderboard() {
+            const leaderboard = loadLeaderboard();
+            const content = document.getElementById('leaderboardContent');
+
+            if (leaderboard.length === 0) {
+                content.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280;">No entries yet. Be the first to play!</div>';
+                return;
+            }
+
+            content.innerHTML = '';
+
+            leaderboard.forEach((entry, index) => {
+                const row = document.createElement('div');
+                row.className = 'leaderboard-row';
+
+                const date = new Date(entry.date);
+                const formattedDate = date.toLocaleDateString();
+
+                row.innerHTML = `
+                    <div class="leaderboard-rank">#${index + 1}</div>
+                    <div>${entry.name}</div>
+                    <div>${entry.score}</div>
+                    <div class="correct-col">${entry.correctAnswers}</div>
+                    <div class="date-col">${formattedDate}</div>
+                `;
+
+                content.appendChild(row);
+            });
+        }
+
+        // LocalStorage - Settings
+        function loadSettings() {
+            try {
+                const data = localStorage.getItem('cyberclarity_settings');
+                if (data) {
+                    const settings = JSON.parse(data);
+                    gameState.settings = { ...gameState.settings, ...settings };
+
+                    // Apply settings to UI
+                    document.getElementById('volumeControl').value = gameState.settings.volume * 100;
+                    document.getElementById('volumeValue').textContent = Math.round(gameState.settings.volume * 100) + '%';
+                    document.getElementById('animationsToggle').checked = gameState.settings.animations;
+                    document.getElementById('animationsStatus').textContent = gameState.settings.animations ? 'Enabled' : 'Disabled';
+
+                    if (!gameState.settings.animations) {
+                        document.body.classList.add('animations-disabled');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        function saveSettings() {
+            try {
+                localStorage.setItem('cyberclarity_settings', JSON.stringify(gameState.settings));
+            } catch (error) {
+                console.error('Error saving settings:', error);
+            }
+        }
+
+        // Voice Selection and Speech Synthesis
+        function initializeVoiceSelection() {
+            if (!('speechSynthesis' in window)) {
+                document.getElementById('voiceSelect').innerHTML = '<option value="">Text-to-speech not supported</option>';
+                document.getElementById('testVoiceBtn').disabled = true;
+                return;
+            }
+
+            function populateVoices() {
+                availableVoices = speechSynthesis.getVoices();
+                const voiceSelect = document.getElementById('voiceSelect');
+
+                if (availableVoices.length === 0) {
+                    return; // Voices not loaded yet
+                }
+
+                voiceSelect.innerHTML = '';
+
+                availableVoices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+
+                // Set saved voice or default
+                if (gameState.settings.voice !== null && gameState.settings.voice < availableVoices.length) {
+                    voiceSelect.value = gameState.settings.voice;
+                } else if (availableVoices.length > 0) {
+                    // Try to find English voice
+                    const englishVoice = availableVoices.findIndex(voice => voice.lang.startsWith('en'));
+                    if (englishVoice !== -1) {
+                        voiceSelect.value = englishVoice;
+                        gameState.settings.voice = englishVoice;
+                        saveSettings();
+                    }
+                }
+            }
+
+            populateVoices();
+
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populateVoices;
+            }
+        }
+
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) return;
+
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.volume = gameState.settings.volume;
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+
+            if (gameState.settings.voice !== null && availableVoices[gameState.settings.voice]) {
+                utterance.voice = availableVoices[gameState.settings.voice];
+            }
+
+            speechSynthesis.speak(utterance);
+        }
+
+        // Reset Game
+        function resetGame() {
+            // Cancel any speech
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+            }
+
+            // Clear timers
+            if (buzzInState.timer) {
+                clearInterval(buzzInState.timer);
+            }
+
+            // Reset state
+            gameState.players = [];
+            gameState.currentPlayerIndex = 0;
+            gameState.totalPlayers = 0;
+            gameState.currentSignupIndex = 0;
+            gameState.answeredQuestions = new Set();
+            gameState.questionsRemaining = 30;
+            gameState.currentQuestion = null;
+
+            buzzInState.active = false;
+            buzzInState.timeRemaining = 10;
+            buzzInState.timer = null;
+            buzzInState.eligiblePlayers = [];
+            buzzInState.currentBuzzedPlayer = null;
+
+            // Close modal
+            document.getElementById('questionModal').classList.remove('active');
+
+            // Show welcome page
+            showWelcomePage();
+        }
+    </script>
+</body>
+</html>

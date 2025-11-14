@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000f1a">
+    <meta name="description" content="Ultimate Cyber Jeopardy - Elite Federal Credit Union Cybersecurity Training Game">
+    <title>ULTIMATE CYBER JEOPARDY ∞ - Elite FCU Training</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===================================
+           ULTIMATE CYBER JEOPARDY - MASTER STYLES
+           =================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Capital Technology Group Colors */
+            --captg-blue: #005487;
+            --captg-green: #72bd44;
+            --captg-purple: #431560;
+
+            /* Game Colors */
+            --jeopardy-blue: #005487;
+            --jeopardy-gold: #ffcc00;
+            --dark-bg: #001a2e;
+            --darker-bg: #000f1a;
+            --card-bg: #002a42;
+
+            /* Cyber Effects */
+            --cyber-cyan: #00fff0;
+            --cyber-red: #ff003c;
+            --cyber-purple: #9d00ff;
+
+            /* Status */
+            --success: #72bd44;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Rajdhani', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas Background */
+        #cyberspace-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* AI Status Indicator */
+        .ai-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid var(--captg-blue);
+            backdrop-filter: blur(10px);
+        }
+
+        .ai-pulse {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--error);
+            animation: pulse 2s ease infinite;
+        }
+
+        .ai-status[data-available="true"] .ai-pulse {
+            background: var(--success);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; box-shadow: 0 0 20px currentColor; }
+        }
+
+        .ai-label {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--cyber-cyan);
+            letter-spacing: 0.1rem;
+        }
+
+        /* BGM Toggle */
+        .bgm-control {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--captg-purple);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .bgm-control:hover {
+            border-color: var(--captg-green);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(114, 189, 68, 0.6);
+        }
+
+        .bgm-icon {
+            font-size: 1.5rem;
+            color: var(--jeopardy-gold);
+        }
+
+        .bgm-control.playing .bgm-icon {
+            animation: musicNote 1s ease infinite;
+        }
+
+        @keyframes musicNote {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Score HUD */
+        .score-hud {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9998;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid var(--captg-blue);
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(15px);
+            min-width: 220px;
+            box-shadow: 0 0 30px rgba(0, 84, 135, 0.5);
+        }
+
+        .score-hud.hidden {
+            display: none;
+        }
+
+        .hud-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--cyber-cyan);
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 0.15rem;
+            border-bottom: 1px solid var(--captg-blue);
+            padding-bottom: 5px;
+        }
+
+        .hud-contestant {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+
+        .hud-name {
+            color: white;
+        }
+
+        .hud-score {
+            font-weight: bold;
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+            animation: glitchSkew 5s infinite;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitchTop 2s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+        }
+
+        .glitch::after {
+            animation: glitchBottom 2.5s infinite;
+            clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+        }
+
+        @keyframes glitchTop {
+            0%, 92%, 100% { transform: translate(0, 0); }
+            93%, 95% { transform: translate(-3px, -2px); color: var(--cyber-cyan); text-shadow: 2px 0 var(--cyber-red); }
+        }
+
+        @keyframes glitchBottom {
+            0%, 94%, 100% { transform: translate(0, 0); }
+            95%, 97% { transform: translate(3px, 2px); color: var(--cyber-red); text-shadow: -2px 0 var(--cyber-cyan); }
+        }
+
+        @keyframes glitchSkew {
+            0%, 98%, 100% { transform: skew(0deg); }
+            99% { transform: skew(2deg); }
+        }
+
+        /* ===================================
+           SETUP SCREEN
+           =================================== */
+
+        .setup-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .show-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(0, 84, 135, 0.3), rgba(67, 21, 96, 0.3));
+            border-radius: 15px;
+            border: 3px solid var(--captg-blue);
+            box-shadow: 0 0 40px rgba(114, 189, 68, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .show-title::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 240, 0.1) 50%, transparent 70%);
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%) translateX(-100%); }
+            100% { transform: translateY(100%) translateX(100%); }
+        }
+
+        .omega-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            color: var(--jeopardy-gold);
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 204, 0, 0.4);
+            letter-spacing: 0.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 900;
+            position: relative;
+            z-index: 1;
+        }
+
+        .infinity {
+            color: var(--cyber-cyan);
+            animation: infinitySpin 8s linear infinite;
+            display: inline-block;
+            text-shadow: 0 0 20px var(--cyber-cyan);
+        }
+
+        @keyframes infinitySpin {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+        }
+
+        .tagline {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            color: var(--captg-green);
+            text-transform: uppercase;
+            letter-spacing: 0.2rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .setup-card {
+            background: var(--card-bg);
+            border: 3px solid var(--captg-blue);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .setup-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--cyber-cyan);
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 0.2rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0, 255, 240, 0.5);
+        }
+
+        .player-count-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .player-count-btn {
+            padding: 2rem;
+            font-size: 2rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            background: var(--darker-bg);
+            border: 2px solid var(--captg-blue);
+            border-radius: 10px;
+            color: var(--jeopardy-gold);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .player-count-btn:hover {
+            border-color: var(--captg-green);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(114, 189, 68, 0.5);
+        }
+
+        .player-inputs {
+            display: grid;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .player-input-group {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .player-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--jeopardy-gold);
+            width: 60px;
+            text-align: center;
+        }
+
+        .player-name-input {
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            border: 2px solid var(--captg-blue);
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .player-name-input:focus {
+            outline: none;
+            border-color: var(--captg-green);
+            box-shadow: 0 0 15px rgba(114, 189, 68, 0.4);
+        }
+
+        .ai-config {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--captg-purple);
+            border-radius: 10px;
+        }
+
+        .ai-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--cyber-cyan);
+        }
+
+        .ai-toggle-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .ai-key-input {
+            width: 100%;
+            padding: 0.75rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            background: var(--darker-bg);
+            border: 2px solid var(--captg-purple);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-key-input:focus {
+            outline: none;
+            border-color: var(--cyber-purple);
+            box-shadow: 0 0 15px rgba(157, 0, 255, 0.4);
+        }
+
+        .ai-disclaimer {
+            font-size: 0.85rem;
+            color: var(--warning);
+            font-style: italic;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.2rem;
+            background: linear-gradient(135deg, var(--captg-green), #5aa033);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(114, 189, 68, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-start::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-start:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(114, 189, 68, 0.6);
+        }
+
+        .btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Settings & Leaderboard Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-secondary {
+            padding: 1rem 2rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: var(--captg-blue);
+            color: white;
+            border: 2px solid var(--captg-blue);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--captg-purple);
+            border-color: var(--captg-purple);
+            transform: translateY(-2px);
+        }
+
+        /* ===================================
+           GAME BOARD SCREEN
+           =================================== */
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 1rem;
+        }
+
+        .podiums {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--darker-bg);
+            border-bottom: 3px solid var(--captg-blue);
+        }
+
+        .podium {
+            background: linear-gradient(180deg, #001428, var(--darker-bg));
+            border: 2px solid var(--captg-blue);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .podium.active {
+            border-color: var(--captg-green);
+            box-shadow: 0 0 30px rgba(114, 189, 68, 0.5);
+        }
+
+        .podium.buzzed {
+            animation: buzzFlash 0.5s ease;
+        }
+
+        @keyframes buzzFlash {
+            0%, 100% { background: #001428; }
+            50% { background: rgba(255, 204, 0, 0.2); }
+        }
+
+        .contestant-name-display {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .contestant-score {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--success);
+            text-shadow: 0 0 15px rgba(114, 189, 68, 0.5);
+        }
+
+        .contestant-score.negative {
+            color: var(--error);
+        }
+
+        .round-banner {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(90deg, var(--darker-bg), var(--captg-purple), var(--darker-bg));
+            margin: 1rem 0;
+        }
+
+        .round-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--jeopardy-gold);
+            letter-spacing: 0.3rem;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+            font-weight: 900;
+        }
+
+        .game-board {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: auto repeat(5, 1fr);
+            gap: 8px;
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .category-header {
+            background: var(--jeopardy-blue);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: bold;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .question-tile {
+            background: var(--jeopardy-blue);
+            color: var(--jeopardy-gold);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .question-tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(114, 189, 68, 0.6);
+        }
+
+        .question-tile.answered {
+            background: var(--darker-bg);
+            color: var(--captg-blue);
+            cursor: default;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .control-panel {
+            background: var(--darker-bg);
+            border-top: 3px solid var(--captg-blue);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .current-picker {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .picker-name {
+            color: var(--captg-green);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        /* ===================================
+           MODALS
+           =================================== */
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--jeopardy-blue);
+            border: 5px solid var(--jeopardy-gold);
+            border-radius: 10px;
+            padding: 3rem;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 60px rgba(255, 204, 0, 0.4);
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-category {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--jeopardy-gold);
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .question-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--jeopardy-gold);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 900;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+        }
+
+        .question-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            line-height: 1.5;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Timer */
+        .timer-bar {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            background: var(--darker-bg);
+            border-radius: 25px;
+            border: 3px solid var(--captg-blue);
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #5aa033);
+            transition: width 0.1s linear;
+            border-radius: 25px;
+        }
+
+        .timer-fill.warning {
+            background: linear-gradient(90deg, var(--warning), var(--error));
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* AI Hint */
+        .ai-hint-container {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .ai-hint-container.hidden {
+            display: none;
+        }
+
+        .ai-hint-btn {
+            padding: 1rem 2rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--cyber-purple), var(--captg-purple));
+            color: white;
+            border: 2px solid var(--cyber-cyan);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-hint-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(157, 0, 255, 0.6);
+        }
+
+        .ai-hint-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ai-hint-display {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(157, 0, 255, 0.2);
+            border: 2px solid var(--cyber-purple);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--cyber-cyan);
+            text-align: left;
+        }
+
+        .ai-hint-display.hidden {
+            display: none;
+        }
+
+        /* Answer Options */
+        .answer-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .answer-btn {
+            padding: 1.5rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: var(--darker-bg);
+            border: 3px solid var(--captg-blue);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .answer-btn:hover {
+            background: var(--captg-blue);
+            border-color: var(--captg-green);
+            transform: translateX(5px);
+        }
+
+        .answer-btn.correct {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .answer-btn.incorrect {
+            background: var(--error);
+            border-color: var(--error);
+        }
+
+        /* Buzzer Panel */
+        .buzzer-panel {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 3px solid var(--jeopardy-gold);
+        }
+
+        .buzzer-prompt {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--jeopardy-gold);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            animation: pulse 1s ease infinite;
+        }
+
+        .buzzer-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .buzz-btn {
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, var(--captg-blue), #001428);
+            border: 3px solid var(--captg-green);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .buzz-btn:hover {
+            background: var(--captg-green);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(114, 189, 68, 0.6);
+        }
+
+        .buzz-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .buzz-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .buzz-timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--error);
+            text-align: center;
+        }
+
+        /* Result Modal */
+        .result-content {
+            background: var(--card-bg);
+            border: 5px solid var(--captg-blue);
+            border-radius: 15px;
+            padding: 3rem;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .result-icon {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-status {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+        }
+
+        .result-status.correct {
+            color: var(--success);
+        }
+
+        .result-status.incorrect {
+            color: var(--error);
+        }
+
+        .result-explanation {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            padding: 1.5rem;
+            background: var(--darker-bg);
+            border-radius: 10px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .btn-continue {
+            padding: 1rem 3rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--captg-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-continue:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(114, 189, 68, 0.6);
+        }
+
+        /* Daily Double Modal */
+        .dd-content {
+            background: linear-gradient(135deg, var(--captg-purple), var(--darker-bg));
+            border: 5px solid var(--jeopardy-gold);
+            border-radius: 15px;
+            padding: 3rem;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .dd-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            color: var(--jeopardy-gold);
+            margin-bottom: 1rem;
+            animation: glow 1.5s ease infinite;
+            font-weight: 900;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 204, 0, 0.4); }
+            50% { text-shadow: 0 0 60px rgba(255, 204, 0, 0.8); }
+        }
+
+        .wager-input {
+            width: 200px;
+            padding: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            background: var(--darker-bg);
+            border: 3px solid var(--captg-green);
+            border-radius: 10px;
+            color: var(--jeopardy-gold);
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .wager-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+        }
+
+        /* Leaderboard Screen */
+        .leaderboard-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .leaderboard-table {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 3px solid var(--captg-blue);
+        }
+
+        .leaderboard-table h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--jeopardy-gold);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .leaderboard-entry {
+            display: grid;
+            grid-template-columns: 60px 1fr 120px;
+            gap: 1rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: var(--darker-bg);
+            border-radius: 8px;
+            border: 2px solid var(--captg-blue);
+        }
+
+        .leaderboard-entry:hover {
+            border-color: var(--captg-green);
+        }
+
+        .leaderboard-rank {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--jeopardy-gold);
+            text-align: center;
+        }
+
+        .leaderboard-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .leaderboard-score {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--success);
+            text-align: right;
+        }
+
+        /* Settings Screen */
+        .settings-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 3px solid var(--captg-blue);
+        }
+
+        .settings-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--jeopardy-gold);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .setting-item {
+            margin: 2rem 0;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--captg-blue);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--cyber-cyan);
+        }
+
+        .setting-item select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--darker-bg);
+            border: 2px solid var(--captg-blue);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .setting-item select:focus {
+            outline: none;
+            border-color: var(--captg-green);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--captg-blue);
+            outline: none;
+        }
+
+        .volume-value {
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            color: var(--jeopardy-gold);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* Winner Screen */
+        .winner-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .winner-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 5rem;
+            color: var(--jeopardy-gold);
+            text-shadow: 0 0 60px rgba(255, 204, 0, 0.8);
+            margin-bottom: 2rem;
+            animation: bounce 1s ease infinite;
+            font-weight: 900;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .champion-display {
+            font-size: 3rem;
+            color: var(--success);
+            margin: 2rem 0;
+            font-weight: bold;
+        }
+
+        .final-standings {
+            background: var(--card-bg);
+            border: 3px solid var(--captg-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .standing-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            margin: 0.5rem 0;
+            background: var(--darker-bg);
+            border-radius: 10px;
+            border: 2px solid var(--captg-blue);
+        }
+
+        .standing-item.first {
+            border-color: var(--jeopardy-gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .omega-title {
+                font-size: 2rem;
+            }
+
+            .game-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .question-tile {
+                font-size: 1.5rem;
+            }
+
+            .answer-options {
+                grid-template-columns: 1fr;
+            }
+
+            .player-count-selector {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas Background -->
+    <canvas id="cyberspace-grid"></canvas>
+
+    <!-- AI Status -->
+    <div id="ai-status-light" class="ai-status" data-available="false">
+        <div class="ai-pulse"></div>
+        <span class="ai-label">AI</span>
+    </div>
+
+    <!-- BGM Toggle -->
+    <button id="bgm-toggle" class="bgm-control">
+        <span class="bgm-icon">♪</span>
+    </button>
+
+    <!-- Score HUD -->
+    <div id="score-hud" class="score-hud hidden">
+        <div class="hud-title">LIVE INTEL</div>
+        <div id="hud-scores"></div>
+    </div>
+
+    <!-- ===================================
+         SETUP SCREEN
+         =================================== -->
+    <div id="setup-screen" class="screen active">
+        <div class="setup-container">
+            <div class="show-title">
+                <h1 class="omega-title">
+                    <span class="glitch" data-text="ULTIMATE CYBER JEOPARDY">ULTIMATE CYBER JEOPARDY</span>
+                    <span class="infinity">∞</span>
+                </h1>
+                <p class="tagline">Elite Federal Credit Union | Cybersecurity Training Excellence</p>
+            </div>
+
+            <div class="setup-card">
+                <h2>SELECT PLAYERS</h2>
+                <div class="player-count-selector">
+                    <button class="player-count-btn" data-count="2">2</button>
+                    <button class="player-count-btn" data-count="3">3</button>
+                    <button class="player-count-btn" data-count="4">4</button>
+                </div>
+
+                <div id="player-inputs" class="player-inputs"></div>
+
+                <div class="ai-config">
+                    <label class="ai-toggle-label">
+                        <input type="checkbox" id="ai-enabled">
+                        <span>Enable AI Assistant (3 Hints/Game)</span>
+                    </label>
+                    <input type="password" id="ai-key" class="ai-key-input" placeholder="OpenAI API Key (optional, stored locally)">
+                    <small class="ai-disclaimer">Key stored in browser only. Never transmitted except to OpenAI.</small>
+                </div>
+
+                <button id="start-btn" class="btn-start">
+                    <span class="btn-text">INITIATE MISSION</span>
+                </button>
+            </div>
+
+            <div class="nav-buttons">
+                <button id="view-leaderboard-btn" class="btn-secondary">Leaderboard</button>
+                <button id="view-settings-btn" class="btn-secondary">Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         GAME SCREEN
+         =================================== -->
+    <div id="game-screen" class="screen">
+        <div class="game-container">
+            <div id="podiums" class="podiums"></div>
+
+            <div class="round-banner">
+                <span id="round-title" class="round-title glitch" data-text="ROUND 1">ROUND 1</span>
+            </div>
+
+            <div id="game-board" class="game-board"></div>
+
+            <div class="control-panel">
+                <div class="current-picker">
+                    <span>COMMAND: </span>
+                    <span id="picker-name" class="picker-name"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         QUESTION MODAL
+         =================================== -->
+    <div id="question-modal" class="modal">
+        <div class="modal-content">
+            <div class="question-category" id="question-category"></div>
+            <div class="question-value" id="question-value"></div>
+            <div class="question-text" id="question-text"></div>
+
+            <div id="timer-bar" class="timer-bar">
+                <div class="timer-fill" id="timer-fill"></div>
+                <div class="timer-text" id="timer-text">15</div>
+            </div>
+
+            <div id="ai-hint-container" class="ai-hint-container hidden">
+                <button id="ai-hint-btn" class="ai-hint-btn">
+                    <span>💡</span>
+                    <span>REQUEST HINT (<span id="hints-remaining">3</span> left)</span>
+                </button>
+                <div id="ai-hint-display" class="ai-hint-display hidden"></div>
+            </div>
+
+            <div id="answer-options" class="answer-options"></div>
+
+            <div id="buzzer-panel" class="buzzer-panel hidden">
+                <div class="buzzer-prompt">⚡ INTERCEPT AVAILABLE! ⚡</div>
+                <div id="buzzer-buttons" class="buzzer-buttons"></div>
+                <div id="buzz-timer" class="buzz-timer">7</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         RESULT MODAL
+         =================================== -->
+    <div id="result-modal" class="modal">
+        <div class="result-content">
+            <div class="result-icon" id="result-icon"></div>
+            <div class="result-status" id="result-status"></div>
+            <div class="result-explanation" id="result-explanation"></div>
+            <button id="continue-btn" class="btn-continue">CONTINUE</button>
+        </div>
+    </div>
+
+    <!-- ===================================
+         DAILY DOUBLE MODAL
+         =================================== -->
+    <div id="dd-modal" class="modal">
+        <div class="dd-content">
+            <h1 class="dd-title glitch" data-text="DAILY DOUBLE!">DAILY DOUBLE!</h1>
+            <p id="dd-info" style="font-size: 1.2rem; margin: 1rem 0;"></p>
+            <input type="number" id="wager-input" class="wager-input" min="5">
+            <p id="dd-max" style="margin: 1rem 0;"></p>
+            <button id="submit-wager-btn" class="btn-continue">SUBMIT WAGER</button>
+        </div>
+    </div>
+
+    <!-- ===================================
+         LEADERBOARD SCREEN
+         =================================== -->
+    <div id="leaderboard-screen" class="screen">
+        <div class="leaderboard-container">
+            <div class="leaderboard-table">
+                <h2>TOP 100 LEADERBOARD</h2>
+                <div id="leaderboard-content"></div>
+            </div>
+            <div class="nav-buttons">
+                <button id="back-from-leaderboard-btn" class="btn-secondary">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         SETTINGS SCREEN
+         =================================== -->
+    <div id="settings-screen" class="screen">
+        <div class="settings-container">
+            <div class="settings-card">
+                <h2>SETTINGS</h2>
+
+                <div class="setting-item">
+                    <label class="setting-label">Voice Selection</label>
+                    <select id="voice-select"></select>
+                </div>
+
+                <div class="setting-item">
+                    <label class="setting-label">Volume</label>
+                    <div class="volume-control">
+                        <input type="range" id="volume-control" min="0" max="100" value="70">
+                        <span class="volume-value" id="volume-value">70%</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <label class="setting-label">
+                        <input type="checkbox" id="animations-toggle" checked> Enable Animations
+                    </label>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button id="back-from-settings-btn" class="btn-secondary">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================
+         WINNER SCREEN
+         =================================== -->
+    <div id="winner-screen" class="screen">
+        <div class="winner-container">
+            <h1 class="winner-title glitch" data-text="MISSION COMPLETE">MISSION COMPLETE</h1>
+            <div style="font-size: 5rem; margin: 2rem 0;">🏆</div>
+            <div id="champion-display" class="champion-display"></div>
+            <div id="final-standings" class="final-standings"></div>
+            <div class="nav-buttons">
+                <button id="new-game-btn" class="btn-start"><span class="btn-text">NEW MISSION</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio -->
+    <audio id="bgm" loop>
+        <source src="data:audio/mpeg;base64," type="audio/mpeg">
+    </audio>
+
+    <script>
+        /**
+         * ULTIMATE CYBER JEOPARDY - GAME ENGINE
+         * Combines best features from both versions
+         */
+
+        // FCU Question Database (from CyberClarity)
+        const fcuQuestions = {
+            "NCUA Compliance": {
+                100: { question: "What federal agency regulates and supervises federal credit unions?", options: ["FDIC", "NCUA", "OCC", "Federal Reserve"], correct: 1, explanation: "The National Credit Union Administration (NCUA) charters, regulates, and supervises federal credit unions." },
+                200: { question: "What is the minimum net worth ratio for a well-capitalized credit union per NCUA?", options: ["5%", "6%", "7%", "8%"], correct: 2, explanation: "NCUA's Prompt Corrective Action framework classifies credit unions with net worth ratio of 7% or higher as well-capitalized." },
+                300: { question: "How often must federal credit unions undergo an NCUA examination at minimum?", options: ["12 months", "18 months", "24 months", "36 months"], correct: 1, explanation: "NCUA examines each federally insured credit union at least once every 18 months." },
+                400: { question: "What form must credit unions file to report suspicious activity to FinCEN?", options: ["CTR", "SAR", "Form 8300", "FBAR"], correct: 1, explanation: "Credit unions must file a Suspicious Activity Report (SAR) within 30 days of detecting suspicious activity." },
+                500: { question: "Under NCUA Part 748, what is the maximum recovery per account holder from the NCUSIF?", options: ["$100,000", "$250,000", "$500,000", "$1,000,000"], correct: 1, explanation: "The NCUSIF provides up to $250,000 of federal share insurance per account holder, per insured credit union." }
+            },
+            "Data Security": {
+                100: { question: "What does AES stand for in encryption?", options: ["Advanced Encryption Standard", "Automated Encryption System", "Advanced Electronic Security", "Automated Electronic Standard"], correct: 0, explanation: "AES is the widely adopted symmetric encryption standard used to protect sensitive data." },
+                200: { question: "What is the minimum recommended password length for financial institution accounts?", options: ["8 characters", "10 characters", "12 characters", "16 characters"], correct: 2, explanation: "FFIEC guidelines recommend minimum 12-character passwords with complexity requirements." },
+                300: { question: "What security protocol should credit unions use for encrypting data in transit?", options: ["SSL 3.0", "TLS 1.2+", "SSH", "IPSec"], correct: 1, explanation: "Transport Layer Security (TLS) 1.2 or higher should be used to encrypt data transmitted over networks." },
+                400: { question: "What access control principle states users should have minimum permissions needed for their role?", options: ["Need to Know", "Least Privilege", "Separation of Duties", "Defense in Depth"], correct: 1, explanation: "Least privilege limits potential damage from compromised accounts by restricting access to only what's necessary." },
+                500: { question: "What cryptographic key length is the current NIST recommendation for RSA encryption?", options: ["1024 bits", "2048 bits", "3072 bits", "4096 bits"], correct: 1, explanation: "NIST recommends minimum 2048-bit RSA keys, with 3072-bit or 4096-bit for higher security requirements." }
+            },
+            "Incident Response": {
+                100: { question: "What is the first phase of an incident response plan?", options: ["Detection", "Preparation", "Containment", "Recovery"], correct: 1, explanation: "Preparation involves establishing policies, procedures, and tools before an incident occurs." },
+                200: { question: "How soon must credit unions notify members after discovering a data breach affecting personal information?", options: ["Immediately", "Within 72 hours", "Without unreasonable delay", "Within 30 days"], correct: 2, explanation: "Various regulations require notification without unreasonable delay, typically interpreted as 30-60 days." },
+                300: { question: "What does IOC stand for in cybersecurity incident response?", options: ["Index of Compromise", "Indicator of Compromise", "Incident Operations Center", "Internal Operations Control"], correct: 1, explanation: "IOCs are forensic artifacts that suggest a security breach has occurred." },
+                400: { question: "Which federal agency must be notified within 72 hours of a significant cyber incident affecting a financial institution?", options: ["FBI", "NCUA", "DHS", "Treasury"], correct: 1, explanation: "NCUA requires notification within 72 hours of a cyber incident that could materially impact operations." },
+                500: { question: "What is the term for the practice of preserving digital evidence in a forensically sound manner?", options: ["Chain of custody", "Evidence logging", "Data preservation", "Forensic capture"], correct: 0, explanation: "Chain of custody maintains evidence integrity through documented handling from collection to presentation." }
+            },
+            "Member Privacy": {
+                100: { question: "What does GLBA stand for in financial services privacy?", options: ["General Legal Banking Act", "Gramm-Leach-Bliley Act", "Global Banking Association", "Government Lending Business Act"], correct: 1, explanation: "The Gramm-Leach-Bliley Act requires financial institutions to protect consumer financial information." },
+                200: { question: "How often must credit unions provide privacy notices to members under GLBA?", options: ["Quarterly", "Annually", "Biennially", "Only at account opening"], correct: 1, explanation: "GLBA requires annual privacy notices informing members about information sharing practices." },
+                300: { question: "What right allows consumers to limit certain information sharing under GLBA?", options: ["Right to access", "Right to deletion", "Opt-out right", "Right to portability"], correct: 2, explanation: "Consumers can opt out of certain types of information sharing with non-affiliated third parties." },
+                400: { question: "What is the FTC's regulatory rule implementing GLBA's privacy provisions called?", options: ["Privacy Rule", "Consumer Protection Rule", "Financial Privacy Act", "Regulation FP"], correct: 0, explanation: "The Privacy Rule requires financial institutions to provide privacy notices and protect consumer information." },
+                500: { question: "Under GLBA, what specific security standard requires written information security programs?", options: ["Security Rule", "Safeguards Rule", "Protection Standard", "Information Security Regulation"], correct: 1, explanation: "The Safeguards Rule requires comprehensive written information security programs with administrative, technical, and physical safeguards." }
+            },
+            "Risk Assessment": {
+                100: { question: "What is the first step in a cybersecurity risk assessment?", options: ["Threat identification", "Asset identification", "Vulnerability scanning", "Risk mitigation"], correct: 1, explanation: "Risk assessment begins with identifying and cataloging information assets that need protection." },
+                200: { question: "What does the 'I' represent in the CIA triad of information security?", options: ["Integration", "Integrity", "Intelligence", "Investigation"], correct: 1, explanation: "The CIA triad consists of Confidentiality, Integrity, and Availability - fundamental security principles." },
+                300: { question: "What framework published by NIST provides cybersecurity risk management guidance?", options: ["NIST 800-53", "NIST Cybersecurity Framework", "NIST SP 800-171", "FISMA"], correct: 1, explanation: "The NIST CSF provides a structured approach to managing cybersecurity risks across five core functions." },
+                400: { question: "What formula calculates risk by multiplying threat likelihood by impact?", options: ["Risk = Threat + Vulnerability", "Risk = Likelihood × Impact", "Risk = Asset × Threat", "Risk = Impact / Likelihood"], correct: 1, explanation: "Quantitative risk assessment uses this formula to prioritize risks based on probability and potential damage." },
+                500: { question: "What risk treatment option involves purchasing insurance or outsourcing to a third party?", options: ["Risk avoidance", "Risk mitigation", "Risk transfer", "Risk acceptance"], correct: 2, explanation: "Risk transfer shifts potential impact to another entity through insurance, contracts, or outsourcing." }
+            },
+            "Vendor Management": {
+                100: { question: "What type of assessment evaluates a vendor's security controls before engagement?", options: ["Security audit", "Due diligence", "Penetration test", "Compliance review"], correct: 1, explanation: "Due diligence assessment evaluates vendor security, financial stability, and regulatory compliance." },
+                200: { question: "What document outlines expectations for vendor information security controls?", options: ["Statement of Work", "Service Level Agreement", "Master Service Agreement", "Security Policy"], correct: 1, explanation: "SLAs define security requirements, performance metrics, and responsibilities for vendor relationships." },
+                300: { question: "What independent audit report provides assurance about service organization controls?", options: ["SOC 1", "SOC 2", "ISO 27001", "PCI DSS"], correct: 1, explanation: "SOC 2 reports assess security, availability, processing integrity, confidentiality, and privacy controls." },
+                400: { question: "How often should credit unions conduct risk assessments of critical vendors?", options: ["Quarterly", "Semi-annually", "Annually", "Biennially"], correct: 2, explanation: "FFIEC guidance recommends annual risk assessments for critical third-party service providers." },
+                500: { question: "What clause allows credit unions to terminate vendor contracts due to security breaches?", options: ["Force majeure", "Right to audit", "Liquidated damages", "Indemnification"], correct: 1, explanation: "Right to audit clauses permit examination of vendor security controls and termination for non-compliance." }
+            }
+        };
+
+        // Game State
+        class UltimateCyberJeopardy {
+            constructor() {
+                this.players = [];
+                this.currentPlayer = null;
+                this.currentRound = 1;
+                this.currentQuestion = null;
+                this.answeredQuestions = new Set();
+                this.dailyDoubles = [];
+                this.timerInterval = null;
+                this.buzzTimerInterval = null;
+                this.buzzerActive = false;
+                this.buzzedPlayers = new Set();
+                this.aiEnabled = false;
+                this.aiKey = null;
+                this.hintsRemaining = 3;
+                this.canvas = null;
+                this.ctx = null;
+                this.gridLines = [];
+                this.bgmPlaying = false;
+                this.settings = { volume: 0.7, animations: true, voice: null };
+
+                this.init();
+            }
+
+            init() {
+                this.loadSettings();
+                this.initCanvas();
+                this.initAI();
+                this.setupEventListeners();
+                this.showScreen('setup');
+            }
+
+            initCanvas() {
+                this.canvas = document.getElementById('cyberspace-grid');
+                if (!this.canvas) return;
+
+                this.ctx = this.canvas.getContext('2d');
+                this.resizeCanvas();
+
+                window.addEventListener('resize', () => this.resizeCanvas());
+
+                // Initialize grid lines
+                for (let i = 0; i < 20; i++) {
+                    this.gridLines.push({
+                        type: 'horizontal',
+                        y: Math.random() * this.canvas.height,
+                        speed: 0.2 + Math.random() * 0.5,
+                        opacity: 0.1 + Math.random() * 0.2
+                    });
+                    this.gridLines.push({
+                        type: 'vertical',
+                        x: Math.random() * this.canvas.width,
+                        speed: 0.2 + Math.random() * 0.5,
+                        opacity: 0.1 + Math.random() * 0.2
+                    });
+                }
+
+                this.animateCanvas();
+            }
+
+            resizeCanvas() {
+                if (!this.canvas) return;
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            animateCanvas() {
+                if (!this.ctx || !this.canvas) return;
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.gridLines.forEach(line => {
+                    this.ctx.strokeStyle = `rgba(0, 255, 255, ${line.opacity})`;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.beginPath();
+
+                    if (line.type === 'horizontal') {
+                        this.ctx.moveTo(0, line.y);
+                        this.ctx.lineTo(this.canvas.width, line.y);
+                        line.y += line.speed;
+                        if (line.y > this.canvas.height) line.y = 0;
+                    } else {
+                        this.ctx.moveTo(line.x, 0);
+                        this.ctx.lineTo(line.x, this.canvas.height);
+                        line.x += line.speed;
+                        if (line.x > this.canvas.width) line.x = 0;
+                    }
+
+                    this.ctx.stroke();
+                });
+
+                requestAnimationFrame(() => this.animateCanvas());
+            }
+
+            initAI() {
+                const savedKey = localStorage.getItem('cyber-jeopardy-ai-key');
+                if (savedKey) {
+                    this.aiKey = savedKey;
+                    document.getElementById('ai-key').value = savedKey;
+                }
+
+                const aiEnabled = localStorage.getItem('cyber-jeopardy-ai-enabled') === 'true';
+                if (aiEnabled) {
+                    document.getElementById('ai-enabled').checked = true;
+                    this.aiEnabled = true;
+                }
+
+                this.updateAIStatus();
+            }
+
+            updateAIStatus() {
+                this.aiEnabled = document.getElementById('ai-enabled').checked;
+                localStorage.setItem('cyber-jeopardy-ai-enabled', this.aiEnabled);
+
+                const hasKey = this.aiKey && this.aiKey.length > 0;
+                const available = this.aiEnabled && hasKey;
+
+                document.getElementById('ai-status-light').setAttribute('data-available', available);
+            }
+
+            setupEventListeners() {
+                // Player count selection
+                document.querySelectorAll('.player-count-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.setPlayerCount(parseInt(btn.dataset.count)));
+                });
+
+                // Start game
+                document.getElementById('start-btn').addEventListener('click', () => this.startGame());
+
+                // Navigation
+                document.getElementById('view-leaderboard-btn').addEventListener('click', () => this.showLeaderboard());
+                document.getElementById('view-settings-btn').addEventListener('click', () => this.showSettings());
+                document.getElementById('back-from-leaderboard-btn').addEventListener('click', () => this.showScreen('setup'));
+                document.getElementById('back-from-settings-btn').addEventListener('click', () => this.showScreen('setup'));
+                document.getElementById('new-game-btn').addEventListener('click', () => location.reload());
+
+                // Game controls
+                document.getElementById('continue-btn').addEventListener('click', () => this.closeResultModal());
+                document.getElementById('submit-wager-btn').addEventListener('click', () => this.submitWager());
+
+                // AI
+                document.getElementById('ai-enabled').addEventListener('change', () => this.updateAIStatus());
+                document.getElementById('ai-key').addEventListener('input', (e) => {
+                    this.aiKey = e.target.value.trim();
+                    if (this.aiKey) {
+                        localStorage.setItem('cyber-jeopardy-ai-key', this.aiKey);
+                    } else {
+                        localStorage.removeItem('cyber-jeopardy-ai-key');
+                    }
+                    this.updateAIStatus();
+                });
+                document.getElementById('ai-hint-btn').addEventListener('click', () => this.requestAIHint());
+
+                // BGM
+                document.getElementById('bgm-toggle').addEventListener('click', () => this.toggleBGM());
+
+                // Settings
+                document.getElementById('volume-control').addEventListener('input', (e) => {
+                    this.settings.volume = e.target.value / 100;
+                    document.getElementById('volume-value').textContent = e.target.value + '%';
+                    this.saveSettings();
+                });
+
+                document.getElementById('animations-toggle').addEventListener('change', (e) => {
+                    this.settings.animations = e.target.checked;
+                    this.saveSettings();
+                });
+
+                // Keyboard shortcuts for buzzing
+                document.addEventListener('keydown', (e) => {
+                    if (this.buzzerActive) {
+                        const keyMap = { 'q': 0, 'w': 1, 'e': 2, 'r': 3 };
+                        const playerIndex = keyMap[e.key.toLowerCase()];
+                        if (playerIndex !== undefined && playerIndex < this.players.length && !this.buzzedPlayers.has(playerIndex)) {
+                            this.handleBuzz(playerIndex);
+                        }
+                    }
+                });
+            }
+
+            setPlayerCount(count) {
+                const container = document.getElementById('player-inputs');
+                container.innerHTML = '';
+
+                for (let i = 0; i < count; i++) {
+                    const group = document.createElement('div');
+                    group.className = 'player-input-group';
+                    group.innerHTML = `
+                        <div class="player-number">${i + 1}</div>
+                        <input type="text" class="player-name-input" placeholder="Player ${i + 1} Name" value="Player ${i + 1}" maxlength="20">
+                    `;
+                    container.appendChild(group);
+                }
+            }
+
+            startGame() {
+                const inputs = document.querySelectorAll('.player-name-input');
+                if (inputs.length === 0) {
+                    alert('Please select number of players first!');
+                    return;
+                }
+
+                this.players = Array.from(inputs).map((input, index) => ({
+                    id: index,
+                    name: input.value.trim() || `Player ${index + 1}`,
+                    score: 0
+                }));
+
+                this.currentPlayer = this.players[Math.floor(Math.random() * this.players.length)];
+                this.currentRound = 1;
+                this.answeredQuestions.clear();
+                this.hintsRemaining = 3;
+                document.getElementById('hints-remaining').textContent = this.hintsRemaining;
+
+                this.generateDailyDoubles();
+                this.buildBoard();
+                this.updatePodiums();
+                this.updateScoreHUD();
+                this.showScreen('game');
+                document.getElementById('score-hud').classList.remove('hidden');
+            }
+
+            generateDailyDoubles() {
+                this.dailyDoubles = [];
+                const numDD = this.currentRound === 1 ? 1 : 2;
+
+                for (let i = 0; i < numDD; i++) {
+                    let pos;
+                    do {
+                        const cat = Math.floor(Math.random() * 6);
+                        const q = Math.floor(Math.random() * 5);
+                        pos = `${cat}-${q}`;
+                    } while (this.dailyDoubles.includes(pos));
+                    this.dailyDoubles.push(pos);
+                }
+            }
+
+            buildBoard() {
+                const board = document.getElementById('game-board');
+                board.innerHTML = '';
+
+                const categories = Object.keys(fcuQuestions);
+                const values = this.currentRound === 1 ? [100, 200, 300, 400, 500] : [200, 400, 600, 800, 1000];
+
+                document.getElementById('round-title').textContent = `ROUND ${this.currentRound}`;
+                document.getElementById('round-title').setAttribute('data-text', `ROUND ${this.currentRound}`);
+
+                // Category headers
+                categories.forEach(cat => {
+                    const header = document.createElement('div');
+                    header.className = 'category-header';
+                    header.textContent = cat;
+                    board.appendChild(header);
+                });
+
+                // Question tiles
+                values.forEach((value, qIndex) => {
+                    categories.forEach((cat, catIndex) => {
+                        const tile = document.createElement('div');
+                        tile.className = 'question-tile';
+                        tile.textContent = this.currentRound === 1 ? value : value;
+                        tile.dataset.category = catIndex;
+                        tile.dataset.question = qIndex;
+
+                        const pos = `${catIndex}-${qIndex}`;
+                        if (this.answeredQuestions.has(pos)) {
+                            tile.classList.add('answered');
+                        } else {
+                            tile.addEventListener('click', () => this.selectQuestion(catIndex, qIndex));
+                        }
+
+                        board.appendChild(tile);
+                    });
+                });
+
+                this.updatePickerDisplay();
+            }
+
+            selectQuestion(catIndex, qIndex) {
+                const categories = Object.keys(fcuQuestions);
+                const category = categories[catIndex];
+                const values = this.currentRound === 1 ? [100, 200, 300, 400, 500] : [200, 400, 600, 800, 1000];
+                const value = values[qIndex];
+                const baseValue = [100, 200, 300, 400, 500][qIndex];
+
+                const pos = `${catIndex}-${qIndex}`;
+                if (this.answeredQuestions.has(pos)) return;
+
+                this.answeredQuestions.add(pos);
+                this.currentQuestion = {
+                    category,
+                    value,
+                    data: fcuQuestions[category][baseValue],
+                    isDailyDouble: this.dailyDoubles.includes(pos)
+                };
+
+                if (this.currentQuestion.isDailyDouble) {
+                    this.showDailyDouble();
+                } else {
+                    this.showQuestion();
+                }
+            }
+
+            showDailyDouble() {
+                const maxWager = Math.max(this.currentPlayer.score, this.currentRound === 1 ? 1000 : 2000);
+
+                document.getElementById('dd-info').textContent = `${this.currentPlayer.name}, you found a Daily Double!`;
+                document.getElementById('wager-input').value = Math.min(maxWager, 500);
+                document.getElementById('wager-input').max = maxWager;
+                document.getElementById('dd-max').textContent = `Max Wager: $${maxWager}`;
+
+                document.getElementById('dd-modal').classList.add('active');
+            }
+
+            submitWager() {
+                const wager = parseInt(document.getElementById('wager-input').value);
+                const max = parseInt(document.getElementById('wager-input').max);
+
+                if (wager < 5 || wager > max) {
+                    alert(`Please enter a wager between $5 and $${max}`);
+                    return;
+                }
+
+                this.currentQuestion.value = wager;
+                document.getElementById('dd-modal').classList.remove('active');
+                this.showQuestion();
+            }
+
+            showQuestion() {
+                document.getElementById('question-category').textContent = this.currentQuestion.category;
+                document.getElementById('question-value').textContent = `$${this.currentQuestion.value}`;
+                document.getElementById('question-text').textContent = this.currentQuestion.data.question;
+
+                // Build answer options
+                const optionsContainer = document.getElementById('answer-options');
+                optionsContainer.innerHTML = '';
+                this.currentQuestion.data.options.forEach((option, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn';
+                    btn.textContent = option;
+                    btn.addEventListener('click', () => this.selectAnswer(index));
+                    optionsContainer.appendChild(btn);
+                });
+
+                // Show/hide AI hint
+                if (this.aiEnabled && this.aiKey && this.hintsRemaining > 0) {
+                    document.getElementById('ai-hint-container').classList.remove('hidden');
+                    document.getElementById('ai-hint-display').classList.add('hidden');
+                } else {
+                    document.getElementById('ai-hint-container').classList.add('hidden');
+                }
+
+                document.getElementById('buzzer-panel').classList.add('hidden');
+                document.getElementById('question-modal').classList.add('active');
+
+                this.startTimer(15);
+            }
+
+            startTimer(seconds) {
+                let timeLeft = seconds;
+                document.getElementById('timer-text').textContent = timeLeft;
+                document.getElementById('timer-fill').style.width = '100%';
+                document.getElementById('timer-fill').classList.remove('warning');
+
+                this.timerInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timer-text').textContent = timeLeft;
+                    document.getElementById('timer-fill').style.width = ((timeLeft / seconds) * 100) + '%';
+
+                    if (timeLeft <= 5) {
+                        document.getElementById('timer-fill').classList.add('warning');
+                    }
+
+                    if (timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        if (!this.buzzerActive) {
+                            this.activateBuzzer();
+                        }
+                    }
+                }, 1000);
+            }
+
+            selectAnswer(answerIndex) {
+                if (this.timerInterval) clearInterval(this.timerInterval);
+
+                const isCorrect = answerIndex === this.currentQuestion.data.correct;
+                const buttons = document.querySelectorAll('.answer-btn');
+                buttons[answerIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
+
+                setTimeout(() => {
+                    if (isCorrect) {
+                        this.handleCorrectAnswer();
+                    } else {
+                        this.handleIncorrectAnswer();
+                    }
+                }, 1000);
+            }
+
+            handleCorrectAnswer() {
+                this.currentPlayer.score += this.currentQuestion.value;
+                this.updatePodiums();
+                this.updateScoreHUD();
+
+                document.getElementById('question-modal').classList.remove('active');
+                this.showResult(true);
+            }
+
+            handleIncorrectAnswer() {
+                this.currentPlayer.score -= this.currentQuestion.value;
+                this.updatePodiums();
+                this.updateScoreHUD();
+
+                this.buzzedPlayers.add(this.currentPlayer.id);
+
+                if (this.buzzedPlayers.size < this.players.length) {
+                    this.activateBuzzer();
+                } else {
+                    document.getElementById('question-modal').classList.remove('active');
+                    this.showResult(false);
+                }
+            }
+
+            activateBuzzer() {
+                document.getElementById('answer-options').innerHTML = '';
+
+                const buzzerPanel = document.getElementById('buzzer-panel');
+                const buzzerButtons = document.getElementById('buzzer-buttons');
+                buzzerButtons.innerHTML = '';
+
+                this.players.forEach((player, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'buzz-btn';
+                    btn.innerHTML = `<span class="buzz-name">${player.name}</span>`;
+                    btn.disabled = this.buzzedPlayers.has(index);
+                    btn.addEventListener('click', () => this.handleBuzz(index));
+                    buzzerButtons.appendChild(btn);
+                });
+
+                buzzerPanel.classList.remove('hidden');
+                this.buzzerActive = true;
+
+                this.startBuzzTimer();
+            }
+
+            startBuzzTimer() {
+                let timeLeft = 7;
+                document.getElementById('buzz-timer').textContent = timeLeft;
+
+                this.buzzTimerInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('buzz-timer').textContent = timeLeft;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(this.buzzTimerInterval);
+                        this.buzzerActive = false;
+                        document.getElementById('question-modal').classList.remove('active');
+                        this.showResult(false, "Time's up!");
+                    }
+                }, 1000);
+            }
+
+            handleBuzz(playerIndex) {
+                if (!this.buzzerActive || this.buzzedPlayers.has(playerIndex)) return;
+
+                clearInterval(this.buzzTimerInterval);
+                this.buzzerActive = false;
+
+                this.currentPlayer = this.players[playerIndex];
+                document.getElementById('buzzer-panel').classList.add('hidden');
+
+                // Show answer options again
+                const optionsContainer = document.getElementById('answer-options');
+                optionsContainer.innerHTML = '';
+                this.currentQuestion.data.options.forEach((option, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn';
+                    btn.textContent = option;
+                    btn.addEventListener('click', () => this.selectAnswer(index));
+                    optionsContainer.appendChild(btn);
+                });
+
+                this.startTimer(15);
+            }
+
+            showResult(isCorrect, message = null) {
+                document.getElementById('result-icon').textContent = isCorrect ? '✓' : '✗';
+
+                const statusEl = document.getElementById('result-status');
+                statusEl.textContent = message || (isCorrect ? 'CORRECT!' : 'INCORRECT!');
+                statusEl.className = 'result-status ' + (isCorrect ? 'correct' : 'incorrect');
+
+                const explanation = document.getElementById('result-explanation');
+                explanation.innerHTML = isCorrect
+                    ? `<strong>${this.currentPlayer.name} +$${this.currentQuestion.value}</strong><br><br>${this.currentQuestion.data.explanation}`
+                    : `Correct answer: ${this.currentQuestion.data.options[this.currentQuestion.data.correct]}<br><br>${this.currentQuestion.data.explanation}`;
+
+                document.getElementById('result-modal').classList.add('active');
+            }
+
+            closeResultModal() {
+                document.getElementById('result-modal').classList.remove('active');
+                this.buzzedPlayers.clear();
+
+                // Check if round/game is over
+                const totalQuestions = 30;
+                if (this.answeredQuestions.size >= totalQuestions) {
+                    if (this.currentRound === 1) {
+                        this.currentRound = 2;
+                        this.answeredQuestions.clear();
+                        this.generateDailyDoubles();
+                        this.buildBoard();
+                    } else {
+                        this.showWinner();
+                    }
+                } else {
+                    this.buildBoard();
+                }
+            }
+
+            async requestAIHint() {
+                if (!this.aiEnabled || !this.aiKey || this.hintsRemaining <= 0) return;
+
+                document.getElementById('ai-hint-btn').disabled = true;
+                document.getElementById('ai-hint-display').textContent = '🔄 Analyzing question...';
+                document.getElementById('ai-hint-display').classList.remove('hidden');
+
+                try {
+                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.aiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-3.5-turbo',
+                            messages: [
+                                { role: 'system', content: 'You are a helpful cybersecurity training assistant. Provide brief, educational hints about cybersecurity questions without giving away the answer directly. Keep responses under 100 words.' },
+                                { role: 'user', content: `Question: ${this.currentQuestion.data.question}\n\nProvide a helpful hint about this cybersecurity concept without revealing the answer.` }
+                            ],
+                            max_tokens: 150,
+                            temperature: 0.7
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('API request failed');
+
+                    const data = await response.json();
+                    const hint = data.choices[0].message.content;
+
+                    this.hintsRemaining--;
+                    document.getElementById('hints-remaining').textContent = this.hintsRemaining;
+                    document.getElementById('ai-hint-display').textContent = `💡 ${hint}`;
+
+                    if (this.hintsRemaining === 0) {
+                        document.getElementById('ai-hint-btn').disabled = true;
+                    } else {
+                        document.getElementById('ai-hint-btn').disabled = false;
+                    }
+                } catch (error) {
+                    console.error('AI Hint Error:', error);
+                    document.getElementById('ai-hint-display').textContent = '❌ Unable to fetch hint. Check API key.';
+                    document.getElementById('ai-hint-btn').disabled = false;
+                }
+            }
+
+            updatePodiums() {
+                const container = document.getElementById('podiums');
+                container.innerHTML = '';
+
+                this.players.forEach((player, index) => {
+                    const podium = document.createElement('div');
+                    podium.className = 'podium' + (player === this.currentPlayer ? ' active' : '');
+                    podium.innerHTML = `
+                        <div class="contestant-name-display">${player.name}</div>
+                        <div class="contestant-score${player.score < 0 ? ' negative' : ''}">$${player.score}</div>
+                    `;
+                    container.appendChild(podium);
+                });
+            }
+
+            updatePickerDisplay() {
+                document.getElementById('picker-name').textContent = this.currentPlayer.name;
+            }
+
+            updateScoreHUD() {
+                const hud = document.getElementById('hud-scores');
+                hud.innerHTML = this.players.map(p => `
+                    <div class="hud-contestant">
+                        <span class="hud-name">${p.name}</span>
+                        <span class="hud-score" style="color: ${p.score < 0 ? '#ef4444' : '#72bd44'}">$${p.score}</span>
+                    </div>
+                `).join('');
+            }
+
+            showWinner() {
+                const sorted = [...this.players].sort((a, b) => b.score - a.score);
+                const winner = sorted[0];
+
+                document.getElementById('champion-display').textContent = `${winner.name} - $${winner.score}`;
+
+                const standings = document.getElementById('final-standings');
+                standings.innerHTML = sorted.map((p, i) => `
+                    <div class="standing-item${i === 0 ? ' first' : ''}">
+                        <span>${i + 1}. ${p.name}</span>
+                        <span>$${p.score}</span>
+                    </div>
+                `).join('');
+
+                this.saveToLeaderboard(sorted);
+                this.showScreen('winner');
+                document.getElementById('score-hud').classList.add('hidden');
+            }
+
+            showLeaderboard() {
+                const leaderboard = this.loadLeaderboard();
+                const content = document.getElementById('leaderboard-content');
+
+                if (leaderboard.length === 0) {
+                    content.innerHTML = '<p style="text-align: center; padding: 2rem; color: #6b7280;">No entries yet. Be the first to play!</p>';
+                } else {
+                    content.innerHTML = leaderboard.map((entry, index) => `
+                        <div class="leaderboard-entry">
+                            <div class="leaderboard-rank">#${index + 1}</div>
+                            <div class="leaderboard-name">${entry.name}</div>
+                            <div class="leaderboard-score">$${entry.score}</div>
+                        </div>
+                    `).join('');
+                }
+
+                this.showScreen('leaderboard');
+            }
+
+            saveToLeaderboard(players) {
+                let leaderboard = this.loadLeaderboard();
+
+                players.forEach(player => {
+                    leaderboard.push({
+                        name: player.name,
+                        score: player.score,
+                        date: new Date().toISOString()
+                    });
+                });
+
+                leaderboard.sort((a, b) => b.score - a.score);
+                leaderboard = leaderboard.slice(0, 100);
+
+                localStorage.setItem('ultimate-cyber-jeopardy-leaderboard', JSON.stringify(leaderboard));
+            }
+
+            loadLeaderboard() {
+                try {
+                    const data = localStorage.getItem('ultimate-cyber-jeopardy-leaderboard');
+                    return data ? JSON.parse(data) : [];
+                } catch (error) {
+                    console.error('Error loading leaderboard:', error);
+                    return [];
+                }
+            }
+
+            showSettings() {
+                // Populate voice select
+                const voices = speechSynthesis.getVoices();
+                const voiceSelect = document.getElementById('voice-select');
+                voiceSelect.innerHTML = voices.map((voice, i) =>
+                    `<option value="${i}">${voice.name} (${voice.lang})</option>`
+                ).join('');
+
+                if (this.settings.voice !== null) {
+                    voiceSelect.value = this.settings.voice;
+                }
+
+                this.showScreen('settings');
+            }
+
+            loadSettings() {
+                try {
+                    const data = localStorage.getItem('ultimate-cyber-jeopardy-settings');
+                    if (data) {
+                        this.settings = { ...this.settings, ...JSON.parse(data) };
+                        document.getElementById('volume-control').value = this.settings.volume * 100;
+                        document.getElementById('volume-value').textContent = Math.round(this.settings.volume * 100) + '%';
+                        document.getElementById('animations-toggle').checked = this.settings.animations;
+                    }
+                } catch (error) {
+                    console.error('Error loading settings:', error);
+                }
+            }
+
+            saveSettings() {
+                localStorage.setItem('ultimate-cyber-jeopardy-settings', JSON.stringify(this.settings));
+            }
+
+            toggleBGM() {
+                const toggle = document.getElementById('bgm-toggle');
+                this.bgmPlaying = !this.bgmPlaying;
+
+                if (this.bgmPlaying) {
+                    toggle.classList.add('playing');
+                } else {
+                    toggle.classList.remove('playing');
+                }
+            }
+
+            showScreen(screenName) {
+                document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+                document.getElementById(`${screenName}-screen`).classList.add('active');
+            }
+        }
+
+        // Initialize game when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new UltimateCyberJeopardy();
+
+            // Initialize speech synthesis voices
+            if ('speechSynthesis' in window) {
+                speechSynthesis.onvoiceschanged = () => {
+                    // Voices loaded
+                };
+            }
+        });
+    </script>
+</body>
+</html>

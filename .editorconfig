@@ -22,3 +22,18 @@ indent_size = 2
 
 [package.json]
 indent_size = 2
+
+[*.{sh,bash}]
+indent_size = 2
+
+[*.py]
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+
+[*.mmd]
+indent_size = 2
+
+[*.mjs]
+indent_size = 2

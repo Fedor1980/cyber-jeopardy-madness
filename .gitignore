@@ -89,7 +89,21 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+
+# NexusOS Documentation Platform Build Outputs
+dist/
+deployment_logs/
+*.secret
+*.pem
+*.key
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+venv/
+.venv/
+.mmdc/
+.temp/
 
 # Gatsby files
 .cache/

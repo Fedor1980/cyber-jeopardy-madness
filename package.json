@@ -1,27 +1,60 @@
 {
   "name": "cyber-jeopardy-madness",
   "version": "1.0.0",
-  "description": "A team-based cybersecurity awareness training game built for Federal Credit Unions",
+  "description": "Cybersecurity awareness training game + NexusOS Documentation Platform",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "npx http-server public -p 8080 -o",
     "dev": "npx http-server public -p 8080 -o",
     "build": "echo 'Static site - no build required'",
-    "test": "echo 'Tests not yet implemented'"
+    "test": "echo 'Tests not yet implemented'",
+    "docs:setup": "npm install",
+    "docs:lint": "markdownlint 'docs/**/*.md' && cspell 'docs/**/*.md'",
+    "docs:diagrams": "node build/render_diagrams.mjs",
+    "docs:html": "node build/render_html.mjs",
+    "docs:pdf": "node build/render_pdfs.mjs",
+    "docs:slides": "node build/render_slides.mjs",
+    "docs:index": "node build/search_indexer.mjs && node build/toc_generator.mjs",
+    "docs:audit": "python3 build/audit_content.py",
+    "docs:build": "npm run docs:lint && npm run docs:diagrams && npm run docs:html && npm run docs:pdf && npm run docs:slides && npm run docs:index",
+    "docs:validate": "bash deployment/deployment_scripts/scripts/validate_docs.sh",
+    "docs:package": "bash -c 'cd dist && zip -r nexusos_docs_v1.0.zip . -x \"*.DS_Store\"'",
+    "docs:clean": "rm -rf dist/* && mkdir -p dist/{html,pdf,diagrams,assets,slides}"
   },
   "keywords": [
     "cybersecurity",
     "jeopardy",
     "training",
     "game",
-    "education"
+    "education",
+    "documentation",
+    "nexusos",
+    "mermaid"
   ],
   "author": "Fedor1980",
   "license": "MIT",
-  "dependencies": {
-    "http-server": "^14.1.1"
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
-  "devDependencies": {},
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "@mermaid-js/mermaid-cli": "^11.3.0",
+    "marked": "^14.1.3",
+    "js-yaml": "^4.1.0",
+    "glob": "^11.0.0",
+    "cheerio": "^1.0.0",
+    "lunr": "^2.3.9",
+    "gray-matter": "^4.0.3",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "markdownlint-cli": "^0.42.0",
+    "cspell": "^8.14.4",
+    "prettier": "^3.3.3",
+    "@playwright/test": "^1.48.2"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Fedor1980/cyber-jeopardy-madness.git"

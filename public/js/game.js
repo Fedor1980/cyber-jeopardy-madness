@@ -1,5 +1,5 @@
 /**
- * CYBER JEOPARDY - PROFESSIONAL GAME SHOW ENGINE
+ * CYBER JEOPARDY OMEGA ∞ - ELITE GAME SHOW ENGINE
  * Capital Technology Group - Cybersecurity Training Game
  *
  * Features:
@@ -8,9 +8,13 @@
  * - 15-Second Answer Timer
  * - 7-Second Buzz-In System (Q/W/E Keys)
  * - Winner Keeps Picking
- * - Daily Doubles with Wagering
- * - 3 Rounds: Jeopardy → Double Jeopardy → Final Jeopardy
+ * - Zero-Day Exploits (Daily Doubles) with Wagering
+ * - 3 Rounds: Reconnaissance → Advanced Ops → Final Verdict
  * - Industry-Specific Question Loading
+ * - AI-Powered Hints (OpenAI GPT Integration)
+ * - Animated Cyberspace Grid Background
+ * - Background Music & Sound Effects
+ * - Live Score HUD
  */
 
 class CyberJeopardyGame {
@@ -39,6 +43,22 @@ class CyberJeopardyGame {
         this.buzzerLocked = false;
         this.buzzedContestants = new Set();
 
+        // AI Assistant State
+        this.aiEnabled = false;
+        this.aiKey = null;
+        this.hintsRemaining = 3;
+        this.maxHints = 3;
+
+        // Canvas Animation State
+        this.canvas = null;
+        this.ctx = null;
+        this.gridLines = [];
+        this.animationFrame = null;
+
+        // Audio State
+        this.bgmPlaying = false;
+        this.bgmAudio = null;
+
         // Elements
         this.elements = {};
 
@@ -52,6 +72,9 @@ class CyberJeopardyGame {
     async init() {
         this.cacheElements();
         this.attachEventListeners();
+        this.initializeCanvas();
+        this.initializeAI();
+        this.initializeAudio();
         await this.loadGameData();
         this.showScreen('setup');
     }
@@ -114,7 +137,35 @@ class CyberJeopardyGame {
             // Winner
             championDisplay: document.getElementById('champion-display'),
             finalStandings: document.getElementById('final-standings'),
-            newGameBtn: document.getElementById('new-game-btn')
+            newGameBtn: document.getElementById('new-game-btn'),
+
+            // Canvas & Effects
+            canvas: document.getElementById('cyberspace-grid'),
+
+            // AI Assistant
+            aiEnabled: document.getElementById('ai-enabled'),
+            aiKey: document.getElementById('ai-key'),
+            aiStatusLight: document.getElementById('ai-status-light'),
+            aiHintContainer: document.getElementById('ai-hint-container'),
+            aiHintBtn: document.getElementById('ai-hint-btn'),
+            aiHintDisplay: document.getElementById('ai-hint-display'),
+            hintsRemaining: document.getElementById('hints-remaining'),
+
+            // Audio Controls
+            bgmToggle: document.getElementById('bgm-toggle'),
+            bgmMain: document.getElementById('bgm-main'),
+            sfxCorrect: document.getElementById('sfx-correct'),
+            sfxWrong: document.getElementById('sfx-wrong'),
+            sfxTimeout: document.getElementById('sfx-timeout'),
+            sfxBuzz: document.getElementById('sfx-buzz'),
+            sfxZeroDay: document.getElementById('sfx-zero-day'),
+
+            // Score HUD
+            scoreHud: document.getElementById('score-hud'),
+            hudScores: document.getElementById('hud-scores'),
+
+            // WebSocket Status
+            wsStatus: document.getElementById('ws-status')
         };
     }
 
@@ -126,6 +177,16 @@ class CyberJeopardyGame {
         this.elements.continueBtn.addEventListener('click', () => this.closeResultModal());
         this.elements.submitWagerBtn.addEventListener('click', () => this.submitDailyDoubleWager());
         this.elements.newGameBtn.addEventListener('click', () => this.resetGame());
+
+        // BGM Toggle
+        this.elements.bgmToggle.addEventListener('click', () => this.toggleBGM());
+
+        // AI Hint Button
+        this.elements.aiHintBtn.addEventListener('click', () => this.requestAIHint());
+
+        // AI Settings
+        this.elements.aiEnabled.addEventListener('change', () => this.updateAIStatus());
+        this.elements.aiKey.addEventListener('input', () => this.saveAIKey());
     }
 
     /**
@@ -166,6 +227,11 @@ class CyberJeopardyGame {
             element: this.elements.podiums[index]
         }));
 
+        // Reset AI hints
+        this.hintsRemaining = this.maxHints;
+        this.elements.hintsRemaining.textContent = this.hintsRemaining;
+        this.elements.aiHintBtn.disabled = false;
+
         // Update podium displays
         this.updatePodiumDisplays();
 
@@ -179,6 +245,10 @@ class CyberJeopardyGame {
         // Show game screen
         this.showScreen('game');
 
+        // Show Score HUD
+        this.showScoreHUD();
+        this.updateScoreHUD();
+
         // Highlight active contestant
         this.updateActiveContestant();
     }
@@ -189,10 +259,16 @@ class CyberJeopardyGame {
     initializeRound() {
         const roundData = this.gameData.rounds[this.currentRound - 1];
 
-        // Set round title
-        this.elements.roundTitle.textContent = roundData.name.toUpperCase();
+        // Set round title with OMEGA theme
+        const roundNames = {
+            1: 'RECONNAISSANCE',
+            2: 'ADVANCED OPS',
+            3: 'FINAL VERDICT'
+        };
+        this.elements.roundTitle.textContent = roundNames[this.currentRound] || roundData.name.toUpperCase();
+        this.elements.roundTitle.setAttribute('data-text', roundNames[this.currentRound] || roundData.name.toUpperCase());
 
-        // Generate Daily Doubles
+        // Generate Daily Doubles (Zero-Day Exploits)
         this.generateDailyDoubles(roundData);
 
         // Build the board
@@ -301,13 +377,16 @@ class CyberJeopardyGame {
     }
 
     /**
-     * Show Daily Double
+     * Show Daily Double (Zero-Day Exploit)
      */
     showDailyDouble() {
         const contestant = this.currentContestant;
         const maxWager = Math.max(contestant.score, this.currentRound === 1 ? 1000 : 2000);
 
-        this.elements.ddContestant.textContent = `${contestant.name}, you found the Daily Double!`;
+        // Play Zero-Day sound effect
+        this.playSFX('zeroday');
+
+        this.elements.ddContestant.textContent = `${contestant.name}, you discovered a ZERO-DAY EXPLOIT!`;
         this.elements.ddCurrentScore.textContent = `Current Score: $${contestant.score}`;
         this.elements.ddMaxWager.textContent = `Maximum Wager: $${maxWager}`;
         this.elements.ddWagerInput.value = Math.min(maxWager, this.currentRound === 1 ? 500 : 1000);
@@ -347,6 +426,15 @@ class CyberJeopardyGame {
 
         // Hide buzzer panel initially
         this.elements.buzzerPanel.style.display = 'none';
+
+        // Show/hide AI hint container
+        if (this.aiEnabled && this.aiKey && this.hintsRemaining > 0) {
+            this.elements.aiHintContainer.classList.remove('hidden');
+            this.hideAIHint(); // Reset hint display
+            this.elements.aiHintBtn.disabled = false;
+        } else {
+            this.elements.aiHintContainer.classList.add('hidden');
+        }
 
         // Show modal
         this.showModal('question');
@@ -424,6 +512,9 @@ class CyberJeopardyGame {
      * Time's up on primary timer
      */
     timeUp() {
+        // Play timeout sound
+        this.playSFX('timeout');
+
         // If buzzer not active, activate it
         if (!this.buzzerActive) {
             this.activateBuzzer();
@@ -468,9 +559,13 @@ class CyberJeopardyGame {
      * Handle correct answer
      */
     handleCorrectAnswer() {
+        // Play correct sound effect
+        this.playSFX('correct');
+
         // Update score
         this.currentContestant.score += this.currentQuestion.wager;
         this.updatePodiumDisplays();
+        this.updateScoreHUD();
 
         // Hide question modal
         this.hideModal('question');
@@ -488,9 +583,13 @@ class CyberJeopardyGame {
      * Handle incorrect answer
      */
     handleIncorrectAnswer() {
+        // Play wrong sound effect
+        this.playSFX('wrong');
+
         // Deduct points
         this.currentContestant.score -= this.currentQuestion.wager;
         this.updatePodiumDisplays();
+        this.updateScoreHUD();
 
         // Add to buzzed contestants
         this.buzzedContestants.add(this.currentContestant.id);
@@ -567,6 +666,9 @@ class CyberJeopardyGame {
     handleBuzz(contestantId) {
         if (!this.buzzerActive || this.buzzerLocked) return;
         if (this.buzzedContestants.has(contestantId)) return;
+
+        // Play buzz sound effect
+        this.playSFX('buzz');
 
         // Lock buzzer temporarily
         this.buzzerLocked = true;
@@ -886,6 +988,11 @@ class CyberJeopardyGame {
 
         if (modalMap[modalName]) {
             modalMap[modalName].classList.remove('active');
+
+            // Hide AI hint container when closing question modal
+            if (modalName === 'question') {
+                this.elements.aiHintContainer.classList.add('hidden');
+            }
         }
     }
 
@@ -894,6 +1001,333 @@ class CyberJeopardyGame {
      */
     resetGame() {
         location.reload();
+    }
+
+    /**
+     * ============================================
+     * OMEGA FEATURES - Canvas, AI, Audio, HUD
+     * ============================================
+     */
+
+    /**
+     * Initialize Canvas Background Animation
+     */
+    initializeCanvas() {
+        this.canvas = this.elements.canvas;
+        if (!this.canvas) return;
+
+        this.ctx = this.canvas.getContext('2d');
+        this.resizeCanvas();
+
+        // Handle window resize
+        window.addEventListener('resize', () => this.resizeCanvas());
+
+        // Initialize grid lines
+        this.initializeGridLines();
+
+        // Start animation
+        this.animateCanvas();
+    }
+
+    /**
+     * Resize canvas to fill window
+     */
+    resizeCanvas() {
+        if (!this.canvas) return;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    /**
+     * Initialize grid lines for animation
+     */
+    initializeGridLines() {
+        this.gridLines = [];
+        const numLines = 20;
+
+        // Horizontal lines
+        for (let i = 0; i < numLines; i++) {
+            this.gridLines.push({
+                type: 'horizontal',
+                y: Math.random() * this.canvas.height,
+                speed: 0.2 + Math.random() * 0.5,
+                opacity: 0.1 + Math.random() * 0.2
+            });
+        }
+
+        // Vertical lines
+        for (let i = 0; i < numLines; i++) {
+            this.gridLines.push({
+                type: 'vertical',
+                x: Math.random() * this.canvas.width,
+                speed: 0.2 + Math.random() * 0.5,
+                opacity: 0.1 + Math.random() * 0.2
+            });
+        }
+    }
+
+    /**
+     * Animate canvas background
+     */
+    animateCanvas() {
+        if (!this.ctx || !this.canvas) return;
+
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw grid lines
+        this.gridLines.forEach(line => {
+            this.ctx.strokeStyle = `rgba(0, 255, 255, ${line.opacity})`;
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+
+            if (line.type === 'horizontal') {
+                this.ctx.moveTo(0, line.y);
+                this.ctx.lineTo(this.canvas.width, line.y);
+                line.y += line.speed;
+                if (line.y > this.canvas.height) line.y = 0;
+            } else {
+                this.ctx.moveTo(line.x, 0);
+                this.ctx.lineTo(line.x, this.canvas.height);
+                line.x += line.speed;
+                if (line.x > this.canvas.width) line.x = 0;
+            }
+
+            this.ctx.stroke();
+        });
+
+        // Continue animation
+        this.animationFrame = requestAnimationFrame(() => this.animateCanvas());
+    }
+
+    /**
+     * Initialize AI Assistant
+     */
+    initializeAI() {
+        // Load saved API key from localStorage
+        const savedKey = localStorage.getItem('cyber-jeopardy-ai-key');
+        if (savedKey) {
+            this.aiKey = savedKey;
+            this.elements.aiKey.value = savedKey;
+        }
+
+        // Load AI enabled state
+        const aiEnabled = localStorage.getItem('cyber-jeopardy-ai-enabled') === 'true';
+        if (aiEnabled) {
+            this.elements.aiEnabled.checked = true;
+            this.aiEnabled = true;
+        }
+
+        this.updateAIStatus();
+    }
+
+    /**
+     * Update AI status indicator
+     */
+    updateAIStatus() {
+        this.aiEnabled = this.elements.aiEnabled.checked;
+        localStorage.setItem('cyber-jeopardy-ai-enabled', this.aiEnabled);
+
+        const hasKey = this.aiKey && this.aiKey.length > 0;
+        const available = this.aiEnabled && hasKey;
+
+        this.elements.aiStatusLight.setAttribute('data-available', available);
+        this.elements.aiStatusLight.title = available
+            ? 'GPT Assistant Active'
+            : 'GPT Assistant Offline';
+    }
+
+    /**
+     * Save AI key to localStorage
+     */
+    saveAIKey() {
+        this.aiKey = this.elements.aiKey.value.trim();
+        if (this.aiKey) {
+            localStorage.setItem('cyber-jeopardy-ai-key', this.aiKey);
+        } else {
+            localStorage.removeItem('cyber-jeopardy-ai-key');
+        }
+        this.updateAIStatus();
+    }
+
+    /**
+     * Request AI Hint for current question
+     */
+    async requestAIHint() {
+        // Check if AI is enabled and key is available
+        if (!this.aiEnabled || !this.aiKey) {
+            this.showAIHint('⚠️ API key required. Please configure your OpenAI API key in the settings.');
+            return;
+        }
+
+        // Check hints remaining
+        if (this.hintsRemaining <= 0) {
+            this.showAIHint('❌ No hints remaining for this game.');
+            return;
+        }
+
+        // Disable button
+        this.elements.aiHintBtn.disabled = true;
+        this.showAIHint('🔄 Analyzing question...');
+
+        try {
+            // Call OpenAI API
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.aiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a helpful cybersecurity training assistant. Provide brief, educational hints about cybersecurity questions without giving away the answer directly. Keep responses under 100 words.'
+                        },
+                        {
+                            role: 'user',
+                            content: `Question: ${this.currentQuestion.question.question}\n\nProvide a helpful hint about this cybersecurity concept without revealing the answer.`
+                        }
+                    ],
+                    max_tokens: 150,
+                    temperature: 0.7
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('API request failed');
+            }
+
+            const data = await response.json();
+            const hint = data.choices[0].message.content;
+
+            // Decrement hints
+            this.hintsRemaining--;
+            this.elements.hintsRemaining.textContent = this.hintsRemaining;
+
+            // Show hint
+            this.showAIHint(`💡 ${hint}`);
+
+            // Update AI status
+            if (this.hintsRemaining === 0) {
+                this.elements.aiHintBtn.disabled = true;
+                this.elements.aiStatusLight.setAttribute('data-available', 'false');
+            }
+
+        } catch (error) {
+            console.error('AI Hint Error:', error);
+            this.showAIHint('❌ Unable to fetch hint. Please check your API key.');
+            this.elements.aiHintBtn.disabled = false;
+        }
+    }
+
+    /**
+     * Display AI hint
+     */
+    showAIHint(message) {
+        this.elements.aiHintDisplay.textContent = message;
+        this.elements.aiHintDisplay.classList.remove('hidden');
+    }
+
+    /**
+     * Hide AI hint display
+     */
+    hideAIHint() {
+        this.elements.aiHintDisplay.classList.add('hidden');
+        this.elements.aiHintDisplay.textContent = '';
+    }
+
+    /**
+     * Initialize Audio System
+     */
+    initializeAudio() {
+        this.bgmAudio = this.elements.bgmMain;
+
+        // Set initial volume
+        if (this.bgmAudio) {
+            this.bgmAudio.volume = 0.3;
+        }
+
+        // Set SFX volumes
+        [this.elements.sfxCorrect, this.elements.sfxWrong, this.elements.sfxTimeout,
+         this.elements.sfxBuzz, this.elements.sfxZeroDay].forEach(sfx => {
+            if (sfx) sfx.volume = 0.5;
+        });
+    }
+
+    /**
+     * Toggle Background Music
+     */
+    toggleBGM() {
+        if (!this.bgmAudio) return;
+
+        if (this.bgmPlaying) {
+            this.bgmAudio.pause();
+            this.bgmPlaying = false;
+            this.elements.bgmToggle.classList.remove('playing');
+        } else {
+            this.bgmAudio.play().catch(err => {
+                console.log('BGM playback failed:', err);
+            });
+            this.bgmPlaying = true;
+            this.elements.bgmToggle.classList.add('playing');
+        }
+    }
+
+    /**
+     * Play Sound Effect
+     */
+    playSFX(sfxName) {
+        const sfxMap = {
+            'correct': this.elements.sfxCorrect,
+            'wrong': this.elements.sfxWrong,
+            'timeout': this.elements.sfxTimeout,
+            'buzz': this.elements.sfxBuzz,
+            'zeroday': this.elements.sfxZeroDay
+        };
+
+        const sfx = sfxMap[sfxName];
+        if (sfx) {
+            sfx.currentTime = 0;
+            sfx.play().catch(err => {
+                console.log('SFX playback failed:', err);
+            });
+        }
+    }
+
+    /**
+     * Update Score HUD
+     */
+    updateScoreHUD() {
+        if (!this.elements.hudScores) return;
+
+        this.elements.hudScores.innerHTML = this.contestants.map(c => `
+            <div class="hud-contestant">
+                <span class="hud-name">${c.name}</span>
+                <span class="hud-score" style="color: ${c.score < 0 ? '#ef4444' : '#72bd44'}">
+                    $${c.score}
+                </span>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Show Score HUD
+     */
+    showScoreHUD() {
+        if (this.elements.scoreHud) {
+            this.elements.scoreHud.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Hide Score HUD
+     */
+    hideScoreHUD() {
+        if (this.elements.scoreHud) {
+            this.elements.scoreHud.classList.add('hidden');
+        }
     }
 }
 

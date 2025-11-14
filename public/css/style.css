@@ -1,6 +1,7 @@
 /* ===================================
-   CYBER JEOPARDY - PROFESSIONAL GAME SHOW
+   CYBER JEOPARDY OMEGA ∞ - ELITE EDITION
    Capital Technology Group Branding
+   Federal Credit Union Cybersecurity Training
    =================================== */
 
 /* Reset and Base Styles */
@@ -24,10 +25,16 @@
     --card-bg: #002a42;
     --podium-bg: #001428;
 
+    /* Cyber Colors */
+    --cyber-cyan: #00fff0;
+    --cyber-red: #ff003c;
+    --cyber-purple: #9d00ff;
+
     /* Text Colors */
     --text-light: #ffffff;
     --text-gold: #ffcc00;
     --text-green: #72bd44;
+    --text-cyan: #00fff0;
 
     /* Status Colors */
     --success-green: #72bd44;
@@ -41,11 +48,206 @@
 }
 
 body {
-    font-family: 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
+    font-family: 'Rajdhani', 'Roboto Condensed', 'Arial Narrow', Arial, sans-serif;
     background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
     color: var(--text-light);
     min-height: 100vh;
     overflow-x: hidden;
+    position: relative;
+}
+
+/* Canvas Background Effects */
+#cyberspace-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.bg-effects {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* AI Assistant Status Light */
+#ai-status-light {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid var(--captg-blue);
+    backdrop-filter: blur(10px);
+}
+
+.ai-pulse {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--error-red);
+    animation: aiPulse 2s ease infinite;
+}
+
+#ai-status-light[data-available="true"] .ai-pulse {
+    background: var(--success-green);
+}
+
+@keyframes aiPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 5px currentColor;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+        box-shadow: 0 0 20px currentColor;
+    }
+}
+
+.ai-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+}
+
+/* BGM Toggle Button */
+#bgm-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid var(--captg-purple);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+#bgm-toggle:hover {
+    border-color: var(--captg-green);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(114, 189, 68, 0.6);
+}
+
+.bgm-icon {
+    font-size: 1.5rem;
+    color: var(--text-gold);
+}
+
+#bgm-toggle.playing .bgm-icon {
+    animation: musicNote 1s ease infinite;
+}
+
+@keyframes musicNote {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* Floating Score HUD */
+#score-hud {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid var(--captg-blue);
+    border-radius: 10px;
+    padding: 15px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 30px rgba(0, 84, 135, 0.5);
+    min-width: 200px;
+}
+
+#score-hud.hidden {
+    display: none;
+}
+
+.hud-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-cyan);
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: 0.15rem;
+    border-bottom: 1px solid var(--captg-blue);
+    padding-bottom: 5px;
+}
+
+.hud-scores {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+}
+
+/* WebSocket Status Indicator */
+#ws-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid var(--captg-blue);
+    backdrop-filter: blur(10px);
+}
+
+.ws-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--error-red);
+}
+
+#ws-status[data-status="online"] .ws-dot {
+    background: var(--success-green);
+    animation: wsPulse 2s ease infinite;
+}
+
+@keyframes wsPulse {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--success-green);
+    }
+    50% {
+        box-shadow: 0 0 15px var(--success-green);
+    }
+}
+
+.ws-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-light);
+    letter-spacing: 0.1rem;
 }
 
 /* Screen Management */
@@ -57,6 +259,83 @@ body {
 .screen.active {
     display: flex;
     flex-direction: column;
+}
+
+/* ===================================
+   GLITCH TEXT EFFECT
+   =================================== */
+
+.glitch {
+    position: relative;
+    display: inline-block;
+    animation: glitchSkew 5s infinite;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    animation: glitchTop 2s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+    -webkit-clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+
+.glitch::after {
+    animation: glitchBottom 2.5s infinite;
+    clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+    -webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+}
+
+@keyframes glitchTop {
+    0%, 92%, 100% {
+        transform: translate(0, 0);
+    }
+    93%, 95% {
+        transform: translate(-3px, -2px);
+        color: var(--cyber-cyan);
+        text-shadow: 2px 0 var(--cyber-red);
+    }
+}
+
+@keyframes glitchBottom {
+    0%, 94%, 100% {
+        transform: translate(0, 0);
+    }
+    95%, 97% {
+        transform: translate(3px, 2px);
+        color: var(--cyber-red);
+        text-shadow: -2px 0 var(--cyber-cyan);
+    }
+}
+
+@keyframes glitchSkew {
+    0%, 98%, 100% {
+        transform: skew(0deg);
+    }
+    99% {
+        transform: skew(2deg);
+    }
+}
+
+.glitch-text {
+    animation: textGlitch 3s infinite;
+}
+
+@keyframes textGlitch {
+    0%, 95%, 100% {
+        opacity: 1;
+    }
+    96% {
+        opacity: 0.8;
+        text-shadow: 2px 0 var(--cyber-cyan), -2px 0 var(--cyber-red);
+    }
 }
 
 /* ===================================
@@ -78,25 +357,126 @@ body {
     background: linear-gradient(135deg, rgba(0, 84, 135, 0.3), rgba(67, 21, 96, 0.3));
     border-radius: 15px;
     border: 3px solid var(--captg-blue);
-    box-shadow: 0 0 40px rgba(114, 189, 68, 0.2);
+    box-shadow: 0 0 40px rgba(114, 189, 68, 0.2),
+                inset 0 0 60px rgba(0, 255, 240, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-.jeopardy-title {
-    font-family: 'Bebas Neue', 'Arial Black', sans-serif;
-    font-size: 4rem;
+.show-title::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(0, 255, 240, 0.1) 50%,
+        transparent 70%
+    );
+    animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateY(-100%) translateX(-100%);
+    }
+    100% {
+        transform: translateY(100%) translateX(100%);
+    }
+}
+
+.omega-title {
+    font-family: 'Orbitron', 'Arial Black', sans-serif;
+    font-size: 3.5rem;
     color: var(--text-gold);
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8),
-                 0 0 30px rgba(255, 204, 0, 0.4);
+                 0 0 30px rgba(255, 204, 0, 0.4),
+                 0 0 60px rgba(0, 255, 240, 0.3);
     letter-spacing: 0.3rem;
     margin-bottom: 0.5rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.infinity {
+    font-size: 4rem;
+    color: var(--cyber-cyan);
+    animation: infinitySpin 8s linear infinite;
+    display: inline-block;
+    text-shadow: 0 0 20px var(--cyber-cyan),
+                 0 0 40px var(--cyber-cyan);
+}
+
+@keyframes infinitySpin {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(90deg) scale(1.1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1);
+    }
+    75% {
+        transform: rotate(270deg) scale(1.1);
+    }
 }
 
 .tagline {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.1rem;
     color: var(--captg-green);
     text-transform: uppercase;
     letter-spacing: 0.2rem;
     font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.security-badge {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 2rem;
+    background: linear-gradient(135deg, var(--error-red), var(--captg-purple));
+    border: 2px solid var(--text-gold);
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.security-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: badgeShine 3s infinite;
+}
+
+@keyframes badgeShine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 200%;
+    }
+}
+
+.badge-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--text-light);
+    letter-spacing: 0.3rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .contestant-setup {
@@ -105,16 +485,19 @@ body {
     border-radius: 15px;
     padding: 2.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(0, 84, 135, 0.3);
 }
 
 .contestant-setup h2 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 2rem;
-    color: var(--captg-purple);
+    color: var(--text-cyan);
     text-align: center;
     margin-bottom: 2rem;
     letter-spacing: 0.2rem;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(0, 255, 240, 0.5);
 }
 
 .contestant-inputs {
@@ -131,6 +514,28 @@ body {
     padding: 1.5rem;
     text-align: center;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.contestant-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyber-cyan), transparent);
+    animation: cardScan 3s linear infinite;
+}
+
+@keyframes cardScan {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .contestant-card:hover {
@@ -139,18 +544,35 @@ body {
     transform: translateY(-5px);
 }
 
+.station-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-cyan);
+    letter-spacing: 0.15rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    border: 1px solid var(--captg-blue);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    display: inline-block;
+}
+
 .podium-number {
+    font-family: 'Orbitron', monospace;
     font-size: 2rem;
     font-weight: bold;
     color: var(--text-gold);
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                 0 0 20px rgba(255, 204, 0, 0.5);
 }
 
 .contestant-name {
     width: 100%;
     padding: 0.75rem;
     font-size: 1.1rem;
+    font-family: 'Rajdhani', sans-serif;
     background: var(--dark-bg);
     border: 2px solid var(--captg-blue);
     border-radius: 8px;
@@ -173,12 +595,13 @@ body {
 
 .industry-selector label {
     display: block;
+    font-family: 'Orbitron', monospace;
     font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--captg-green);
+    font-weight: 700;
+    color: var(--text-cyan);
     margin-bottom: 1rem;
     text-transform: uppercase;
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.15rem;
 }
 
 .industry-dropdown {
@@ -186,6 +609,7 @@ body {
     max-width: 400px;
     padding: 0.75rem 1rem;
     font-size: 1.1rem;
+    font-family: 'Rajdhani', sans-serif;
     background: var(--dark-bg);
     border: 2px solid var(--captg-blue);
     border-radius: 8px;
@@ -200,30 +624,113 @@ body {
     box-shadow: 0 0 15px rgba(114, 189, 68, 0.4);
 }
 
+/* AI Configuration Section */
+.ai-config {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--captg-purple);
+    border-radius: 10px;
+}
+
+.ai-toggle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.ai-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.ai-toggle-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-cyan);
+}
+
+.ai-key-input {
+    width: 100%;
+    padding: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    background: var(--darker-bg);
+    border: 2px solid var(--captg-purple);
+    border-radius: 8px;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.ai-key-input:focus {
+    outline: none;
+    border-color: var(--cyber-purple);
+    box-shadow: 0 0 15px rgba(157, 0, 255, 0.4);
+}
+
+.ai-disclaimer {
+    font-size: 0.85rem;
+    color: var(--warning-orange);
+    font-style: italic;
+    display: block;
+    margin-top: 0.5rem;
+}
+
 .btn-start {
     width: 100%;
     padding: 1.25rem 2rem;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: 0.2rem;
-    background: var(--captg-green);
+    background: linear-gradient(135deg, var(--captg-green), #5aa033);
     color: var(--text-light);
     border: none;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 5px 20px rgba(114, 189, 68, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-start::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-start:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn-start:hover {
-    background: #81cc53;
+    background: linear-gradient(135deg, #81cc53, var(--captg-green));
     transform: translateY(-3px);
     box-shadow: 0 10px 30px rgba(114, 189, 68, 0.6);
 }
 
 .btn-start:active {
     transform: translateY(-1px);
+}
+
+.btn-text,
+.btn-glow {
+    position: relative;
+    z-index: 1;
 }
 
 .game-info {
@@ -235,11 +742,12 @@ body {
 }
 
 .game-info h3 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.5rem;
-    color: var(--captg-purple);
+    color: var(--text-cyan);
     margin-bottom: 1rem;
     letter-spacing: 0.1rem;
+    font-weight: 700;
 }
 
 .game-info ul {
@@ -284,6 +792,7 @@ body {
     padding: 1rem;
     background: var(--darker-bg);
     border-bottom: 3px solid var(--captg-blue);
+    position: relative;
 }
 
 .podium {
@@ -294,6 +803,35 @@ body {
     text-align: center;
     transition: all 0.3s ease;
     position: relative;
+    overflow: hidden;
+}
+
+.podium-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(114, 189, 68, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.podium.active .podium-glow {
+    opacity: 1;
+    animation: podiumGlowPulse 2s ease infinite;
+}
+
+@keyframes podiumGlowPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.6;
+    }
 }
 
 .podium.active {
@@ -318,6 +856,7 @@ body {
 }
 
 .contestant-name-display {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.3rem;
     font-weight: bold;
     color: var(--text-light);
@@ -326,14 +865,18 @@ body {
 }
 
 .contestant-score {
+    font-family: 'Orbitron', monospace;
     font-size: 2rem;
     font-weight: bold;
     color: var(--captg-green);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                 0 0 15px rgba(114, 189, 68, 0.5);
 }
 
 .contestant-score.negative {
     color: var(--error-red);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                 0 0 15px rgba(239, 68, 68, 0.5);
 }
 
 .buzz-indicator {
@@ -355,18 +898,45 @@ body {
     padding: 1rem;
     background: linear-gradient(90deg, var(--darker-bg), var(--captg-purple), var(--darker-bg));
     margin: 1rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.round-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 240, 0.2), transparent);
+    animation: bannerSweep 4s linear infinite;
+}
+
+@keyframes bannerSweep {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 200%;
+    }
 }
 
 #round-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
     color: var(--text-gold);
     letter-spacing: 0.3rem;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8),
+                 0 0 20px rgba(255, 204, 0, 0.5);
+    font-weight: 900;
+    position: relative;
+    z-index: 1;
 }
 
 /* Jeopardy Board */
-.jeopardy-board {
+.jeopardy-board,
+.intel-grid {
     flex: 1;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -383,6 +953,7 @@ body {
     color: var(--text-light);
     padding: 1rem;
     text-align: center;
+    font-family: 'Rajdhani', sans-serif;
     font-weight: bold;
     font-size: 0.95rem;
     text-transform: uppercase;
@@ -393,12 +964,34 @@ body {
     justify-content: center;
     min-height: 70px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.category-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: headerShine 5s infinite;
+}
+
+@keyframes headerShine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 200%;
+    }
 }
 
 .question-tile {
     background: var(--jeopardy-blue);
     color: var(--text-gold);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
     font-weight: bold;
     text-align: center;
@@ -452,7 +1045,8 @@ body {
 }
 
 /* Control Panel */
-.control-panel {
+.control-panel,
+.verdict-unit {
     background: var(--darker-bg);
     border-top: 3px solid var(--captg-blue);
     padding: 1rem;
@@ -460,15 +1054,31 @@ body {
 }
 
 .current-picker {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--text-light);
 }
 
-#picker-name {
+.picker-label {
+    font-family: 'Orbitron', monospace;
+    color: var(--text-cyan);
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+}
+
+#picker-name,
+.picker-name {
     color: var(--captg-green);
     font-weight: bold;
     font-size: 1.5rem;
+    text-shadow: 0 0 15px rgba(114, 189, 68, 0.5);
+}
+
+.picker-instruction {
+    color: var(--text-gold);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
 }
 
 /* ===================================
@@ -494,7 +1104,8 @@ body {
     animation: fadeIn 0.3s ease;
 }
 
-.question-screen {
+.question-screen,
+.intel-decode {
     background: var(--jeopardy-blue);
     border: 5px solid var(--text-gold);
     border-radius: 10px;
@@ -505,9 +1116,11 @@ body {
     overflow-y: auto;
     box-shadow: 0 0 60px rgba(255, 204, 0, 0.4);
     animation: slideIn 0.4s ease;
+    position: relative;
 }
 
 .question-category {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--text-gold);
@@ -518,14 +1131,17 @@ body {
 }
 
 .question-value {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 3rem;
     color: var(--text-gold);
     text-align: center;
     margin-bottom: 2rem;
+    font-weight: 900;
+    text-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
 }
 
 .question-text {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 2rem;
     line-height: 1.5;
     color: var(--text-light);
@@ -568,11 +1184,104 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 2rem;
     font-weight: bold;
     color: var(--text-light);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.timer-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 25px;
+    background: transparent;
+    pointer-events: none;
+}
+
+.timer-fill.warning ~ .timer-pulse {
+    animation: timerPulseEffect 1s ease infinite;
+}
+
+@keyframes timerPulseEffect {
+    0%, 100% {
+        box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+    50% {
+        box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.8);
+    }
+}
+
+/* AI Hint System */
+.ai-hint-container {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.ai-hint-container.hidden {
+    display: none;
+}
+
+.ai-hint-btn {
+    padding: 1rem 2rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--cyber-purple), var(--captg-purple));
+    color: var(--text-light);
+    border: 2px solid var(--cyber-cyan);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ai-hint-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(157, 0, 255, 0.6);
+    border-color: var(--text-gold);
+}
+
+.ai-hint-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hint-icon {
+    font-size: 1.5rem;
+    animation: hintBlink 2s ease infinite;
+}
+
+@keyframes hintBlink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.ai-hint-display {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(157, 0, 255, 0.2);
+    border: 2px solid var(--cyber-purple);
+    border-radius: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-cyan);
+    text-align: left;
+}
+
+.ai-hint-display.hidden {
+    display: none;
 }
 
 /* Answer Options */
@@ -585,6 +1294,7 @@ body {
 
 .answer-btn {
     padding: 1.5rem;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.2rem;
     font-weight: 600;
     background: var(--darker-bg);
@@ -635,13 +1345,14 @@ body {
 }
 
 .buzzer-prompt {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 2rem;
     color: var(--text-gold);
     text-align: center;
     margin-bottom: 1.5rem;
     letter-spacing: 0.2rem;
     animation: pulse 1s ease infinite;
+    font-weight: 700;
 }
 
 @keyframes pulse {
@@ -681,19 +1392,20 @@ body {
 }
 
 .buzz-key {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
     font-weight: bold;
     color: var(--text-gold);
 }
 
 .buzz-name {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.1rem;
     font-weight: 600;
 }
 
 .buzz-timer {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 3rem;
     font-weight: bold;
     color: var(--error-red);
@@ -711,7 +1423,8 @@ body {
    RESULT MODAL
    =================================== */
 
-.result-screen {
+.result-screen,
+.verdict-panel {
     background: var(--card-bg);
     border: 5px solid var(--captg-blue);
     border-radius: 15px;
@@ -728,10 +1441,11 @@ body {
 }
 
 .result-status {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 3rem;
     margin-bottom: 1rem;
     letter-spacing: 0.2rem;
+    font-weight: 900;
 }
 
 .result-status.correct {
@@ -745,12 +1459,14 @@ body {
 }
 
 .result-contestant {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
     color: var(--captg-green);
 }
 
 .result-explanation {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.1rem;
     line-height: 1.6;
     padding: 1.5rem;
@@ -763,7 +1479,7 @@ body {
 
 .btn-continue {
     padding: 1rem 3rem;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: 0.2rem;
@@ -782,10 +1498,11 @@ body {
 }
 
 /* ===================================
-   DAILY DOUBLE MODAL
+   DAILY DOUBLE (ZERO-DAY) MODAL
    =================================== */
 
-.daily-double-screen {
+.daily-double-screen,
+.zero-day-screen {
     background: linear-gradient(135deg, var(--captg-purple), var(--darker-bg));
     border: 5px solid var(--text-gold);
     border-radius: 15px;
@@ -801,20 +1518,43 @@ body {
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
+.dd-announcement {
+    margin-bottom: 2rem;
+}
+
 .dd-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 4rem;
     color: var(--text-gold);
     letter-spacing: 0.3rem;
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8),
                  0 0 40px rgba(255, 204, 0, 0.6);
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     animation: glow 1.5s ease infinite;
+    font-weight: 900;
 }
 
 @keyframes glow {
     0%, 100% { text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 204, 0, 0.4); }
     50% { text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 204, 0, 0.8); }
+}
+
+.threat-level {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    color: var(--error-red);
+    font-weight: 700;
+    letter-spacing: 0.2rem;
+    animation: threatBlink 1s ease infinite;
+}
+
+@keyframes threatBlink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
 .dd-wager-section {
@@ -824,6 +1564,7 @@ body {
 .dd-contestant,
 .dd-current-score,
 .dd-max-wager {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.2rem;
     margin-bottom: 1rem;
     color: var(--text-light);
@@ -837,16 +1578,18 @@ body {
 
 .dd-wager-section label {
     display: block;
+    font-family: 'Orbitron', monospace;
     font-size: 1.3rem;
     font-weight: bold;
     color: var(--text-gold);
     margin: 1.5rem 0 1rem;
+    letter-spacing: 0.1rem;
 }
 
 .wager-input {
     width: 200px;
     padding: 1rem;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 2rem;
     text-align: center;
     background: var(--darker-bg);
@@ -865,7 +1608,7 @@ body {
 .btn-wager {
     margin-top: 2rem;
     padding: 1rem 3rem;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: 0.2rem;
@@ -887,6 +1630,10 @@ body {
    FINAL JEOPARDY SCREEN
    =================================== */
 
+.final-verdict-screen {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+}
+
 .fj-container {
     max-width: 1200px;
     width: 100%;
@@ -895,7 +1642,7 @@ body {
 }
 
 .fj-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 5rem;
     color: var(--text-gold);
     text-align: center;
@@ -904,6 +1651,35 @@ body {
                  0 0 40px rgba(255, 204, 0, 0.6);
     margin-bottom: 3rem;
     animation: glow 2s ease infinite;
+    font-weight: 900;
+}
+
+.threat-meter {
+    width: 100%;
+    height: 30px;
+    background: var(--darker-bg);
+    border: 3px solid var(--captg-blue);
+    border-radius: 15px;
+    margin: 2rem 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.threat-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-green), var(--warning-orange), var(--error-red));
+    width: 0%;
+    transition: width 2s ease;
+    animation: threatScan 3s linear infinite;
+}
+
+@keyframes threatScan {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
 }
 
 .fj-phase {
@@ -918,6 +1694,10 @@ body {
    WINNER SCREEN
    =================================== */
 
+.champion-screen {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+}
+
 .winner-container {
     max-width: 900px;
     width: 100%;
@@ -928,7 +1708,7 @@ body {
 }
 
 .winner-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 5rem;
     color: var(--text-gold);
     letter-spacing: 0.3rem;
@@ -936,6 +1716,7 @@ body {
                  0 0 60px rgba(255, 204, 0, 0.8);
     margin-bottom: 2rem;
     animation: bounce 1s ease infinite;
+    font-weight: 900;
 }
 
 @keyframes bounce {
@@ -943,7 +1724,30 @@ body {
     50% { transform: translateY(-20px); }
 }
 
+.champion-badge {
+    font-size: 2.5rem;
+    color: var(--text-gold);
+    margin: 2rem 0;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--captg-purple), var(--captg-blue));
+    border: 3px solid var(--text-gold);
+    border-radius: 15px;
+    display: inline-block;
+    box-shadow: 0 0 40px rgba(255, 204, 0, 0.5);
+    animation: badgeFloat 3s ease infinite;
+}
+
+@keyframes badgeFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-10px) scale(1.05);
+    }
+}
+
 .champion-display {
+    font-family: 'Orbitron', monospace;
     font-size: 3rem;
     color: var(--captg-green);
     font-weight: bold;
@@ -968,6 +1772,7 @@ body {
     background: var(--darker-bg);
     border-radius: 10px;
     border: 2px solid var(--border-color);
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1.3rem;
 }
 
@@ -982,6 +1787,7 @@ body {
 }
 
 .standing-item .score {
+    font-family: 'Orbitron', monospace;
     font-weight: bold;
     color: var(--captg-green);
 }
@@ -992,7 +1798,7 @@ body {
 
 .btn-primary {
     padding: 1.25rem 3rem;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: 0.2rem;
@@ -1036,17 +1842,26 @@ body {
    =================================== */
 
 @media (max-width: 1200px) {
-    .jeopardy-board {
+    .jeopardy-board,
+    .intel-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 
     .question-tile {
         font-size: 2rem;
     }
+
+    .omega-title {
+        font-size: 2.5rem;
+    }
 }
 
 @media (max-width: 768px) {
-    .jeopardy-title {
+    .omega-title {
+        font-size: 2rem;
+    }
+
+    .infinity {
         font-size: 2.5rem;
     }
 
@@ -1058,7 +1873,8 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .jeopardy-board {
+    .jeopardy-board,
+    .intel-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
@@ -1090,6 +1906,22 @@ body {
     .fj-title,
     .winner-title {
         font-size: 3rem;
+    }
+
+    .dd-title {
+        font-size: 2.5rem;
+    }
+
+    #score-hud {
+        top: 70px;
+        right: 10px;
+        min-width: 150px;
+        padding: 10px;
+    }
+
+    #ai-status-light,
+    #bgm-toggle {
+        top: 10px;
     }
 }
 

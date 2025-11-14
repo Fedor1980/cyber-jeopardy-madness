@@ -3,41 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Jeopardy! - Professional Game Show Edition</title>
+    <meta name="theme-color" content="#000f1a">
+    <meta name="description" content="CYBER JEOPARDY OMEGA ∞ - Elite Cybersecurity Awareness Training Game for Federal Credit Unions">
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+
+    <title>CYBER JEOPARDY OMEGA ∞ - Elite Training Edition</title>
+
+    <!-- Futuristic Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="app">
-        <!-- Contestant Setup Screen -->
-        <div id="setup-screen" class="screen active">
+    <!-- Canvas Background Effects -->
+    <canvas id="cyberspace-grid" class="bg-effects"></canvas>
+
+    <!-- AI Assistant Status Light -->
+    <div id="ai-status-light" class="ai-status" data-available="false" title="GPT Assistant">
+        <div class="ai-pulse"></div>
+        <span class="ai-label">AI</span>
+    </div>
+
+    <!-- BGM Toggle -->
+    <button id="bgm-toggle" class="bgm-control" aria-label="Toggle Background Music">
+        <span class="bgm-icon">♪</span>
+    </button>
+
+    <!-- Floating Team Score HUD -->
+    <div id="score-hud" class="score-hud hidden" role="region" aria-label="Live Scores">
+        <div class="hud-title">LIVE INTEL</div>
+        <div id="hud-scores" class="hud-scores"></div>
+    </div>
+
+    <div id="app" role="application">
+        <!-- ============================================
+             CONTESTANT SETUP SCREEN
+             ============================================ -->
+        <div id="setup-screen" class="screen active" role="main">
             <div class="setup-container">
                 <div class="show-title">
-                    <h1 class="jeopardy-title">CYBER JEOPARDY!</h1>
-                    <p class="tagline">Professional Cybersecurity Training Game Show</p>
+                    <h1 class="omega-title">
+                        <span class="glitch" data-text="CYBER JEOPARDY OMEGA">CYBER JEOPARDY OMEGA</span>
+                        <span class="infinity">∞</span>
+                    </h1>
+                    <p class="tagline">Elite Federal Credit Union | Cybersecurity Ops Training</p>
+                    <div class="security-badge">
+                        <span class="badge-text">CLASSIFIED</span>
+                    </div>
                 </div>
 
                 <div class="contestant-setup">
-                    <h2>CONTESTANT SETUP</h2>
+                    <h2>OPERATIVE DESIGNATION</h2>
 
                     <div class="contestant-inputs">
-                        <div class="contestant-card">
+                        <div class="contestant-card" data-station="alpha">
+                            <div class="station-label">STATION ALPHA</div>
                             <div class="podium-number">1</div>
-                            <input type="text" class="contestant-name" placeholder="Contestant 1 Name" maxlength="20" value="Alex">
+                            <input type="text" class="contestant-name" placeholder="Operative 1 Callsign" maxlength="20" value="Cipher" aria-label="Player 1 Name">
                         </div>
-                        <div class="contestant-card">
+                        <div class="contestant-card" data-station="beta">
+                            <div class="station-label">STATION BETA</div>
                             <div class="podium-number">2</div>
-                            <input type="text" class="contestant-name" placeholder="Contestant 2 Name" maxlength="20" value="Blake">
+                            <input type="text" class="contestant-name" placeholder="Operative 2 Callsign" maxlength="20" value="Firewall" aria-label="Player 2 Name">
                         </div>
-                        <div class="contestant-card">
+                        <div class="contestant-card" data-station="gamma">
+                            <div class="station-label">STATION GAMMA</div>
                             <div class="podium-number">3</div>
-                            <input type="text" class="contestant-name" placeholder="Contestant 3 Name" maxlength="20" value="Casey">
+                            <input type="text" class="contestant-name" placeholder="Operative 3 Callsign" maxlength="20" value="Sentinel" aria-label="Player 3 Name">
                         </div>
                     </div>
 
                     <div class="industry-selector">
-                        <label for="industry">Select Industry Vertical:</label>
-                        <select id="industry" class="industry-dropdown">
+                        <label for="industry">MISSION SECTOR:</label>
+                        <select id="industry" class="industry-dropdown" aria-label="Industry Vertical">
                             <option value="fcu">Federal Credit Unions</option>
                             <option value="banking">Banking & Finance</option>
                             <option value="healthcare">Healthcare</option>
@@ -46,150 +89,215 @@
                         </select>
                     </div>
 
-                    <button id="start-show-btn" class="btn-start">START SHOW</button>
+                    <!-- AI Assistant Config (Optional) -->
+                    <div class="ai-config">
+                        <label class="ai-toggle">
+                            <input type="checkbox" id="ai-enabled">
+                            <span class="ai-toggle-label">Enable GPT Assistant (3 Hints/Game)</span>
+                        </label>
+                        <input type="password" id="ai-key" class="ai-key-input" placeholder="OpenAI API Key (stored locally only)" aria-label="OpenAI API Key">
+                        <small class="ai-disclaimer">Key is stored in browser storage only. Never transmitted except to OpenAI API.</small>
+                    </div>
+
+                    <button id="start-show-btn" class="btn-start" aria-label="Start Game">
+                        <span class="btn-text">INITIATE MISSION</span>
+                        <span class="btn-glow"></span>
+                    </button>
                 </div>
 
                 <div class="game-info">
-                    <h3>HOW TO PLAY</h3>
+                    <h3>MISSION PARAMETERS</h3>
                     <ul>
-                        <li><strong>Random Start:</strong> Computer selects first contestant</li>
-                        <li><strong>15-Second Timer:</strong> Active contestant has 15s to answer</li>
-                        <li><strong>Buzz-In System:</strong> If wrong, others have 7s to buzz in</li>
-                        <li><strong>Keep Picking:</strong> Correct answer = you pick next question</li>
-                        <li><strong>3 Rounds:</strong> Jeopardy → Double Jeopardy → Final Jeopardy</li>
-                        <li><strong>Daily Doubles:</strong> Hidden questions for wagering</li>
+                        <li><strong>Random Deployment:</strong> System assigns first operative</li>
+                        <li><strong>15-Second Timer:</strong> Active operative has 15s to decode</li>
+                        <li><strong>Buzz-In Protocol:</strong> If incorrect, others have 7s to intercept</li>
+                        <li><strong>Sustained Control:</strong> Correct intel = continued command</li>
+                        <li><strong>3 Phases:</strong> Recon → Advanced Ops → Final Verdict</li>
+                        <li><strong>Zero-Day Events:</strong> Hidden high-stakes questions</li>
+                        <li><strong>Keyboard Nav:</strong> Full accessibility support (Tab, Enter, Q/W/E)</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- Game Board Screen -->
-        <div id="game-screen" class="screen">
+        <!-- ============================================
+             GAME BOARD SCREEN
+             ============================================ -->
+        <div id="game-screen" class="screen" role="main">
             <!-- Contestant Podiums -->
-            <div class="podiums">
-                <div class="podium" id="podium-0">
+            <div class="podiums" role="region" aria-label="Contestants">
+                <div class="podium" id="podium-0" data-contestant="0">
                     <div class="contestant-info">
-                        <div class="contestant-name-display">Contestant 1</div>
-                        <div class="contestant-score">$0</div>
+                        <div class="contestant-name-display">Operative 1</div>
+                        <div class="contestant-score" aria-live="polite">$0</div>
                     </div>
-                    <div class="buzz-indicator"></div>
+                    <div class="buzz-indicator" aria-hidden="true"></div>
+                    <div class="podium-glow"></div>
                 </div>
-                <div class="podium" id="podium-1">
+                <div class="podium" id="podium-1" data-contestant="1">
                     <div class="contestant-info">
-                        <div class="contestant-name-display">Contestant 2</div>
-                        <div class="contestant-score">$0</div>
+                        <div class="contestant-name-display">Operative 2</div>
+                        <div class="contestant-score" aria-live="polite">$0</div>
                     </div>
-                    <div class="buzz-indicator"></div>
+                    <div class="buzz-indicator" aria-hidden="true"></div>
+                    <div class="podium-glow"></div>
                 </div>
-                <div class="podium" id="podium-2">
+                <div class="podium" id="podium-2" data-contestant="2">
                     <div class="contestant-info">
-                        <div class="contestant-name-display">Contestant 3</div>
-                        <div class="contestant-score">$0</div>
+                        <div class="contestant-name-display">Operative 3</div>
+                        <div class="contestant-score" aria-live="polite">$0</div>
                     </div>
-                    <div class="buzz-indicator"></div>
+                    <div class="buzz-indicator" aria-hidden="true"></div>
+                    <div class="podium-glow"></div>
                 </div>
             </div>
 
             <!-- Round Display -->
-            <div class="round-banner">
-                <span id="round-title">JEOPARDY!</span>
+            <div class="round-banner" role="banner">
+                <span id="round-title" class="glitch-text" data-text="RECONNAISSANCE">RECONNAISSANCE</span>
             </div>
 
             <!-- Game Board -->
-            <div id="game-board" class="jeopardy-board"></div>
+            <div id="game-board" class="intel-grid" role="grid" aria-label="Question Board"></div>
 
             <!-- Control Panel -->
-            <div class="control-panel">
+            <div class="control-panel verdict-unit" role="status" aria-live="polite">
                 <div class="current-picker">
-                    <span id="picker-name">Contestant 1</span> - SELECT A CATEGORY
+                    <span class="picker-label">COMMAND:</span>
+                    <span id="picker-name" class="picker-name">Operative 1</span>
+                    <span class="picker-instruction">- SELECT INTEL CATEGORY</span>
                 </div>
             </div>
         </div>
 
-        <!-- Question Display Modal -->
-        <div id="question-modal" class="modal">
-            <div class="question-screen">
-                <div class="question-category"></div>
+        <!-- ============================================
+             QUESTION DISPLAY MODAL
+             ============================================ -->
+        <div id="question-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="question-category">
+            <div class="question-screen intel-decode">
+                <div class="question-category" id="question-category"></div>
                 <div class="question-value"></div>
-                <div class="question-text"></div>
+                <div class="question-text" role="heading" aria-level="2"></div>
 
-                <div id="timer-bar" class="timer-bar">
+                <div id="timer-bar" class="timer-bar" role="timer" aria-label="Time Remaining">
                     <div class="timer-fill"></div>
-                    <div class="timer-text">15</div>
+                    <div class="timer-text" aria-live="assertive">15</div>
+                    <div class="timer-pulse"></div>
                 </div>
 
-                <div class="answer-options" id="answer-options"></div>
+                <!-- AI Hint Button -->
+                <div id="ai-hint-container" class="ai-hint-container hidden">
+                    <button id="ai-hint-btn" class="ai-hint-btn" aria-label="Request AI Hint">
+                        <span class="hint-icon">💡</span>
+                        <span class="hint-text">REQUEST INTEL (<span id="hints-remaining">3</span> remaining)</span>
+                    </button>
+                    <div id="ai-hint-display" class="ai-hint-display hidden" role="status" aria-live="polite"></div>
+                </div>
+
+                <div class="answer-options" id="answer-options" role="radiogroup" aria-label="Answer Options"></div>
 
                 <!-- Buzzer Panel -->
-                <div id="buzzer-panel" class="buzzer-panel" style="display: none;">
-                    <div class="buzzer-prompt">BUZZ IN TO ANSWER!</div>
+                <div id="buzzer-panel" class="buzzer-panel" style="display: none;" role="region" aria-label="Buzz In">
+                    <div class="buzzer-prompt">⚡ INTERCEPT AVAILABLE! ⚡</div>
                     <div class="buzzer-buttons">
-                        <button class="buzz-btn" data-contestant="0">
+                        <button class="buzz-btn" data-contestant="0" aria-label="Buzz In - Player 1 (Q key)">
                             <span class="buzz-key">Q</span>
                             <span class="buzz-name"></span>
                         </button>
-                        <button class="buzz-btn" data-contestant="1">
+                        <button class="buzz-btn" data-contestant="1" aria-label="Buzz In - Player 2 (W key)">
                             <span class="buzz-key">W</span>
                             <span class="buzz-name"></span>
                         </button>
-                        <button class="buzz-btn" data-contestant="2">
+                        <button class="buzz-btn" data-contestant="2" aria-label="Buzz In - Player 3 (E key)">
                             <span class="buzz-key">E</span>
                             <span class="buzz-name"></span>
                         </button>
                     </div>
-                    <div id="buzz-timer" class="buzz-timer">7</div>
+                    <div id="buzz-timer" class="buzz-timer" aria-live="assertive">7</div>
                 </div>
             </div>
         </div>
 
-        <!-- Answer Result Modal -->
-        <div id="result-modal" class="modal">
-            <div class="result-screen">
-                <div class="result-icon"></div>
-                <div class="result-status"></div>
-                <div class="result-contestant"></div>
-                <div class="result-explanation"></div>
-                <button id="continue-btn" class="btn-continue">CONTINUE</button>
+        <!-- ============================================
+             ANSWER RESULT MODAL
+             ============================================ -->
+        <div id="result-modal" class="modal" role="dialog" aria-modal="true">
+            <div class="result-screen verdict-panel">
+                <div class="result-icon" aria-hidden="true"></div>
+                <div class="result-status" role="heading" aria-level="1"></div>
+                <div class="result-contestant" aria-live="polite"></div>
+                <div class="result-explanation" role="article"></div>
+                <button id="continue-btn" class="btn-continue" aria-label="Continue">
+                    <span>PROCEED</span>
+                </button>
             </div>
         </div>
 
-        <!-- Daily Double Modal -->
-        <div id="daily-double-modal" class="modal">
-            <div class="daily-double-screen">
+        <!-- ============================================
+             DAILY DOUBLE (ZERO-DAY) MODAL
+             ============================================ -->
+        <div id="daily-double-modal" class="modal" role="dialog" aria-modal="true">
+            <div class="daily-double-screen zero-day-screen">
                 <div class="dd-announcement">
-                    <h1 class="dd-title">DAILY DOUBLE!</h1>
-                    <audio id="dd-sound" src=""></audio>
+                    <h1 class="dd-title glitch" data-text="ZERO-DAY EXPLOIT!">ZERO-DAY EXPLOIT!</h1>
+                    <div class="threat-level">THREAT LEVEL: CRITICAL</div>
                 </div>
                 <div class="dd-wager-section">
                     <p class="dd-contestant"></p>
                     <p class="dd-current-score"></p>
-                    <label>ENTER YOUR WAGER:</label>
-                    <input type="number" id="dd-wager-input" class="wager-input" min="5" />
+                    <label for="dd-wager-input">RESOURCE ALLOCATION:</label>
+                    <input type="number" id="dd-wager-input" class="wager-input" min="5" aria-label="Wager Amount" />
                     <p class="dd-max-wager"></p>
-                    <button id="submit-wager-btn" class="btn-wager">SUBMIT WAGER</button>
+                    <button id="submit-wager-btn" class="btn-wager" aria-label="Submit Wager">
+                        <span>COMMIT RESOURCES</span>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Final Jeopardy Screen -->
-        <div id="final-jeopardy-screen" class="screen">
+        <!-- ============================================
+             FINAL JEOPARDY SCREEN
+             ============================================ -->
+        <div id="final-jeopardy-screen" class="screen final-verdict-screen" role="main">
             <div class="fj-container">
-                <h1 class="fj-title">FINAL JEOPARDY!</h1>
-                <div id="fj-phase" class="fj-phase"></div>
+                <h1 class="fj-title glitch" data-text="FINAL VERDICT">FINAL VERDICT</h1>
+                <div class="threat-meter">
+                    <div class="threat-bar"></div>
+                </div>
+                <div id="fj-phase" class="fj-phase" role="region"></div>
             </div>
         </div>
 
-        <!-- Winner Screen -->
-        <div id="winner-screen" class="screen">
+        <!-- ============================================
+             WINNER SCREEN
+             ============================================ -->
+        <div id="winner-screen" class="screen champion-screen" role="main">
             <div class="winner-container">
-                <h1 class="winner-title">CHAMPION!</h1>
-                <div id="champion-display" class="champion-display"></div>
-                <div id="final-standings" class="final-standings"></div>
+                <h1 class="winner-title glitch" data-text="MISSION COMPLETE">MISSION COMPLETE</h1>
+                <div class="champion-badge">🏆 SECURITY CHAMPION 🏆</div>
+                <div id="champion-display" class="champion-display" role="status" aria-live="polite"></div>
+                <div id="final-standings" class="final-standings" role="region" aria-label="Final Standings"></div>
                 <div class="winner-actions">
-                    <button id="new-game-btn" class="btn-primary">NEW GAME</button>
+                    <button id="new-game-btn" class="btn-primary" aria-label="Start New Game">
+                        <span>NEW MISSION</span>
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="sfx-correct" preload="auto"><source src="sfx/correct.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-wrong" preload="auto"><source src="sfx/wrong.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-timeout" preload="auto"><source src="sfx/timeout.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-buzz" preload="auto"><source src="sfx/buzz.mp3" type="audio/mpeg"></audio>
+    <audio id="sfx-zero-day" preload="auto"><source src="sfx/zeroday.mp3" type="audio/mpeg"></audio>
+    <audio id="bgm-main" loop><source src="bgm/cyber-theme.mp3" type="audio/mpeg"></audio>
+
+    <!-- WebSocket Connection Indicator -->
+    <div id="ws-status" class="ws-indicator" data-status="offline" title="Multiplayer Status">
+        <span class="ws-dot"></span>
+        <span class="ws-label">OFFLINE</span>
     </div>
 
     <script src="js/game.js"></script>

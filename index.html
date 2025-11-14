@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=public/index.html">
+    <title>Redirecting to Cyber Jeopardy Madness...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #001a2e 0%, #000f1a 100%);
+            color: white;
+        }
+        .loader {
+            text-align: center;
+        }
+        .spinner {
+            font-size: 4rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner">🔒</div>
+        <h1>Loading Cyber Jeopardy Madness...</h1>
+        <p>Redirecting to game...</p>
+        <p><a href="public/index.html" style="color: #72bd44;">Click here if not redirected automatically</a></p>
+    </div>
+    <script>
+        // Immediate redirect
+        window.location.href = 'public/index.html';
+    </script>
+</body>
+</html>

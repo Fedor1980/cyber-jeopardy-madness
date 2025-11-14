@@ -1,0 +1,168 @@
+{
+  "industry_pack": "federal-credit-union",
+  "name": "Federal Credit Union Security",
+  "description": "NCUA and FFIEC cybersecurity compliance for credit unions",
+  "rounds": {
+    "1": {
+      "categories": [
+        {
+          "name": "NCUA Regulations",
+          "description": "National Credit Union Administration security requirements",
+          "order_position": 0
+        },
+        {
+          "name": "Access Control",
+          "description": "Member authentication and authorization best practices",
+          "order_position": 1
+        },
+        {
+          "name": "Incident Response",
+          "description": "Breach notification and incident handling",
+          "order_position": 2
+        },
+        {
+          "name": "Third-Party Risk",
+          "description": "Vendor security and due diligence",
+          "order_position": 3
+        },
+        {
+          "name": "Encryption",
+          "description": "Data protection in transit and at rest",
+          "order_position": 4
+        },
+        {
+          "name": "Business Continuity",
+          "description": "Disaster recovery and resilience planning",
+          "order_position": 5
+        }
+      ],
+      "questions": [
+        {
+          "category": "NCUA Regulations",
+          "point_value": 200,
+          "difficulty": "easy",
+          "question_text": "What is the primary federal regulator for credit unions in the United States?",
+          "correct_answer": "National Credit Union Administration (NCUA)",
+          "distractors": [
+            "Federal Deposit Insurance Corporation (FDIC)",
+            "Office of the Comptroller of the Currency (OCC)",
+            "Consumer Financial Protection Bureau (CFPB)"
+          ],
+          "explanation": "The NCUA is an independent federal agency that regulates, charters, and supervises federal credit unions. It also provides deposit insurance for member accounts.",
+          "compliance_reference": "Federal Credit Union Act",
+          "learning_outcome": "Understand the regulatory framework governing credit unions",
+          "tags": ["regulation", "compliance", "NCUA"]
+        },
+        {
+          "category": "NCUA Regulations",
+          "point_value": 400,
+          "difficulty": "medium",
+          "question_text": "Under NCUA Part 748 Appendix B, what are the three key areas of the Information Security Program?",
+          "correct_answer": "Administrative, Technical, and Physical safeguards",
+          "distractors": [
+            "Prevention, Detection, and Response",
+            "People, Process, and Technology",
+            "Confidentiality, Integrity, and Availability"
+          ],
+          "explanation": "NCUA Part 748 Appendix B requires credit unions to implement administrative, technical, and physical safeguards to protect member information. This aligns with the GLBA Safeguards Rule.",
+          "compliance_reference": "NCUA Part 748 Appendix B",
+          "learning_outcome": "Identify the three pillars of information security controls",
+          "tags": ["NCUA", "safeguards", "GLBA"]
+        },
+        {
+          "category": "NCUA Regulations",
+          "point_value": 600,
+          "difficulty": "hard",
+          "question_text": "How many days does a credit union have to notify members of a data breach under NCUA regulations?",
+          "correct_answer": "As soon as possible, typically within 72 hours",
+          "distractors": [
+            "30 days from discovery",
+            "90 days from discovery",
+            "Immediately upon discovery"
+          ],
+          "explanation": "NCUA requires credit unions to notify affected members as soon as possible after discovering a breach, typically within 72 hours, though exact timing may vary based on circumstances and investigation needs.",
+          "compliance_reference": "NCUA Letter to Credit Unions 14-CU-18",
+          "learning_outcome": "Understand breach notification timelines for credit unions",
+          "tags": ["breach", "notification", "compliance"]
+        },
+        {
+          "category": "NCUA Regulations",
+          "point_value": 800,
+          "difficulty": "hard",
+          "question_text": "What minimum percentage of assets must a Federally Insured Credit Union (FICU) allocate to the National Credit Union Share Insurance Fund (NCUSIF)?",
+          "correct_answer": "1% of insured shares",
+          "distractors": [
+            "0.5% of total assets",
+            "2% of insured shares",
+            "1.5% of total deposits"
+          ],
+          "explanation": "All FICUs must maintain a deposit equal to 1% of their insured shares in the NCUSIF. This deposit is automatically adjusted as insured shares change.",
+          "compliance_reference": "Federal Credit Union Act § 202",
+          "learning_outcome": "Know the financial requirements for federal insurance",
+          "tags": ["NCUSIF", "insurance", "financial"]
+        },
+        {
+          "category": "NCUA Regulations",
+          "point_value": 1000,
+          "difficulty": "expert",
+          "question_text": "Under the FFIEC Cybersecurity Assessment Tool, what are the five domains of cybersecurity maturity?",
+          "correct_answer": "Cyber Risk Management, Threat Intelligence, Cybersecurity Controls, External Dependency Management, and Cyber Incident Management",
+          "distractors": [
+            "Prevention, Detection, Response, Recovery, and Governance",
+            "Identity, Protect, Detect, Respond, and Recover",
+            "Assessment, Planning, Implementation, Testing, and Monitoring"
+          ],
+          "explanation": "The FFIEC CAT assesses maturity across five key domains to help financial institutions evaluate their cybersecurity preparedness relative to their risk profile.",
+          "compliance_reference": "FFIEC Cybersecurity Assessment Tool",
+          "learning_outcome": "Understand the FFIEC cybersecurity maturity framework",
+          "tags": ["FFIEC", "CAT", "maturity"]
+        }
+      ]
+    },
+    "2": {
+      "categories": [
+        {
+          "name": "Advanced Threats",
+          "description": "Sophisticated attack vectors targeting financial institutions",
+          "order_position": 0
+        },
+        {
+          "name": "Compliance Deep Dive",
+          "description": "Complex regulatory requirements",
+          "order_position": 1
+        },
+        {
+          "name": "Security Architecture",
+          "description": "Enterprise security design patterns",
+          "order_position": 2
+        },
+        {
+          "name": "Forensics & Investigation",
+          "description": "Digital forensics and incident analysis",
+          "order_position": 3
+        },
+        {
+          "name": "Secure Development",
+          "description": "Application security best practices",
+          "order_position": 4
+        },
+        {
+          "name": "Risk Management",
+          "description": "Enterprise risk assessment methodologies",
+          "order_position": 5
+        }
+      ],
+      "questions": []
+    },
+    "final": {
+      "category": "Cybersecurity Leadership",
+      "question": {
+        "question_text": "According to the NCUA's Cybersecurity Resources guide, what percentage of credit unions experienced a cybersecurity incident in the past 12 months, and what is the primary recommended mitigation strategy?",
+        "correct_answer": "Over 60% experienced incidents, with multi-factor authentication (MFA) implementation as the top mitigation strategy",
+        "explanation": "Recent NCUA reports indicate that over 60% of credit unions faced cybersecurity incidents. The most effective countermeasure is implementing MFA across all critical systems and member-facing applications, reducing account takeover risk by over 99%.",
+        "compliance_reference": "NCUA Cybersecurity Resources",
+        "learning_outcome": "Understand current threat landscape and primary defensive controls for credit unions"
+      }
+    }
+  }
+}

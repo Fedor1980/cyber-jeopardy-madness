@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NexusOS Documentation Platform - Confluence Space Template -->
+<confluence-space>
+  <space>
+    <key>NEXUSOS</key>
+    <name>NexusOS Documentation</name>
+    <description>
+      <![CDATA[
+        Comprehensive documentation suite for NexusOS platform including API documentation,
+        user guides, admin manuals, training materials, and integration guides.
+      ]]>
+    </description>
+    <type>documentation</type>
+    <permissions>
+      <permission>
+        <type>viewspace</type>
+        <groups>
+          <group>confluence-users</group>
+        </groups>
+      </permission>
+      <permission>
+        <type>editspace</type>
+        <groups>
+          <group>nexusos-contributors</group>
+        </groups>
+      </permission>
+    </permissions>
+  </space>
+
+  <homepage>
+    <title>NexusOS Documentation Home</title>
+    <content>
+      <![CDATA[
+        <h1>Welcome to NexusOS Documentation</h1>
+        <p>This space contains comprehensive documentation for the NexusOS platform.</p>
+
+        <h2>Quick Links</h2>
+        <ul>
+          <li><a href="/display/NEXUSOS/API+Documentation">API Documentation</a></li>
+          <li><a href="/display/NEXUSOS/User+Guides">User Guides</a></li>
+          <li><a href="/display/NEXUSOS/Admin+Manual">Admin Manual</a></li>
+          <li><a href="/display/NEXUSOS/Training+Materials">Training Materials</a></li>
+        </ul>
+
+        <h2>Getting Started</h2>
+        <p>New to NexusOS? Start with our <a href="/display/NEXUSOS/User+Onboarding">User Onboarding Guide</a>.</p>
+      ]]>
+    </content>
+  </homepage>
+
+  <labels>
+    <label>nexusos</label>
+    <label>documentation</label>
+    <label>api</label>
+    <label>platform</label>
+  </labels>
+</confluence-space>

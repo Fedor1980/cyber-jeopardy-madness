@@ -1,0 +1,6 @@
+# HTML Rendering Configuration
+theme: default
+highlightStyle: github
+tocDepth: 3
+includeCSS: true
+standalone: true

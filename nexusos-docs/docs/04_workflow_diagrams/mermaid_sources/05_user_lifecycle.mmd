@@ -1,0 +1,53 @@
+stateDiagram-v2
+    [*] --> Invited: Admin Invites User
+    
+    Invited --> PendingActivation: Invitation Sent
+    PendingActivation --> Active: User Accepts<br/>& Completes Setup
+    PendingActivation --> Expired: Invitation Expires<br/>(7 days)
+    Expired --> Invited: Resend Invitation
+    
+    Active --> MFARequired: MFA Policy Enabled
+    MFARequired --> Active: MFA Configured
+    MFARequired --> Suspended: MFA Not Configured<br/>After Grace Period
+    
+    Active --> Active: Normal Usage<br/>API Calls, Agents, etc.
+    
+    Active --> PasswordReset: Password Reset Request
+    PasswordReset --> Active: New Password Set
+    
+    Active --> Locked: 5 Failed Login Attempts
+    Locked --> Active: Auto-Unlock After 30min<br/>or Admin Unlock
+    
+    Active --> Suspended: Policy Violation<br/>or Admin Action
+    Suspended --> Active: Admin Reactivates
+    Suspended --> Deactivated: Prolonged Suspension<br/>(>90 days)
+    
+    Active --> Deactivated: User Leaves Organization<br/>or Account Closure
+    Deactivated --> Archived: Data Retention Period<br/>(30 days)
+    Deactivated --> Active: Reactivation Request<br/>(Within 30 days)
+    
+    Archived --> Deleted: Permanent Deletion<br/>After Retention
+    Deleted --> [*]
+    
+    note right of Active
+        Active State Includes:
+        - API access enabled
+        - Can create/execute agents
+        - Can trigger workflows
+        - Access to workspace
+    end note
+    
+    note right of Suspended
+        Suspended State:
+        - Login disabled
+        - API keys revoked
+        - Resources retained
+        - Can be reactivated
+    end note
+    
+    note right of Deactivated
+        Deactivated State:
+        - All access revoked
+        - Data retained
+        - 30-day recovery window
+    end note

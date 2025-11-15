@@ -1,0 +1,63 @@
+flowchart TD
+    Alert([Security Alert]) --> Assess{Alert<br/>Type}
+    
+    Assess -->|Unauthorized<br/>Access| UnAuth[Unauthorized Access<br/>Attempted or Successful]
+    Assess -->|Data<br/>Exfiltration| DataExf[Unusual Data Transfer<br/>Detected]
+    Assess -->|Malware| Malware[Malicious Code<br/>Detected]
+    Assess -->|DDoS| DDoS[Distributed Denial<br/>of Service]
+    Assess -->|Injection| Injection[SQL/Code Injection<br/>Attempt]
+    
+    UnAuth --> BlockAccess[Block User/IP<br/>Revoke Credentials]
+    BlockAccess --> InvestAccess[Investigate Access Logs<br/>& Session Data]
+    InvestAccess --> DataBreach{Data<br/>Accessed?}
+    
+    DataExf --> IsolateSystem[Isolate Affected<br/>Systems Immediately]
+    IsolateSystem --> BlockEgress[Block Egress<br/>Network Traffic]
+    BlockEgress --> AssessData[Assess Data Exposure<br/>& Classification]
+    
+    Malware --> QuarantineSystem[Quarantine System<br/>Prevent Spread]
+    QuarantineSystem --> FullScan[Full System Scan<br/>All Infrastructure]
+    FullScan --> RemoveThreat[Remove Malware<br/>Rebuild If Needed]
+    
+    DDoS --> EnableWAF[Activate WAF Rules<br/>DDoS Protection]
+    EnableWAF --> RateLimit[Aggressive Rate Limiting<br/>IP Blocking]
+    RateLimit --> CloudFlare[Activate CDN<br/>DDoS Mitigation]
+    
+    Injection --> BlockIP[Block Source IP<br/>Immediately]
+    BlockIP --> PatchVuln[Patch Vulnerability<br/>Update WAF Rules]
+    PatchVuln --> ScanExploit[Scan for Exploitation<br/>Success]
+    
+    DataBreach -->|Yes| HighSeverity[High Severity<br/>Data Compromised]
+    DataBreach -->|No| MedSeverity[Medium Severity<br/>Attempted Only]
+    
+    AssessData --> DataType{Data<br/>Type}
+    DataType -->|PII/PHI| HighSeverity
+    DataType -->|Internal| MedSeverity
+    DataType -->|Public| LowSeverity[Low Severity<br/>No Sensitive Data]
+    
+    RemoveThreat --> MedSeverity
+    CloudFlare --> LowSeverity
+    ScanExploit --> ExploitSuccess{Exploit<br/>Successful?}
+    ExploitSuccess -->|Yes| HighSeverity
+    ExploitSuccess -->|No| LowSeverity
+    
+    HighSeverity --> P0[Declare P0<br/>Security Incident]
+    P0 --> Legal[Contact Legal<br/>& Compliance]
+    Legal --> NotifyReq{Notification<br/>Required?}
+    NotifyReq -->|Yes| NotifyUsers[Notify Affected<br/>Users & Authorities]
+    NotifyReq -->|No| SecurityPM
+    NotifyUsers --> SecurityPM[Security Post-Mortem<br/>& Remediation]
+    
+    MedSeverity --> SecurityTeam[Notify Security Team<br/>Investigate Further]
+    SecurityTeam --> SecurityPM
+    
+    LowSeverity --> Document[Document & Monitor<br/>No Immediate Action]
+    Document --> SecurityPM
+    
+    SecurityPM --> ActionItems[Create Action Items<br/>Prevent Recurrence]
+    ActionItems --> End([Incident Closed])
+    
+    style Alert fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style HighSeverity fill:#ff8787,stroke:#c92a2a
+    style Legal fill:#ffd93d,stroke:#f59f00
+    style End fill:#90ee90,stroke:#2f9e44,color:#000

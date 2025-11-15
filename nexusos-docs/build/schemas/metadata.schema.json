@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Document Metadata Schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date"
+    },
+    "category": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    }
+  }
+}

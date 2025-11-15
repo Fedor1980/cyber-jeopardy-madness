@@ -1,0 +1,73 @@
+sequenceDiagram
+    participant Ops as Operations Team
+    participant Monitor as Monitoring System
+    participant Primary as Primary Site<br/>(us-east-1)
+    participant DNS as DNS/Load Balancer
+    participant DR as DR Site<br/>(us-west-2)
+    participant DB as Database
+    participant Users as End Users
+    
+    Note over Primary: Normal Operations
+    Primary->>Monitor: Health Check OK
+    Monitor->>Ops: System Healthy
+    
+    Note over Primary: Disaster Occurs
+    Primary--xMonitor: Health Check Failed
+    Monitor->>Monitor: 3 consecutive failures
+    Monitor->>Ops: CRITICAL ALERT<br/>Primary Site Down
+    
+    Ops->>Ops: Assess Situation<br/>Declare Disaster
+    Ops->>DR: Verify DR Site Ready
+    DR->>Ops: DR Site Healthy
+    
+    Ops->>DB: Verify Latest Backup
+    DB->>Ops: Backup Available<br/>RPO: 30 minutes
+    
+    Note over Ops,DR: BEGIN FAILOVER
+    Ops->>DR: Initiate Failover Sequence
+    
+    DR->>DB: Restore from Latest Backup
+    DB->>DR: Database Restored
+    
+    DR->>DR: Start Application Services
+    DR->>DR: Run Health Checks
+    DR->>Ops: Services Healthy
+    
+    Ops->>DR: Run Smoke Tests
+    DR->>Ops: Tests Passed
+    
+    Ops->>DNS: Update DNS Records<br/>Point to DR Site
+    DNS->>DNS: Propagate Changes<br/>(TTL: 60s)
+    
+    Note over Users: Users Experience Brief Downtime
+    
+    Users->>DNS: Request api.nexusos.io
+    DNS->>Users: Resolve to DR Site IP
+    Users->>DR: API Request
+    DR->>Users: Response (200 OK)
+    
+    Ops->>Monitor: Enable Enhanced Monitoring
+    Monitor->>DR: Continuous Health Checks
+    
+    loop Every 15 minutes
+        DR->>Monitor: Metrics & Logs
+        Monitor->>Ops: Status Dashboard
+    end
+    
+    Note over Ops,DR: Service Restored<br/>RTO: 4 hours achieved
+    
+    Ops->>Users: Send Communication<br/>"Service Restored"
+    
+    Note over Primary: Later: Primary Site Recovery
+    Ops->>Primary: Assess & Rebuild
+    Primary->>Ops: Site Restored
+    
+    Ops->>DR: Prepare for Failback
+    DR->>Primary: Sync Data
+    Primary->>DR: Sync Complete
+    
+    Ops->>DNS: Update DNS to Primary
+    DNS->>Users: Resolve to Primary
+    
+    Users->>Primary: Resume Normal Operations
+    Note over Primary: Normal Operations Restored

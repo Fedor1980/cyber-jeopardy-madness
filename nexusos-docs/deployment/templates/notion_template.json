@@ -1,0 +1,185 @@
+{
+  "notion_template": {
+    "database": {
+      "title": [
+        {
+          "type": "text",
+          "text": {
+            "content": "NexusOS Documentation"
+          }
+        }
+      ],
+      "description": [
+        {
+          "type": "text",
+          "text": {
+            "content": "Complete documentation suite for NexusOS platform"
+          }
+        }
+      ],
+      "properties": {
+        "Title": {
+          "title": {}
+        },
+        "Category": {
+          "select": {
+            "options": [
+              {
+                "name": "API Documentation",
+                "color": "blue"
+              },
+              {
+                "name": "User Guides",
+                "color": "green"
+              },
+              {
+                "name": "Admin Manual",
+                "color": "red"
+              },
+              {
+                "name": "Training Materials",
+                "color": "purple"
+              },
+              {
+                "name": "Integration Guides",
+                "color": "orange"
+              },
+              {
+                "name": "Quick References",
+                "color": "yellow"
+              }
+            ]
+          }
+        },
+        "Status": {
+          "status": {
+            "options": [
+              {
+                "name": "Published",
+                "color": "green"
+              },
+              {
+                "name": "Draft",
+                "color": "yellow"
+              },
+              {
+                "name": "Under Review",
+                "color": "orange"
+              },
+              {
+                "name": "Archived",
+                "color": "gray"
+              }
+            ],
+            "groups": [
+              {
+                "name": "Active",
+                "option_ids": ["published", "draft", "under-review"]
+              },
+              {
+                "name": "Inactive",
+                "option_ids": ["archived"]
+              }
+            ]
+          }
+        },
+        "Tags": {
+          "multi_select": {
+            "options": [
+              {
+                "name": "API",
+                "color": "blue"
+              },
+              {
+                "name": "Authentication",
+                "color": "red"
+              },
+              {
+                "name": "Security",
+                "color": "red"
+              },
+              {
+                "name": "Tutorial",
+                "color": "green"
+              },
+              {
+                "name": "Reference",
+                "color": "purple"
+              },
+              {
+                "name": "Incident Response",
+                "color": "red"
+              }
+            ]
+          }
+        },
+        "Last Updated": {
+          "date": {}
+        },
+        "Owner": {
+          "people": {}
+        },
+        "Version": {
+          "rich_text": {}
+        }
+      }
+    },
+    "page_template": {
+      "parent": {
+        "type": "database_id",
+        "database_id": "{{DATABASE_ID}}"
+      },
+      "icon": {
+        "type": "emoji",
+        "emoji": "📚"
+      },
+      "cover": {
+        "type": "external",
+        "external": {
+          "url": "https://via.placeholder.com/1500x600/0066CC/FFFFFF?text=NexusOS+Documentation"
+        }
+      },
+      "properties": {
+        "Title": {
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": "{{PAGE_TITLE}}"
+              }
+            }
+          ]
+        },
+        "Category": {
+          "select": {
+            "name": "{{CATEGORY}}"
+          }
+        },
+        "Status": {
+          "status": {
+            "name": "Published"
+          }
+        },
+        "Tags": {
+          "multi_select": []
+        },
+        "Last Updated": {
+          "date": {
+            "start": "{{CURRENT_DATE}}"
+          }
+        },
+        "Version": {
+          "rich_text": [
+            {
+              "type": "text",
+              "text": {
+                "content": "1.0.0"
+              }
+            }
+          ]
+        }
+      },
+      "children": []
+    }
+  }
+}

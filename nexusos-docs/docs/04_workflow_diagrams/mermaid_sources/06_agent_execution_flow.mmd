@@ -1,0 +1,58 @@
+flowchart TD
+    Start([Agent Execution Request]) --> Auth{Authentication<br/>Valid?}
+    
+    Auth -->|No| Reject[Return 401<br/>Unauthorized]
+    Auth -->|Yes| RateLimit{Rate Limit<br/>Check}
+    
+    RateLimit -->|Exceeded| RateLimitReject[Return 429<br/>Rate Limit Exceeded]
+    RateLimit -->|OK| ValidateInput[Validate Input<br/>Schema Check]
+    
+    ValidateInput --> InputValid{Input<br/>Valid?}
+    InputValid -->|No| InvalidInput[Return 422<br/>Validation Error]
+    InputValid -->|Yes| QueueCheck{Execution<br/>Queue}
+    
+    QueueCheck -->|Queue Full| QueueFull[Return 503<br/>Queue Full]
+    QueueCheck -->|Available| Enqueue[Add to Queue<br/>Return 202 Accepted]
+    
+    Enqueue --> ExecutionID[Generate Execution ID<br/>Update Status: Pending]
+    ExecutionID --> Worker[Worker Picks Up<br/>From Queue]
+    
+    Worker --> UpdateRunning[Update Status:<br/>Running]
+    UpdateRunning --> LoadAgent[Load Agent<br/>Configuration]
+    
+    LoadAgent --> PrepareContext[Prepare Execution<br/>Context & Memory]
+    PrepareContext --> CallModel[Call AI Model<br/>With Prompt & Input]
+    
+    CallModel --> ModelResponse{Model<br/>Response}
+    ModelResponse -->|Timeout| Timeout[Update Status:<br/>Timeout]
+    ModelResponse -->|Error| ModelError[Update Status:<br/>Failed]
+    ModelResponse -->|Success| ProcessOutput[Process Output<br/>Transform Data]
+    
+    ProcessOutput --> RunHooks{Post-Execution<br/>Hooks?}
+    RunHooks -->|Yes| ExecuteHooks[Execute Webhooks<br/>Notifications]
+    RunHooks -->|No| SaveResult
+    ExecuteHooks --> SaveResult[Save Result<br/>to Database]
+    
+    SaveResult --> UpdateMetrics[Update Metrics<br/>- Token Usage<br/>- Duration<br/>- Cost]
+    
+    UpdateMetrics --> Success[Update Status:<br/>Completed]
+    
+    Timeout --> NotifyTimeout[Notify User<br/>Timeout Occurred]
+    ModelError --> NotifyError[Notify User<br/>Error Details]
+    Success --> NotifySuccess[Notify User<br/>Result Available]
+    
+    NotifyTimeout --> End([Execution Complete])
+    NotifyError --> End
+    NotifySuccess --> End
+    
+    Reject --> End
+    RateLimitReject --> End
+    InvalidInput --> End
+    QueueFull --> End
+    
+    style Start fill:#6366f1,stroke:#4f46e5,color:#fff
+    style Success fill:#90ee90,stroke:#2f9e44
+    style Timeout fill:#ffd93d,stroke:#f59f00
+    style ModelError fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style Reject fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style End fill:#6b7280,stroke:#4b5563,color:#fff

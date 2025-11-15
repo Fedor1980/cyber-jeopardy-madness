@@ -1,0 +1,61 @@
+flowchart TD
+    Start([System Components]) --> Collect[Data Collection Layer]
+    
+    Collect --> Metrics[Prometheus Metrics]
+    Collect --> Logs[Centralized Logging<br/>Elasticsearch]
+    Collect --> Traces[Distributed Tracing<br/>Jaeger]
+    Collect --> Events[Event Stream<br/>Kafka]
+    
+    Metrics --> MetricsDB[(Prometheus<br/>Time Series DB)]
+    Logs --> LogsDB[(Elasticsearch<br/>Log Storage)]
+    Traces --> TracesDB[(Jaeger<br/>Trace Storage)]
+    Events --> EventsDB[(Kafka<br/>Event Log)]
+    
+    MetricsDB --> Grafana[Grafana Dashboards]
+    LogsDB --> Kibana[Kibana Log Analysis]
+    TracesDB --> JaegerUI[Jaeger UI]
+    EventsDB --> StreamProcess[Stream Processing]
+    
+    Grafana --> AlertMgr[Alert Manager]
+    Kibana --> AlertMgr
+    StreamProcess --> AlertMgr
+    
+    AlertMgr --> Rules{Alert Rules<br/>Evaluation}
+    
+    Rules -->|Critical| P0Alert[P0 Critical Alert<br/>- System Down<br/>- Data Breach<br/>- Error Rate >5%]
+    Rules -->|Warning| P1Alert[P1 Warning Alert<br/>- High CPU >80%<br/>- Memory >85%<br/>- Slow Response]
+    Rules -->|Info| P2Alert[P2 Info Alert<br/>- Approaching Limits<br/>- Unusual Patterns]
+    
+    P0Alert --> PagerDuty[PagerDuty<br/>Immediate Page]
+    P1Alert --> Slack[Slack Alert<br/>@oncall]
+    P2Alert --> Email[Email Notification<br/>Team Inbox]
+    
+    PagerDuty --> Response[Incident Response<br/>Team Mobilizes]
+    Slack --> Review[Engineer Reviews<br/>Takes Action]
+    Email --> Monitor[Monitor & Track<br/>No Immediate Action]
+    
+    Response --> Actions{Response<br/>Actions}
+    
+    Actions --> AutoScale[Auto-Scaling<br/>Triggered]
+    Actions --> CircuitBreaker[Circuit Breaker<br/>Activated]
+    Actions --> Failover[Failover<br/>to DR Site]
+    Actions --> ManualFix[Manual<br/>Intervention]
+    
+    AutoScale --> Verify[Verify Resolution]
+    CircuitBreaker --> Verify
+    Failover --> Verify
+    ManualFix --> Verify
+    
+    Verify --> MetricsDB
+    
+    Review --> UpdateDash[Update Runbook<br/>Document Fix]
+    Monitor --> Trend[Trend Analysis<br/>Capacity Planning]
+    
+    UpdateDash --> End([Monitoring Continues])
+    Trend --> End
+    
+    style Start fill:#6366f1,stroke:#4f46e5,color:#fff
+    style P0Alert fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style P1Alert fill:#ffd93d,stroke:#f59f00
+    style P2Alert fill:#90ee90,stroke:#2f9e44
+    style End fill:#6b7280,stroke:#4b5563,color:#fff

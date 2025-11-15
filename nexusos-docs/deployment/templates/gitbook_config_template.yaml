@@ -1,0 +1,73 @@
+# NexusOS Documentation Platform - GitBook Configuration Template
+
+# Book Metadata
+title: NexusOS Documentation
+description: Complete documentation suite for NexusOS - API docs, admin manuals, training materials
+author: NexusOS Team
+language: en
+
+# Structure
+root: ./
+structure:
+  readme: README.md
+  summary: SUMMARY.md
+  glossary: docs/11_appendices/glossary.md
+
+# Plugins
+plugins:
+  - search
+  - fontsettings
+  - sharing
+  - livereload
+  - prism
+  - anchors
+  - toc
+  - back-to-top-button
+  - expandable-chapters
+  - github
+  - edit-link
+
+# Plugin Configuration
+pluginsConfig:
+  search:
+    maxIndexSize: 1000000
+  sharing:
+    facebook: false
+    twitter: true
+    google: false
+    linkedin: true
+    all:
+      - facebook
+      - twitter
+      - linkedin
+  github:
+    url: https://github.com/nexusos/docs
+  edit-link:
+    base: https://github.com/nexusos/docs/edit/main
+    label: Edit This Page
+  prism:
+    css:
+      - prism-themes/themes/prism-vs.css
+  toc:
+    addClass: true
+    className: "toc"
+
+# Theme
+theme: default
+
+# Variables
+variables:
+  version: "1.0.0"
+  copyright: "© 2025 NexusOS Team"
+
+# PDF Options
+pdf:
+  pageNumbers: true
+  fontSize: 12
+  fontFamily: "Arial"
+  paperSize: "a4"
+  margin:
+    top: 56
+    bottom: 56
+    right: 62
+    left: 62

@@ -1,0 +1,42 @@
+flowchart TD
+    Start([P0 Incident Detected]) --> Assess{Severity<br/>Assessment}
+    Assess -->|Confirmed P0| Declare[Declare P0 Incident<br/>Create War Room]
+    Assess -->|Lower Priority| Lower[Use P1/P2 Playbook]
+    
+    Declare --> Team[Assemble Response Team<br/>- Incident Commander<br/>- Technical Lead<br/>- Comms Lead]
+    Team --> Notify[Notify Stakeholders<br/>- Engineering<br/>- Leadership<br/>- Support]
+    
+    Notify --> StatusPage[Update Status Page<br/>Major Outage]
+    StatusPage --> Diagnose{Rapid<br/>Diagnosis}
+    
+    Diagnose -->|Database| DB[Database Failover<br/>or Scaling]
+    Diagnose -->|Application| App[Rollback Deployment<br/>or Restart Services]
+    Diagnose -->|Infrastructure| Infra[Scale Resources<br/>or Failover Region]
+    Diagnose -->|Unknown| Protect[Enable Circuit Breakers<br/>Maintenance Mode]
+    
+    DB --> Monitor[Monitor Metrics<br/>- Error Rate<br/>- Response Time<br/>- User Impact]
+    App --> Monitor
+    Infra --> Monitor
+    Protect --> Monitor
+    
+    Monitor --> Resolved{Issue<br/>Resolved?}
+    Resolved -->|No After 30min| Escalate[Escalate &<br/>Deeper Diagnosis]
+    Escalate --> Diagnose
+    
+    Resolved -->|Yes| Verify[Verify Resolution<br/>- All Services Healthy<br/>- Error Rate Normal<br/>- User Testing]
+    
+    Verify --> Stable{Stable<br/>2+ Hours?}
+    Stable -->|No| Monitor
+    Stable -->|Yes| CommCustomer[Customer Communication<br/>Incident Resolved]
+    
+    CommCustomer --> Document[Document Timeline<br/>& Actions Taken]
+    Document --> Close[Close Incident<br/>Update Status Page]
+    Close --> PM[Schedule Post-Mortem<br/>Within 5 Days]
+    PM --> End([Incident Complete])
+    
+    style Start fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style Declare fill:#ff8787,stroke:#c92a2a
+    style Diagnose fill:#ffd93d,stroke:#f59f00
+    style Resolved fill:#ffd93d,stroke:#f59f00
+    style Stable fill:#ffd93d,stroke:#f59f00
+    style End fill:#90ee90,stroke:#2f9e44,color:#000

@@ -1,0 +1,58 @@
+# NexusOS Documentation Platform - Git Ignore
+
+# Build outputs
+dist/
+*.log
+*.tmp
+deployment_logs/
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.secret
+*.pem
+*.key
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# Temporary files
+*.bak
+*.cache
+.temp/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+venv/
+.venv/
+*.egg-info/
+
+# Mermaid CLI temp
+.mmdc/
+
+# Coverage & test reports
+coverage/
+.nyc_output/
+test-results/
+*.lcov
+
+# Generated files (can be regenerated)
+# dist/** is gitignored, but you can commit specific artifacts if needed

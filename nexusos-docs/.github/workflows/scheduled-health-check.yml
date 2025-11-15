@@ -1,0 +1,12 @@
+name: Daily Health Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./docs/09_scripts/health_check.sh

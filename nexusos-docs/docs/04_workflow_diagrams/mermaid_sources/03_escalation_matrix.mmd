@@ -1,0 +1,52 @@
+flowchart TD
+    Incident([Incident Occurs]) --> Severity{Incident<br/>Severity}
+    
+    Severity -->|P2 Medium| P2Flow[P2 - Medium Priority<br/>SLA: 4 hours]
+    Severity -->|P1 High| P1Flow[P1 - High Priority<br/>SLA: 1 hour]
+    Severity -->|P0 Critical| P0Flow[P0 - Critical<br/>SLA: 15 minutes]
+    
+    P2Flow --> P2Engineer[On-Call Engineer<br/>Responds Within 4h]
+    P2Engineer --> P2Resolve{Resolved<br/>In 48h?}
+    P2Resolve -->|Yes| Close
+    P2Resolve -->|No| EscalateP1[Escalate to P1]
+    
+    P1Flow --> P1Engineer[Page On-Call<br/>Immediate Response]
+    P1Engineer --> P1Team[Notify Engineering<br/>Manager]
+    P1Team --> P1Resolve{Resolved<br/>In 8h?}
+    P1Resolve -->|Yes| Close
+    P1Resolve -->|No| EscalateP0[Escalate to P0]
+    
+    EscalateP1 --> P1Flow
+    EscalateP0 --> P0Flow
+    
+    P0Flow --> P0Page[Page Multiple Teams<br/>All Hands]
+    P0Page --> P0IC[Incident Commander<br/>Assigned]
+    P0IC --> P0EngMgr[Engineering Manager<br/>Notified Immediately]
+    P0EngMgr --> P0VP[VP Engineering<br/>Notified]
+    
+    P0VP --> P0Duration{Duration<br/>>2 Hours?}
+    P0Duration -->|No| P0Resolve{Resolved?}
+    P0Duration -->|Yes| P0CTO[CTO Notified]
+    
+    P0CTO --> P0Scope{Scope}
+    P0Scope -->|Security<br/>Breach| P0CISO[CISO & Legal<br/>Immediately]
+    P0Scope -->|Financial<br/>Impact| P0CFO[CFO Notified]
+    P0Scope -->|Customer<br/>Impact >1000| P0CEO[CEO Notified]
+    
+    P0CISO --> P0Resolve
+    P0CFO --> P0Resolve
+    P0CEO --> P0Resolve
+    
+    P0Resolve -->|Yes| Close[Close Incident<br/>Notify Stakeholders]
+    P0Resolve -->|No| P0Continue[Continue Response<br/>Update Every 30min]
+    P0Continue --> P0Resolve
+    
+    Close --> PostMortem[Schedule<br/>Post-Mortem]
+    PostMortem --> End([Complete])
+    
+    style Incident fill:#6366f1,stroke:#4f46e5,color:#fff
+    style P2Flow fill:#90ee90,stroke:#2f9e44
+    style P1Flow fill:#ffd93d,stroke:#f59f00
+    style P0Flow fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    style P0CEO fill:#ff8787,stroke:#c92a2a
+    style End fill:#90ee90,stroke:#2f9e44,color:#000

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusOS Documentation Platform - Beautiful Docs Made Simple</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      background: #ffffff;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+      color: white;
+      padding: 100px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 24px;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 16px 40px;
+      background: white;
+      color: #6366f1;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 18px;
+      border-radius: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    .feature {
+      padding: 30px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feature:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
+      border-color: #6366f1;
+    }
+
+    .feature h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #6366f1;
+    }
+
+    .feature p {
+      color: #64748b;
+      line-height: 1.7;
+    }
+
+    .pricing {
+      background: #f9fafb;
+    }
+
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 60px;
+    }
+
+    .pricing-card {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      border: 2px solid #e5e7eb;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(99, 102, 241, 0.15);
+      border-color: #6366f1;
+    }
+
+    .pricing-card.featured {
+      border-color: #6366f1;
+      border-width: 3px;
+      position: relative;
+      transform: scale(1.05);
+    }
+
+    .pricing-card.featured::before {
+      content: 'POPULAR';
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #6366f1;
+      color: white;
+      padding: 5px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .tier-name {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #1e293b;
+    }
+
+    .tier-price {
+      font-size: 48px;
+      font-weight: 800;
+      color: #6366f1;
+      margin-bottom: 10px;
+    }
+
+    .tier-price span {
+      font-size: 18px;
+      color: #64748b;
+      font-weight: 400;
+    }
+
+    .tier-features {
+      list-style: none;
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .tier-features li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      color: #475569;
+    }
+
+    .tier-features li::before {
+      content: '✓ ';
+      color: #10b981;
+      font-weight: 700;
+      margin-right: 10px;
+    }
+
+    .buy-button {
+      display: inline-block;
+      padding: 14px 32px;
+      background: #6366f1;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .buy-button:hover {
+      background: #4f46e5;
+    }
+
+    .testimonials {
+      padding: 80px 20px;
+      background: white;
+    }
+
+    .testimonial {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 40px;
+      background: #f9fafb;
+      border-left: 4px solid #6366f1;
+      border-radius: 8px;
+    }
+
+    .testimonial p {
+      font-size: 18px;
+      font-style: italic;
+      color: #475569;
+      margin-bottom: 20px;
+    }
+
+    .testimonial .author {
+      font-weight: 700;
+      color: #1e293b;
+      font-style: normal;
+    }
+
+    h2 {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1e293b;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      font-size: 18px;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    footer {
+      background: #1e293b;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    footer a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero p {
+        font-size: 18px;
+      }
+
+      .pricing-card.featured {
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Beautiful Documentation.<br>Zero Configuration.</h1>
+    <p>Transform your markdown into stunning, searchable documentation in seconds</p>
+    <a href="#pricing" class="cta-button">Get Started →</a>
+  </div>
+
+  <!-- Features Section -->
+  <div class="container">
+    <h2>Everything You Need</h2>
+    <p class="subtitle">A complete documentation platform that just works</p>
+
+    <div class="features">
+      <div class="feature">
+        <h3>🔍 Interactive Search</h3>
+        <p>Real-time search with fuzzy matching, keyboard shortcuts, and relevance scoring. Your users find what they need instantly.</p>
+      </div>
+
+      <div class="feature">
+        <h3>🌙 Dark Mode</h3>
+        <p>Automatic theme switching with localStorage persistence. Respects user preferences. Looks professional day and night.</p>
+      </div>
+
+      <div class="feature">
+        <h3>📄 Multi-Format Output</h3>
+        <p>Generate HTML sites, branded PDFs, presentations, and diagrams from a single markdown source. Write once, publish everywhere.</p>
+      </div>
+
+      <div class="feature">
+        <h3>📊 Mermaid Diagrams</h3>
+        <p>Auto-render flowcharts, sequence diagrams, ERDs, and more. Complex concepts made visual and beautiful.</p>
+      </div>
+
+      <div class="feature">
+        <h3>🎨 Custom Branding</h3>
+        <p>Professional branded PDFs with custom covers, headers, footers, and watermarks. Make it yours.</p>
+      </div>
+
+      <div class="feature">
+        <h3>📱 Mobile Responsive</h3>
+        <p>Perfect on every device. Your documentation looks great whether it's viewed on a phone, tablet, or desktop.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing Section -->
+  <div class="pricing">
+    <div class="container">
+      <h2 id="pricing">Simple, Transparent Pricing</h2>
+      <p class="subtitle">Choose the plan that's right for you. No hidden fees. No subscriptions.</p>
+
+      <div class="pricing-cards">
+        <!-- Free Tier -->
+        <div class="pricing-card">
+          <div class="tier-name">Free</div>
+          <div class="tier-price">$0</div>
+          <ul class="tier-features">
+            <li>HTML generation</li>
+            <li>Interactive search</li>
+            <li>Dark mode</li>
+            <li>Diagram rendering</li>
+            <li>Basic PDFs</li>
+            <li>Slides</li>
+            <li>Community support</li>
+          </ul>
+          <a href="https://github.com/nexusos/docs-platform" class="buy-button">Download Free</a>
+        </div>
+
+        <!-- Professional Tier -->
+        <div class="pricing-card featured">
+          <div class="tier-name">Professional</div>
+          <div class="tier-price">$99<span>/one-time</span></div>
+          <ul class="tier-features">
+            <li>All Free features</li>
+            <li>Branded PDFs</li>
+            <li>White-label customization</li>
+            <li>Watermark support</li>
+            <li>Priority email support</li>
+            <li>Commercial license</li>
+            <li>Lifetime updates</li>
+          </ul>
+          <a href="mailto:sales@nexusos.com?subject=Professional%20License" class="buy-button">Buy Now</a>
+        </div>
+
+        <!-- Enterprise Tier -->
+        <div class="pricing-card">
+          <div class="tier-name">Enterprise</div>
+          <div class="tier-price">$499<span>/one-time</span></div>
+          <ul class="tier-features">
+            <li>All Professional features</li>
+            <li>Custom integrations</li>
+            <li>On-premise deployment</li>
+            <li>SLA guarantees</li>
+            <li>Training sessions (2hrs)</li>
+            <li>White-glove onboarding</li>
+            <li>Unlimited installs</li>
+            <li>Phone support</li>
+          </ul>
+          <a href="mailto:sales@nexusos.com?subject=Enterprise%20License" class="buy-button">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials Section -->
+  <div class="testimonials">
+    <div class="container">
+      <h2>Loved by Teams Worldwide</h2>
+
+      <div class="testimonial">
+        <p>"We switched to NexusOS Docs and cut our documentation time in half. The branded PDFs look incredible, and our customers love the dark mode."</p>
+        <div class="author">— Sarah Chen, Head of Engineering @ TechFlow</div>
+      </div>
+
+      <div class="testimonial">
+        <p>"Setup took 5 minutes. Seriously. We went from messy Google Docs to professional documentation that clients actually read."</p>
+        <div class="author">— Marcus Williams, CTO @ DevStack</div>
+      </div>
+
+      <div class="testimonial">
+        <p>"The search feature is a game-changer. Our support team can find answers instantly, and ticket volume dropped by 30%."</p>
+        <div class="author">— Jessica Park, Customer Success @ CloudBase</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="hero" style="padding: 60px 20px;">
+    <h1 style="font-size: 36px;">Ready to Transform Your Documentation?</h1>
+    <p style="font-size: 18px;">Join hundreds of teams creating beautiful docs with NexusOS</p>
+    <a href="#pricing" class="cta-button">Choose Your Plan →</a>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2024 NexusOS. All rights reserved.</p>
+    <p style="margin-top: 10px;">
+      <a href="mailto:sales@nexusos.com">Sales</a> •
+      <a href="mailto:support@nexusos.com">Support</a> •
+      <a href="https://github.com/nexusos/docs-platform">GitHub</a>
+    </p>
+  </footer>
+</body>
+</html>

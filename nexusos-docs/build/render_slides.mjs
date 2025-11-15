@@ -9,11 +9,17 @@ const OUTPUT_PDF = 'outputs/slides/admin_training.pdf';
 
 async function renderSlides() {
   console.log('Rendering Marp slides...');
-  
+
+  // Create output directory if it doesn't exist
+  const outputDir = 'outputs/slides';
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
   const markdown = fs.readFileSync(SLIDES_FILE, 'utf8');
   const marp = new Marp();
   const { html } = marp.render(markdown);
-  
+
   fs.writeFileSync(OUTPUT_HTML, html);
   console.log(`✓ HTML: ${OUTPUT_HTML}`);
   

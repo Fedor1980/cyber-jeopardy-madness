@@ -10,7 +10,12 @@ const OUTPUT_DIR = 'outputs/diagrams';
 
 async function renderDiagrams() {
   console.log('Rendering Mermaid diagrams...');
-  
+
+  // Create output directory if it doesn't exist
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+
   const files = fs.readdirSync(DIAGRAM_DIR).filter(f => f.endsWith('.mmd'));
   
   for (const file of files) {

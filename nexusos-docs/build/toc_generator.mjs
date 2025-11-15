@@ -6,7 +6,12 @@ import path from 'path';
 
 async function generateTOC() {
   console.log('Generating table of contents...');
-  
+
+  // Create output directory if it doesn't exist
+  if (!fs.existsSync('outputs')) {
+    fs.mkdirSync('outputs', { recursive: true });
+  }
+
   const files = await glob('docs/**/*.md');
   const toc = files.map(file => ({
     path: file,

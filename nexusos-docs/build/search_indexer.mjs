@@ -6,7 +6,12 @@ import { glob } from 'glob';
 
 async function buildSearchIndex() {
   console.log('Building search index...');
-  
+
+  // Create output directory if it doesn't exist
+  if (!fs.existsSync('outputs')) {
+    fs.mkdirSync('outputs', { recursive: true });
+  }
+
   const files = await glob('docs/**/*.md');
   const documents = files.map((file, id) => ({
     id,

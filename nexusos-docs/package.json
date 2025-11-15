@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "setup": "npm install",
-    "lint": "markdownlint 'docs/**/*.md' && cspell 'docs/**/*.md'",
+    "lint": "markdownlint \"docs/**/*.md\" && cspell \"docs/**/*.md\"",
     "diagrams": "node build/render_diagrams.mjs",
     "html": "node build/render_html.mjs",
     "pdf": "node build/render_pdfs.mjs",

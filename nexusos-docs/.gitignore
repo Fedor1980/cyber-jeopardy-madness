@@ -2,6 +2,7 @@
 
 # Build outputs
 dist/
+outputs/
 *.log
 *.tmp
 deployment_logs/
@@ -17,6 +18,7 @@ package-lock.json
 *.secret
 *.pem
 *.key
+business/licenses.json
 
 # OS files
 .DS_Store

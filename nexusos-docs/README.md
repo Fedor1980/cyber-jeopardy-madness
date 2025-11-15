@@ -4,439 +4,539 @@ version: 1.0.0
 last_updated: 2025-01-15
 ---
 
-# NexusOS Documentation Platform
+# 📚 NexusOS Documentation Platform
 
-Comprehensive documentation system for NexusOS - the AI-powered automation platform.
+> **Beautiful, searchable documentation from markdown. Zero configuration.**
 
-## Overview
+Transform your markdown files into stunning HTML sites, branded PDFs, presentations, and diagrams in seconds.
 
-This repository contains complete documentation for NexusOS including:
-- API documentation with OpenAPI specifications
-- User guides and onboarding materials
-- Administrator manuals and runbooks
-- Incident response playbooks
-- Training materials and certification programs
-- Integration guides for popular platforms
-- Automated build and deployment scripts
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## Quick Start
+---
 
-### Prerequisites
+## ✨ New Features
 
-- Node.js 18+ and npm
-- Python 3.9+
-- Docker (optional, for local preview)
-- Mermaid CLI (`npm install -g @mermaid-js/mermaid-cli`)
+### 🔍 **Interactive Search** *(NEW!)*
+- Real-time fuzzy search across all documentation
+- Keyboard shortcuts (`/` to focus, `↑↓` to navigate, `Esc` to clear)
+- Relevance scoring and highlighted results
+- Beautiful dropdown UI
+- Client-side (no backend required)
+
+### 🌙 **Dark Mode** *(NEW!)*
+- Automatic system theme detection
+- Manual toggle button (fixed top-right)
+- localStorage persistence across sessions
+- Smooth transitions
+- Accessibility features (reduced motion, high contrast)
+- Print-optimized (forces light theme)
+
+### 📄 **Branded PDF Export** *(NEW - Premium!)*
+- Professional cover pages with custom branding
+- Custom colors, logos, and company information
+- Headers and footers on every page
+- Page numbers and document classification
+- Optional watermarks for sensitive docs
+- White-label ready for clients
+
+### 💰 **Business Infrastructure** *(NEW - Premium!)*
+- Professional sales landing page
+- License key generation system
+- Multi-tier pricing (Free, Professional, Enterprise)
+- Email templates for customer onboarding
+- Marketing and sales playbook
+
+---
+
+## 🚀 Quick Start
 
 ### Installation
 
 ```bash
 # Clone repository
-git clone https://github.com/nexusos/docs.git
-cd docs
+git clone https://github.com/nexusos/docs-platform.git
+cd docs-platform
 
 # Install dependencies
 npm install
 
-# Build documentation
+# Build everything
 npm run build
-
-# Start local preview server
-npm run serve
 ```
 
-### Quick Commands
+### Your First Documentation
+
+1. **Add markdown files** to `docs/`:
 
 ```bash
-npm run build          # Build all documentation
-npm run render:diagrams # Render Mermaid diagrams
-npm run render:slides   # Generate slide decks
-npm run render:pdfs     # Generate PDF versions
-npm run lint           # Lint markdown files
-npm run validate       # Validate all documentation
-npm run deploy         # Deploy to production
+docs/
+├── 01_getting_started/
+│   ├── README.md
+│   └── installation.md
+├── 02_guides/
+│   └── tutorial.md
+└── 03_api/
+    └── reference.md
 ```
 
-## Repository Structure
+2. **Build your documentation:**
+
+```bash
+npm run build
+```
+
+3. **View the output:**
+
+```bash
+# Open in browser (with search and dark mode!)
+open outputs/html/01_getting_started/README.html
+
+# Or serve with any static server
+npx serve outputs/html
+```
+
+That's it! 🎉
+
+**Try the search:** Press `/` to focus, type to search, use arrow keys to navigate results!
+
+---
+
+## 📋 Commands
+
+### Build Commands
+
+```bash
+# Full build (everything)
+npm run build              # Lint, diagrams, HTML, PDF, slides, search index
+
+# Premium build (with branded PDFs)
+npm run build-premium      # Uses custom branding from branding/config.json
+
+# Individual outputs
+npm run html               # Generate HTML with search & dark mode
+npm run pdf                # Generate basic PDFs
+npm run pdf-branded        # Generate branded PDFs (Premium)
+npm run diagrams           # Render Mermaid diagrams to SVG
+npm run slides             # Create presentation decks (Marp)
+npm run index              # Build search index + table of contents
+
+# Quality & validation
+npm run lint               # Check markdown quality
+npm run audit              # Content quality audit
+npm run validate           # Validate documentation structure
+```
+
+---
+
+## 📁 Repository Structure
 
 ```
 nexusos-docs/
-├── docs/                           # Main documentation
-│   ├── 01_api_documentation/       # API docs and OpenAPI specs
-│   ├── 02_user_guides/             # End-user documentation
-│   ├── 03_admin_manual/            # Administrator guides
-│   │   └── incident_playbooks/     # Incident response procedures
-│   ├── 04_workflow_diagrams/       # System diagrams (Mermaid)
-│   │   └── mermaid_sources/        # Diagram source files
-│   ├── 05_training_materials/      # Training decks and exercises
-│   │   ├── exercises/              # Hands-on exercises
-│   │   ├── certification/          # Certification program
-│   │   └── themes/                 # Marp themes
-│   ├── 06_quick_references/        # Cheat sheets and quick refs
-│   ├── 07_integration_guides/      # Integration documentation
-│   ├── 08_templates/               # Document templates
-│   ├── 09_scripts/                 # Utility scripts
-│   ├── 10_branding/                # Brand assets and guidelines
-│   │   └── logos/                  # Logo files (SVG)
-│   └── 11_appendices/              # Glossary, compliance, etc.
-├── build/                          # Build scripts and tooling
-│   ├── schemas/                    # JSON schemas for validation
-│   └── config/                     # Build configuration
-├── deployment/                     # Deployment automation
-│   ├── deployment_scripts/         # Deployment scripts
-│   │   ├── config/                 # Deployment configs
-│   │   ├── scripts/                # Shell scripts
-│   │   └── lib/                    # Shared libraries
-│   └── templates/                  # Platform-specific templates
-├── .github/                        # GitHub Actions workflows
-│   ├── workflows/                  # CI/CD workflows
-│   └── actions/                    # Custom actions
-├── outputs/                        # Generated documentation
-│   ├── html/                       # HTML output
-│   ├── pdf/                        # PDF output
-│   ├── diagrams/                   # Rendered diagrams
-│   └── slides/                     # Slide decks
-└── package.json                    # Node.js dependencies
-
+├── docs/                          # 📝 Your markdown source files
+│   ├── 01_api_documentation/      # API docs (4 files)
+│   ├── 02_user_guides/            # User guides (4 files)
+│   ├── 03_admin_manual/           # Admin guides + incident playbooks
+│   ├── 04_workflow_diagrams/      # Mermaid diagram sources
+│   ├── 05_training_materials/     # Slides, exercises, quizzes
+│   ├── 06_quick_references/       # Cheat sheets (7 files)
+│   ├── 07_integration_guides/     # Platform integrations (5 files)
+│   ├── 08_templates/              # Document templates (8 files)
+│   ├── 10_branding/               # Brand assets & guidelines
+│   └── 11_appendices/             # Glossary, SLAs, contacts (6 files)
+│
+├── outputs/                       # 📦 Generated documentation
+│   ├── html/                      # HTML with search & dark mode
+│   ├── pdf/                       # Basic PDFs
+│   ├── pdf-branded/               # Branded PDFs (Premium)
+│   ├── diagrams/                  # Rendered SVG diagrams
+│   ├── slides/                    # Presentation decks
+│   ├── search-index.json          # Lunr.js search index
+│   └── manifest.json              # Table of contents
+│
+├── public/                        # 🌐 Static assets
+│   ├── css/
+│   │   ├── themes.css             # Dark/light theme system
+│   │   └── search.css             # Search UI styling
+│   └── js/
+│       ├── theme-switcher.js      # Theme switching logic
+│       └── search.js              # Search functionality
+│
+├── branding/                      # 🎨 Branding (Premium)
+│   ├── config.json                # Company info, colors, logo
+│   └── README.md                  # Branding guide
+│
+├── business/                      # 💰 Monetization (Premium)
+│   ├── SALES_PAGE.html            # Product landing page
+│   ├── license-generator.mjs      # License key management
+│   └── README.md                  # Sales & marketing playbook
+│
+├── build/                         # 🔧 Build scripts
+│   ├── render_html.mjs            # HTML generation with search
+│   ├── render_pdfs.mjs            # Basic PDF generation
+│   ├── render_pdf_branded.mjs     # Branded PDF generation (Premium)
+│   ├── render_diagrams.mjs        # Mermaid diagram rendering
+│   ├── render_slides.mjs          # Marp slide generation
+│   ├── search_indexer.mjs         # Lunr.js indexing
+│   ├── toc_generator.mjs          # Manifest generation
+│   └── audit_content.py           # Content quality auditor
+│
+└── deployment/                    # 🚀 Deployment automation
+    └── deployment_scripts/        # Deploy to Confluence, GitBook, etc.
 ```
 
-## Documentation Sections
+**67 Documentation Files** | **7 Diagrams** | **50 Slides** | **8 Templates** | **Fully Searchable**
 
-### 1. API Documentation
-- Complete REST API reference
-- OpenAPI 3.0 specifications (YAML and JSON)
-- Authentication guides (OAuth 2.0, API keys)
+---
+
+## 🌟 Features in Detail
+
+### Multi-Format Output
+
+Write your documentation **once in Markdown**, generate:
+
+- ✅ **HTML Sites** - Responsive, searchable, with dark mode
+- ✅ **PDFs** - Professional exports (basic or branded)
+- ✅ **Presentations** - Marp-powered slide decks
+- ✅ **Diagrams** - Auto-rendered from Mermaid code
+- ✅ **Search Index** - Client-side Lunr.js search
+
+### Interactive Search
+
+```markdown
+Press / to search
+Type to find
+↑↓ to navigate
+Enter to visit
+Esc to clear
+```
+
+Features:
+- Fuzzy matching (finds results even with typos)
+- Relevance scoring
+- Category badges
+- Highlighted terms in excerpts
+- Mobile responsive
+- Keyboard-first UX
+
+### Dark Mode
+
+- Detects system preference (`prefers-color-scheme`)
+- Manual toggle button (sun/moon icons)
+- Saves preference in `localStorage`
+- 16+ CSS custom properties
+- Smooth transitions
+- Accessibility support
+- Forces light mode for printing
+
+### Branded PDFs *(Premium)*
+
+Professional features:
+- **Cover Pages** - Gradient background, company logo, category badge, title, tagline, classification label
+- **Brand Colors** - Custom primary/secondary colors throughout
+- **Typography** - Professional font hierarchy
+- **Headers/Footers** - Company name, category, document title, classification, date, page numbers
+- **Watermarks** - Optional "CONFIDENTIAL" or custom text
+- **Classification** - Public, Internal, Confidential levels
+- **White-label** - Easy client customization
+
+Configure in `branding/config.json`:
+
+```json
+{
+  "companyName": "Your Company",
+  "tagline": "Your Slogan",
+  "website": "www.yourcompany.com",
+  "email": "support@yourcompany.com",
+  "logoUrl": "./branding/logo.png",
+  "primaryColor": "#6366f1",
+  "secondaryColor": "#1e293b",
+  "classification": "Internal Use Only",
+  "watermark": "CONFIDENTIAL",
+  "showWatermark": false,
+  "version": "1.0"
+}
+```
+
+### Diagram Rendering
+
+Supports **Mermaid.js** for:
+- Flowcharts
+- Sequence diagrams
+- State diagrams
+- Entity-relationship diagrams
+- Gantt charts
+- Git graphs
+- Class diagrams
+- User journeys
+
+Auto-renders to high-quality SVG.
+
+---
+
+## 💰 Pricing
+
+### Free
+**$0** - Perfect for open source projects
+
+- HTML generation
+- Interactive search
+- Dark mode
+- Diagram rendering
+- Basic PDFs
+- Slides generation
+- Community support
+
+### Professional
+**$99 one-time** - For commercial teams
+
+All Free features, plus:
+
+- ✅ **Branded PDFs** with custom covers
+- ✅ **White-label** customization
+- ✅ **Watermark** support
+- ✅ **Priority email** support
+- ✅ **Commercial license**
+- ✅ **Lifetime updates**
+
+### Enterprise
+**$499 one-time** - For large organizations
+
+All Professional features, plus:
+
+- ✅ **Custom integrations**
+- ✅ **On-premise deployment** support
+- ✅ **SLA guarantees**
+- ✅ **Training sessions** (2 hours)
+- ✅ **White-glove onboarding**
+- ✅ **Unlimited installs**
+- ✅ **Phone support**
+
+[View Full Pricing →](business/SALES_PAGE.html) | [Contact Sales →](mailto:sales@nexusos.com)
+
+---
+
+## 🎯 Use Cases
+
+### 📘 API Documentation
+- REST API reference with endpoints
+- Authentication guides (OAuth, API keys)
 - Rate limiting documentation
-- Interactive API quickstart
+- Code examples
+- Quick reference cards
 
-### 2. User Guides
-- Comprehensive onboarding guide (2000+ words)
-- Quick start checklist
-- FAQ with 40+ questions
-- Video tutorial references
+**Example:** `docs/01_api_documentation/`
 
-### 3. Administrator Manual
-- Full admin manual (3200+ words)
-- Condensed quick reference
-- 5 incident response playbooks:
-  - P0 Critical incidents
-  - P1 High priority
-  - P2 Medium priority
-  - Security breach response
-  - Disaster recovery
+### 📗 User Manuals
+- Getting started guides
+- Step-by-step tutorials
+- FAQs (40+ questions)
+- Onboarding checklists
+- Troubleshooting
 
-### 4. Workflow Diagrams
-- 7 comprehensive Mermaid diagrams:
-  - P0 incident response flow
-  - Security decision tree
-  - Escalation matrix
-  - DR failover process
-  - User lifecycle
-  - Agent execution flow
-  - System monitoring
+**Example:** `docs/02_user_guides/`
 
-### 5. Training Materials
-- 50-slide Marp presentation
-- 4 hands-on lab exercises
-- Certification quiz (25 questions)
-- Answer keys and solutions
-- Custom Marp theme
+### 📕 Admin Documentation
+- System architecture
+- Deployment guides
+- Incident playbooks (P0, P1, P2, Security, DR)
+- Runbooks and SOPs
+- Configuration guides
 
-### 6. Quick References
-- Incident response checklist
-- Admin cheat sheet
-- API endpoints reference
+**Example:** `docs/03_admin_manual/`
+
+### 📙 Training Materials
+- Presentation slides (50+ slides)
+- Hands-on exercises (4 labs)
+- Certification quizzes (25 questions)
+- Answer keys
+- Speaker notes
+
+**Example:** `docs/05_training_materials/`
+
+### 📓 Knowledge Base
+- Team processes
+- Best practices
+- Templates (incident reports, change requests)
+- Internal wikis
+- Quick references
+
+**Example:** `docs/06_quick_references/`
+
+---
+
+## 🎨 Customization
+
+### Themes
+
+Edit `public/css/themes.css`:
+
+```css
+/* Light theme */
+:root, :root[data-theme="light"] {
+  --color-bg-primary: #ffffff;
+  --color-text-primary: #111827;
+  --color-accent: #6366f1;
+  --color-code-bg: #f5f5f5;
+  /* ... 16+ variables */
+}
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  --color-bg-primary: #0f172a;
+  --color-text-primary: #f1f5f9;
+  --color-accent: #818cf8;
+  --color-code-bg: #1e293b;
+  /* ... */
+}
+```
+
+### Search
+
+Customize `public/js/search.js` and `public/css/search.css`:
+- Result count
+- UI colors
 - Keyboard shortcuts
-- SLA commitments
-- Emergency contacts
+- Search behavior
 
-### 7. Integration Guides
-- Confluence import
-- Notion integration
-- GitBook setup
-- GitHub Pages deployment
-- Docusaurus integration
+### Branding
 
-### 8. Templates
-- Incident report
-- Post-mortem
-- Security incident
-- Customer communication
-- Change request
-- Runbook
-- SLA report
-- Onboarding checklist
+See `branding/README.md` for complete guide:
+- Logo specifications
+- Color scheme recommendations
+- Document classification options
+- Watermark usage
+- White-label examples
 
-### 9. Scripts
-Executable scripts for:
-- Health checking
-- Backup verification
-- User cleanup
-- Metrics export
-- Log analysis
-- Incident notification
+---
 
-### 10. Branding
-- Brand guidelines
-- Color palette
-- Typography guide
-- Logo files (SVG)
-
-### 11. Appendices
-- Glossary (50+ terms)
-- Compliance checklist
-- Security policies
-- SLA definitions
-- Contact directory
-- Revision history
-
-## Build System
-
-### Architecture
-
-The build system uses Node.js and Python to:
-1. Render Mermaid diagrams to SVG/PNG/PDF
-2. Convert Markdown to self-contained HTML
-3. Generate PDFs using Playwright
-4. Render Marp slides to HTML/PDF
-5. Generate table of contents and manifest
-6. Build search index (Lunr.js)
-7. Audit content quality
-
-### Build Scripts
-
-Located in `build/`:
-
-- `render_diagrams.mjs` - Render Mermaid diagrams with content hashing
-- `render_html.mjs` - Convert Markdown to HTML
-- `render_pdfs.mjs` - Generate PDF versions
-- `render_slides.mjs` - Convert Marp to HTML/PDF
-- `toc_generator.mjs` - Generate navigation manifest
-- `search_indexer.mjs` - Build search index
-- `audit_content.py` - Content quality auditor
-
-### Configuration
-
-Configuration files in `build/config/`:
-- `pdf.yaml` - PDF generation settings
-- `html.yaml` - HTML rendering options
-- `lint.yaml` - Linting rules
-
-## Deployment
+## 🛠️ Deployment
 
 ### Supported Platforms
 
+- **GitHub Pages** - Static site hosting
 - **Confluence** - Import to Confluence spaces
 - **GitBook** - Sync to GitBook
-- **GitHub Pages** - Deploy as static site
 - **Notion** - Export to Notion workspace
 - **Custom** - Self-hosted documentation portal
 
-### Deployment Scripts
-
-Located in `deployment/deployment_scripts/scripts/`:
-
-- `deploy_all.sh` - Master deployment script
-- `deploy_confluence.sh` - Deploy to Confluence
-- `deploy_gitbook.sh` - Deploy to GitBook
-- `deploy_github_pages.sh` - Deploy to GitHub Pages
-- `deploy_notion.py` - Deploy to Notion
-- `validate_docs.sh` - Comprehensive validation
-- `test_deployment.sh` - Test deployment
-- `rollback.sh` - Rollback to previous version
-
-### Deployment Process
+### Deploy Commands
 
 ```bash
-# Validate documentation
-./deployment/deployment_scripts/scripts/validate_docs.sh
+# Deploy to all platforms
+npm run deploy
 
-# Test deployment (dry-run)
-./deployment/deployment_scripts/scripts/deploy_all.sh --dry-run
+# Dry run (preview changes)
+npm run deploy:dry-run
 
-# Deploy to production
-./deployment/deployment_scripts/scripts/deploy_all.sh --environment production
-
-# Rollback if needed
-./deployment/deployment_scripts/scripts/rollback.sh --version previous
+# Platform-specific
+bash deployment/deployment_scripts/scripts/deploy_github_pages.sh
+bash deployment/deployment_scripts/scripts/deploy_confluence.sh
+bash deployment/deployment_scripts/scripts/deploy_gitbook.sh
+python deployment/deployment_scripts/scripts/deploy_notion.py
 ```
 
-## CI/CD
+---
 
-### GitHub Actions Workflows
+## 🤝 Contributing
 
-Located in `.github/workflows/`:
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-- `validate-docs.yml` - PR validation
-- `deploy-docs.yml` - Main deployment
-- `scheduled-health-check.yml` - Daily health checks
-- `manual-deploy.yml` - Manual deployment trigger
+### Development
 
-### Automated Checks
+```bash
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/nexusos-docs
+cd nexusos-docs
 
-Every pull request triggers:
-- Markdown linting
-- Link validation
-- Spell checking
-- Schema validation
-- Diagram rendering tests
-- Build verification
+# Create branch
+git checkout -b feature/your-feature
 
-## Contributing
+# Make changes, build, test
+npm run build
+npm run lint
+npm run validate
+
+# Commit and push
+git commit -m "Add feature"
+git push origin feature/your-feature
+
+# Open Pull Request
+```
 
 ### Documentation Standards
 
 - Use front-matter (YAML) in all Markdown files
 - Follow naming conventions (lowercase, hyphens)
-- Include version and last_updated in front-matter
+- Include version and last_updated
 - Write in clear, concise language
 - Use code blocks with language tags
 - Validate links before committing
 
-### Pull Request Process
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run validation: `npm run validate`
-5. Submit pull request
-6. Address review feedback
-7. Merge after approval
+## 📝 License
 
-### Commit Message Format
+### Free Tier
+MIT License - See [LICENSE](LICENSE)
 
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-Types: `docs`, `feat`, `fix`, `style`, `refactor`, `test`, `chore`
-
-Example:
-```
-docs(api): add webhook documentation
-
-- Add webhook setup guide
-- Include example payloads
-- Document signature verification
-
-Closes #123
-```
-
-## Development
-
-### Local Preview
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server with hot reload
-npm run dev
-
-# Open browser
-open http://localhost:3000
-```
-
-### Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run specific test suites
-npm run test:links        # Validate links
-npm run test:spelling     # Spell check
-npm run test:diagrams     # Test diagram rendering
-npm run test:build        # Test full build
-```
-
-### Linting
-
-```bash
-# Lint all Markdown files
-npm run lint
-
-# Fix auto-fixable issues
-npm run lint:fix
-
-# Check spelling
-npm run spell-check
-```
-
-## Maintenance
-
-### Regular Tasks
-
-**Daily**:
-- Monitor deployment status
-- Check for broken links
-- Review user feedback
-
-**Weekly**:
-- Update changelog
-- Review and merge PRs
-- Update dependencies
-
-**Monthly**:
-- Review and update outdated content
-- Audit documentation completeness
-- Generate analytics reports
-
-### Updating Documentation
-
-1. Update source Markdown files
-2. Update version in front-matter
-3. Update `last_updated` timestamp
-4. Run build: `npm run build`
-5. Validate: `npm run validate`
-6. Commit changes
-7. Deploy: `npm run deploy`
-
-## Versioning
-
-This project follows [Semantic Versioning](https://semver.org/):
-
-- **Major version** (1.x.x): Breaking changes, major restructuring
-- **Minor version** (x.1.x): New sections, significant additions
-- **Patch version** (x.x.1): Bug fixes, minor updates
-
-Current version: **1.0.0**
-
-## License
-
-Copyright © 2025 NexusOS, Inc.
-
-This documentation is proprietary and confidential. See [LICENSE](./LICENSE) for details.
-
-## Support
-
-### Documentation Issues
-
-- **Bug Reports**: [GitHub Issues](https://github.com/nexusos/docs/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/nexusos/docs/discussions)
-- **Questions**: [Community Forum](https://community.nexusos.io)
-
-### Contact
-
-- **Documentation Team**: docs@nexusos.io
-- **Technical Writing**: writers@nexusos.io
-- **General Support**: support@nexusos.io
-
-## Acknowledgments
-
-Built with:
-- [Marp](https://marp.app/) - Slide decks
-- [Mermaid](https://mermaid-js.github.io/) - Diagrams
-- [Playwright](https://playwright.dev/) - PDF generation
-- [Lunr.js](https://lunrjs.com/) - Search indexing
-- [markdownlint](https://github.com/DavidAnson/markdownlint) - Linting
+### Professional & Enterprise
+Commercial licenses available at business/SALES_PAGE.html
 
 ---
 
-**Last Updated**: 2025-01-15  
-**Version**: 1.0.0  
+## 🆘 Support
+
+### Community (Free)
+- [GitHub Issues](https://github.com/nexusos/docs-platform/issues)
+- [Discussions](https://github.com/nexusos/docs-platform/discussions)
+- [Discord](https://discord.gg/nexusos)
+
+### Professional
+- Priority email: support@nexusos.com
+- 48-hour response time
+- Bug fix guarantees
+
+### Enterprise
+- Phone: +1-XXX-XXX-XXXX
+- Dedicated account manager
+- SLA guarantees
+- Custom training sessions
+
+---
+
+## 🔗 Links
+
+- **Website**: https://www.nexusos.com
+- **Documentation**: https://docs.nexusos.com
+- **Sales**: sales@nexusos.com
+- **Support**: support@nexusos.com
+- **Twitter**: [@nexusos](https://twitter.com/nexusos)
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+- [Marked](https://marked.js.org/) - Markdown parser
+- [Mermaid](https://mermaid.js.org/) - Diagram rendering
+- [Marp](https://marp.app/) - Presentation slides
+- [Lunr.js](https://lunrjs.com/) - Search indexing
+- [Playwright](https://playwright.dev/) - PDF generation
+
+---
+
+## ⭐ Star History
+
+If you find this project useful, please give it a star! ⭐
+
+---
+
+**Made with ❤️ by the NexusOS Team**
+
+**Version**: 1.0.0
+**Last Updated**: 2025-01-15
 **Status**: Production Ready
+
+[Get Started →](#quick-start) | [View Examples →](#use-cases) | [Pricing →](#pricing)

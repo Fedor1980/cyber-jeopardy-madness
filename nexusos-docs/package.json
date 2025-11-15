@@ -10,10 +10,12 @@
     "diagrams": "node build/render_diagrams.mjs",
     "html": "node build/render_html.mjs",
     "pdf": "node build/render_pdfs.mjs",
+    "pdf-branded": "node build/render_pdf_branded.mjs",
     "slides": "node build/render_slides.mjs",
     "index": "node build/search_indexer.mjs && node build/toc_generator.mjs",
     "audit": "python3 build/audit_content.py",
     "build": "npm run lint && npm run diagrams && npm run html && npm run pdf && npm run slides && npm run index",
+    "build-premium": "npm run lint && npm run diagrams && npm run html && npm run pdf-branded && npm run slides && npm run index",
     "validate": "bash deployment/deployment_scripts/scripts/validate_docs.sh",
     "package": "bash -c 'cd dist && zip -r nexusos_docs_v1.0.zip . -x \"*.DS_Store\"'",
     "clean": "rm -rf dist/* && mkdir -p dist/{html,pdf,diagrams,assets,slides}",
@@ -46,7 +48,8 @@
     "cheerio": "^1.0.0",
     "lunr": "^2.3.9",
     "gray-matter": "^4.0.3",
-    "chalk": "^5.3.0"
+    "chalk": "^5.3.0",
+    "playwright": "^1.48.2"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.42.0",

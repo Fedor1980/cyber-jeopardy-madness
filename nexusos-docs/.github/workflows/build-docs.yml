@@ -1,0 +1,93 @@
+name: Build Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - 'build/**'
+      - 'public/**'
+      - 'branding/**'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright browsers
+      run: npx playwright install chromium
+
+    - name: Lint documentation
+      run: npm run lint
+      continue-on-error: true
+
+    - name: Render diagrams
+      run: npm run diagrams
+
+    - name: Generate HTML
+      run: npm run html
+
+    - name: Generate search index
+      run: npm run index
+
+    - name: Generate slides
+      run: npm run slides
+      continue-on-error: true
+
+    - name: Audit content quality
+      run: npm run audit
+      continue-on-error: true
+
+    - name: Upload HTML artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation-html
+        path: outputs/html/
+        retention-days: 30
+
+    - name: Upload diagrams
+      uses: actions/upload-artifact@v4
+      with:
+        name: diagrams
+        path: outputs/diagrams/
+        retention-days: 30
+
+    - name: Upload slides
+      uses: actions/upload-artifact@v4
+      with:
+        name: slides
+        path: outputs/slides/
+        retention-days: 30
+        if-no-files-found: ignore
+
+    - name: Comment PR with preview
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '✅ Documentation built successfully!\n\n📦 Artifacts available:\n- HTML documentation\n- Diagrams\n- Slides\n\nDownload from the Actions tab to preview changes.'
+          })

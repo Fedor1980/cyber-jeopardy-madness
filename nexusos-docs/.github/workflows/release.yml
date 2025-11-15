@@ -1,0 +1,100 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build all outputs
+      run: npm run build-premium
+
+    - name: Create package archives
+      run: |
+        cd outputs
+        zip -r ../nexusos-docs-html-${{ github.ref_name }}.zip html/
+        zip -r ../nexusos-docs-diagrams-${{ github.ref_name }}.zip diagrams/
+        zip -r ../nexusos-docs-slides-${{ github.ref_name }}.zip slides/
+        zip -r ../nexusos-docs-complete-${{ github.ref_name }}.zip .
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        echo "## What's Changed" > CHANGELOG.md
+        git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> CHANGELOG.md
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: CHANGELOG.md
+        files: |
+          nexusos-docs-html-${{ github.ref_name }}.zip
+          nexusos-docs-diagrams-${{ github.ref_name }}.zip
+          nexusos-docs-slides-${{ github.ref_name }}.zip
+          nexusos-docs-complete-${{ github.ref_name }}.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish to npm (if package.json updated)
+      if: hashFiles('package.json') != ''
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Notify release
+      uses: slackapi/slack-github-action@v1
+      with:
+        payload: |
+          {
+            "text": "🎉 New release: ${{ github.ref_name }}",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "🎉 NexusOS Docs Release ${{ github.ref_name }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Release Notes:*\nCheck GitHub for full changelog"
+                }
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View Release"
+                    },
+                    "url": "https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

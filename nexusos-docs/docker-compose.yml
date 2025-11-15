@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Documentation server
+  docs:
+    build: .
+    container_name: nexusos-docs
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - docs-network
+
+  # Builder service (for rebuilding docs)
+  builder:
+    image: node:20-alpine
+    container_name: nexusos-docs-builder
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=production
+    command: sh -c "npm ci && npm run build"
+    profiles:
+      - build
+    networks:
+      - docs-network
+
+  # Optional: Analytics service
+  analytics:
+    image: plausible/analytics:latest
+    container_name: nexusos-analytics
+    ports:
+      - "8000:8000"
+    environment:
+      - BASE_URL=http://localhost:8000
+      - SECRET_KEY_BASE=${ANALYTICS_SECRET_KEY:-changeme}
+    profiles:
+      - analytics
+    networks:
+      - docs-network
+
+networks:
+  docs-network:
+    driver: bridge
+
+volumes:
+  node_modules:

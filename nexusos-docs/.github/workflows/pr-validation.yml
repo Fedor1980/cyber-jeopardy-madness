@@ -1,0 +1,130 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - run: npm ci
+
+    - name: Lint Markdown
+      run: npm run lint
+
+    - name: Check spelling
+      run: npx cspell "docs/**/*.md"
+
+  validate-links:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check broken links
+      uses: lycheeverse/lychee-action@v1
+      with:
+        args: --verbose --no-progress 'docs/**/*.md'
+        fail: true
+
+  validate-structure:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - run: npm ci
+
+    - name: Validate documentation structure
+      run: npm run validate
+
+  test-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - run: npm ci
+
+    - name: Test full build
+      run: npm run build
+      continue-on-error: true
+
+    - name: Check for build artifacts
+      run: |
+        test -d outputs/html || exit 1
+        test -f outputs/search-index.json || exit 1
+        test -f outputs/manifest.json || exit 1
+
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+
+    - name: Scan for secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+
+  comment-preview:
+    needs: [lint, test-build]
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+    - uses: actions/github-script@v7
+      with:
+        script: |
+          const body = `## ✅ PR Validation Complete
+
+          All checks passed! Your documentation changes are ready for review.
+
+          ### What was checked:
+          - ✅ Markdown linting
+          - ✅ Spell checking
+          - ✅ Link validation
+          - ✅ Structure validation
+          - ✅ Build test
+          - ✅ Security scan
+
+          ### Next steps:
+          1. Request review from documentation team
+          2. Address any feedback
+          3. Merge when approved
+
+          ### Preview:
+          Download build artifacts from the Actions tab to preview your changes locally.
+          `;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body
+          })

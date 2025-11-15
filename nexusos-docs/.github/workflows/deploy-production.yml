@@ -1,0 +1,144 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build premium documentation
+      run: npm run build-premium
+      env:
+        LICENSE_SECRET: ${{ secrets.LICENSE_SECRET }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-build
+        path: outputs/
+        retention-days: 90
+
+  deploy-github-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: production-build
+        path: outputs
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./outputs/html
+        cname: docs.nexusos.com
+
+  deploy-confluence:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: production-build
+        path: outputs
+
+    - name: Deploy to Confluence
+      run: bash deployment/deployment_scripts/scripts/deploy_confluence.sh
+      env:
+        CONFLUENCE_URL: ${{ secrets.CONFLUENCE_URL }}
+        CONFLUENCE_USER: ${{ secrets.CONFLUENCE_USER }}
+        CONFLUENCE_TOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
+        CONFLUENCE_SPACE: ${{ secrets.CONFLUENCE_SPACE }}
+
+  deploy-s3:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: production-build
+        path: outputs
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Deploy to S3
+      run: |
+        aws s3 sync outputs/html s3://${{ secrets.S3_BUCKET }}/docs/ --delete
+        aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_ID }} --paths "/*"
+
+  notify-success:
+    needs: [deploy-github-pages, deploy-confluence, deploy-s3]
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+    - name: Notify Slack
+      uses: slackapi/slack-github-action@v1
+      with:
+        payload: |
+          {
+            "text": "✅ Documentation deployed successfully to production!",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Documentation Deployment*\n✅ Successfully deployed to all platforms"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {"type": "mrkdwn", "text": "*Commit:*\n${{ github.sha }}"},
+                  {"type": "mrkdwn", "text": "*Author:*\n${{ github.actor }}"},
+                  {"type": "mrkdwn", "text": "*GitHub Pages:*\nhttps://docs.nexusos.com"},
+                  {"type": "mrkdwn", "text": "*Status:*\nLive"}
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

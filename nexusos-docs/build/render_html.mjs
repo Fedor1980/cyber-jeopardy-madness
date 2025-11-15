@@ -45,8 +45,26 @@ async function copyStaticAssets() {
   fs.mkdirSync(jsDir, { recursive: true });
   fs.mkdirSync(cssDir, { recursive: true });
 
-  // Copy search files if they exist
+  // Copy public assets if they exist
   if (fs.existsSync(PUBLIC_DIR)) {
+    // Theme files
+    if (fs.existsSync(path.join(PUBLIC_DIR, 'js', 'theme-switcher.js'))) {
+      fs.copyFileSync(
+        path.join(PUBLIC_DIR, 'js', 'theme-switcher.js'),
+        path.join(jsDir, 'theme-switcher.js')
+      );
+      console.log('✓ Copied theme-switcher.js');
+    }
+
+    if (fs.existsSync(path.join(PUBLIC_DIR, 'css', 'themes.css'))) {
+      fs.copyFileSync(
+        path.join(PUBLIC_DIR, 'css', 'themes.css'),
+        path.join(cssDir, 'themes.css')
+      );
+      console.log('✓ Copied themes.css');
+    }
+
+    // Search files
     if (fs.existsSync(path.join(PUBLIC_DIR, 'js', 'search.js'))) {
       fs.copyFileSync(
         path.join(PUBLIC_DIR, 'js', 'search.js'),
@@ -89,6 +107,7 @@ function wrapHTML(content, relativeRoot = './') {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NexusOS Documentation</title>
+  <link rel="stylesheet" href="${relativeRoot}css/themes.css">
   <link rel="stylesheet" href="${relativeRoot}css/search.css">
   <style>
     body {
@@ -161,6 +180,8 @@ function wrapHTML(content, relativeRoot = './') {
 <body>
   ${content}
 
+  <!-- Theme switcher -->
+  <script src="${relativeRoot}js/theme-switcher.js"></script>
   <!-- Lunr.js for search -->
   <script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
   <!-- Search functionality -->

@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import os
+import requests
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
@@ -63,6 +64,40 @@ class HealthResponse(BaseModel):
     qdrant_connected: bool
     collection_exists: bool
     total_scrolls: int
+
+class SemanticSearchRequest(BaseModel):
+    """Request model for semantic search."""
+    query: str = Field(..., description="Natural language search query")
+    limit: int = Field(5, ge=1, le=20, description="Number of results")
+    score_threshold: float = Field(0.7, ge=0.0, le=1.0, description="Minimum similarity score")
+
+class ScrollWithScore(BaseModel):
+    """Scroll response with similarity score."""
+    uuid: str
+    scroll_id: str
+    content: str
+    source_system: str
+    consent_id: str
+    similarity_score: float = Field(..., description="Semantic similarity (0-1)")
+
+class SemanticSearchResponse(BaseModel):
+    """Response for semantic search."""
+    query: str
+    results: List[ScrollWithScore]
+    total: int
+
+class RAGRequest(BaseModel):
+    """Request model for RAG question answering."""
+    question: str = Field(..., description="Question to answer")
+    max_context_scrolls: int = Field(3, ge=1, le=10, description="Max scrolls for context")
+    temperature: float = Field(0.7, ge=0.0, le=2.0, description="LLM temperature")
+
+class RAGResponse(BaseModel):
+    """Response for RAG question answering."""
+    question: str
+    answer: str
+    sources: List[ScrollResponse]
+    confidence: str
 
 # Qdrant Client
 def get_qdrant_client():
@@ -244,19 +279,139 @@ async def search_scrolls(
             detail=f"Error searching scrolls: {str(e)}"
         )
 
+@app.post("/api/scrolls/semantic-search", response_model=SemanticSearchResponse, tags=["Semantic Search"])
+async def semantic_search(
+    search: SemanticSearchRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """
+    Semantic search using natural language queries.
+    Finds scrolls by meaning, not just keywords.
+    """
+    try:
+        from semantic_search import generate_query_embedding
+
+        # Generate embedding for query
+        query_embedding = generate_query_embedding(search.query)
+
+        # Search Qdrant with vector similarity
+        client = get_qdrant_client()
+        search_result = client.search(
+            collection_name=COLLECTION_NAME,
+            query_vector=query_embedding,
+            limit=search.limit,
+            score_threshold=search.score_threshold
+        )
+
+        # Build results
+        results = []
+        for scored_point in search_result:
+            results.append(ScrollWithScore(
+                uuid=str(scored_point.id),
+                scroll_id=scored_point.payload['scroll_id'],
+                content=scored_point.payload['content'],
+                source_system=scored_point.payload['source_system'],
+                consent_id=scored_point.payload['consent_id'],
+                similarity_score=scored_point.score
+            ))
+
+        return SemanticSearchResponse(
+            query=search.query,
+            results=results,
+            total=len(results)
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error in semantic search: {str(e)}"
+        )
+
+
+@app.post("/api/scrolls/ask", response_model=RAGResponse, tags=["RAG"])
+async def ask_question(
+    request: RAGRequest,
+    api_key: str = Depends(verify_api_key)
+):
+    """
+    Ask a question and get an answer using RAG (Retrieval-Augmented Generation).
+    Retrieves relevant scrolls and uses LLM to generate answer.
+    """
+    try:
+        from semantic_search import generate_query_embedding, generate_rag_answer
+
+        # 1. Generate embedding for question
+        question_embedding = generate_query_embedding(request.question)
+
+        # 2. Retrieve relevant scrolls
+        client = get_qdrant_client()
+        search_result = client.search(
+            collection_name=COLLECTION_NAME,
+            query_vector=question_embedding,
+            limit=request.max_context_scrolls,
+            score_threshold=0.6
+        )
+
+        if not search_result:
+            return RAGResponse(
+                question=request.question,
+                answer="I don't have enough information in the consented scrolls to answer this question.",
+                sources=[],
+                confidence="low"
+            )
+
+        # 3. Build context from retrieved scrolls
+        context_scrolls = []
+        sources = []
+        for scored_point in search_result:
+            context_scrolls.append({
+                'content': scored_point.payload['content'],
+                'source_system': scored_point.payload['source_system']
+            })
+            sources.append(ScrollResponse(
+                uuid=str(scored_point.id),
+                scroll_id=scored_point.payload['scroll_id'],
+                content=scored_point.payload['content'],
+                source_system=scored_point.payload['source_system'],
+                consent_id=scored_point.payload['consent_id']
+            ))
+
+        # 4. Generate answer using LLM
+        answer, confidence = generate_rag_answer(
+            request.question,
+            context_scrolls,
+            request.temperature
+        )
+
+        return RAGResponse(
+            question=request.question,
+            answer=answer,
+            sources=sources,
+            confidence=confidence
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error generating answer: {str(e)}"
+        )
+
+
 @app.get("/", tags=["Info"])
 async def root():
     """API info endpoint."""
     return {
         "name": "Sovereign Scroll API",
-        "version": "1.0.0",
-        "description": "Query validated and consented scrolls",
+        "version": "2.0.0",
+        "description": "Query validated and consented scrolls with semantic search and RAG",
         "docs": "/docs",
         "endpoints": {
             "health": "/health",
             "list_scrolls": "/api/scrolls",
             "get_scroll": "/api/scrolls/{scroll_id}",
-            "search": "/api/scrolls/search"
+            "search": "/api/scrolls/search",
+            "semantic_search": "/api/scrolls/semantic-search",
+            "ask": "/api/scrolls/ask"
         }
     }
 

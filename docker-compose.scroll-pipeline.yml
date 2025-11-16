@@ -77,12 +77,24 @@ services:
       - kafka
       - opa
       - qdrant
+      - embedding-service
     environment:
       KAFKA_BROKER: kafka:29092
       KAFKA_TOPIC: scrolls.raw
       OPA_URL: http://opa:8181
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
+      EMBEDDING_SERVICE_URL: http://embedding-service:8001
+    restart: unless-stopped
+
+  # Embedding Service (semantic embeddings)
+  embedding-service:
+    build:
+      context: ./embedding-service
+      dockerfile: Dockerfile
+    container_name: embedding-service
+    ports:
+      - "8001:8001"
     restart: unless-stopped
 
   # Scroll API (REST query interface)
@@ -95,11 +107,14 @@ services:
       - "8000:8000"
     depends_on:
       - qdrant
+      - embedding-service
     environment:
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
       COLLECTION_NAME: scrolls
       API_KEY: sovereign-scroll-key-2024
+      EMBEDDING_SERVICE_URL: http://embedding-service:8001
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     restart: unless-stopped
 
 volumes:

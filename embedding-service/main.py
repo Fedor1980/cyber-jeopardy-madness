@@ -1,0 +1,106 @@
+"""
+Embedding Service
+Generates semantic embeddings for text using sentence-transformers.
+"""
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+from typing import List
+from sentence_transformers import SentenceTransformer
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize FastAPI
+app = FastAPI(
+    title="Embedding Service",
+    description="Generate semantic embeddings for text",
+    version="1.0.0"
+)
+
+# Load model (all-MiniLM-L6-v2: 384 dimensions, fast, good quality)
+logger.info("Loading sentence-transformers model...")
+model = SentenceTransformer('all-MiniLM-L6-v2')
+logger.info("Model loaded successfully")
+
+# Request/Response Models
+class EmbeddingRequest(BaseModel):
+    """Request model for generating embeddings."""
+    text: str = Field(..., description="Text to embed")
+
+class BatchEmbeddingRequest(BaseModel):
+    """Request model for batch embeddings."""
+    texts: List[str] = Field(..., description="List of texts to embed")
+
+class EmbeddingResponse(BaseModel):
+    """Response model for single embedding."""
+    embedding: List[float] = Field(..., description="384-dimensional embedding vector")
+    dimensions: int = Field(..., description="Number of dimensions")
+
+class BatchEmbeddingResponse(BaseModel):
+    """Response model for batch embeddings."""
+    embeddings: List[List[float]] = Field(..., description="List of embedding vectors")
+    count: int = Field(..., description="Number of embeddings")
+    dimensions: int = Field(..., description="Number of dimensions per embedding")
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    return {
+        "status": "healthy",
+        "model": "all-MiniLM-L6-v2",
+        "dimensions": 384
+    }
+
+@app.post("/embed", response_model=EmbeddingResponse)
+async def generate_embedding(request: EmbeddingRequest):
+    """
+    Generate embedding for a single text.
+    """
+    try:
+        embedding = model.encode(request.text).tolist()
+
+        return EmbeddingResponse(
+            embedding=embedding,
+            dimensions=len(embedding)
+        )
+    except Exception as e:
+        logger.error(f"Error generating embedding: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/embed/batch", response_model=BatchEmbeddingResponse)
+async def generate_batch_embeddings(request: BatchEmbeddingRequest):
+    """
+    Generate embeddings for multiple texts.
+    """
+    try:
+        embeddings = model.encode(request.texts).tolist()
+
+        return BatchEmbeddingResponse(
+            embeddings=embeddings,
+            count=len(embeddings),
+            dimensions=len(embeddings[0]) if embeddings else 0
+        )
+    except Exception as e:
+        logger.error(f"Error generating batch embeddings: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/")
+async def root():
+    """API info endpoint."""
+    return {
+        "name": "Embedding Service",
+        "version": "1.0.0",
+        "model": "all-MiniLM-L6-v2",
+        "dimensions": 384,
+        "endpoints": {
+            "health": "/health",
+            "single_embed": "/embed",
+            "batch_embed": "/embed/batch"
+        }
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)

@@ -16,6 +16,8 @@ QDRANT_HOST = os.getenv('QDRANT_HOST', 'localhost')
 QDRANT_PORT = int(os.getenv('QDRANT_PORT', '6333'))
 COLLECTION_NAME = os.getenv('COLLECTION_NAME', 'scrolls')
 API_KEY = os.getenv('API_KEY', 'sovereign-scroll-key-2024')
+EMBEDDING_SERVICE_URL = os.getenv('EMBEDDING_SERVICE_URL', 'http://localhost:8001')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
 # FastAPI app
 app = FastAPI(

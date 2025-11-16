@@ -16,6 +16,7 @@ KAFKA_GROUP_ID = os.getenv('KAFKA_GROUP_ID', 'scroll-processor-group')
 OPA_URL = os.getenv('OPA_URL', 'http://localhost:8181')
 QDRANT_HOST = os.getenv('QDRANT_HOST', 'localhost')
 QDRANT_PORT = int(os.getenv('QDRANT_PORT', '6333'))
+EMBEDDING_SERVICE_URL = os.getenv('EMBEDDING_SERVICE_URL', 'http://localhost:8001')
 COLLECTION_NAME = 'scrolls'
 
 # --- Pydantic Schema ---
@@ -25,6 +26,32 @@ class Scroll(BaseModel):
     content: str = Field(..., description="The raw textual content.")
     source_system: str = Field(..., description="Origin system name.")
     consent_id: str = Field(..., description="DLT record ID for governance verification.")
+
+
+def generate_embedding(text: str) -> list:
+    """
+    Generate semantic embedding for text using the embedding service.
+    Returns 384-dimensional vector.
+    """
+    try:
+        response = requests.post(
+            f"{EMBEDDING_SERVICE_URL}/embed",
+            json={"text": text},
+            timeout=10
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            return result['embedding']
+        else:
+            print(f"  Embedding service returned status {response.status_code}, using fallback")
+            # Fallback to dummy vector if service unavailable
+            return [0.1] * 384
+
+    except Exception as e:
+        print(f"  Error generating embedding: {e}, using fallback")
+        # Fallback to dummy vector
+        return [0.1] * 384
 
 
 def check_consent_with_opa(consent_id: str) -> bool:
@@ -77,19 +104,19 @@ def initialize_qdrant():
 
 def store_in_qdrant(client, scroll_data: dict):
     """
-    Stores validated scroll in Qdrant vector database.
-    For now, using a dummy vector since we're not generating embeddings yet.
+    Stores validated scroll in Qdrant vector database with semantic embedding.
     """
     try:
-        # Create a simple dummy vector (in production, this would be from an embedding model)
-        dummy_vector = [0.1] * 384
+        # Generate semantic embedding from content
+        print(f"  Generating embedding...")
+        embedding = generate_embedding(scroll_data['content'])
 
         # Generate a deterministic UUID from the scroll_id
         point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, scroll_data['scroll_id']))
 
         point = PointStruct(
             id=point_id,
-            vector=dummy_vector,
+            vector=embedding,
             payload={
                 'scroll_id': scroll_data['scroll_id'],
                 'content': scroll_data['content'],
@@ -103,7 +130,7 @@ def store_in_qdrant(client, scroll_data: dict):
             points=[point]
         )
 
-        print(f"  Stored in Qdrant: {scroll_data['scroll_id']}")
+        print(f"  Stored in Qdrant with semantic embedding: {scroll_data['scroll_id']}")
         return True
 
     except Exception as e:

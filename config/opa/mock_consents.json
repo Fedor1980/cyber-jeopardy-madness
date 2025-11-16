@@ -1,0 +1,10 @@
+{
+  "consents": [
+    {
+      "consent_id": "0xAb1C2D3E4F5a6B7c8D9e0F1a2B3c4D5e6F7a8B9c",
+      "status": "CONSENTED",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "source": "DLT_Blockchain_Mainnet"
+    }
+  ]
+}

@@ -39,6 +39,9 @@ services:
       - "--server"
       - "--log-level=debug"
       - "--addr=0.0.0.0:8181"
+      - "--set=decision_logs.console=true"
+      - "/policies/consent_policy.rego"
+      - "/policies/mock_consents.json"
     volumes:
       - ./config/opa:/policies
     healthcheck:

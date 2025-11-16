@@ -85,5 +85,22 @@ services:
       QDRANT_PORT: 6333
     restart: unless-stopped
 
+  # Scroll API (REST query interface)
+  scroll-api:
+    build:
+      context: ./scroll-api
+      dockerfile: Dockerfile
+    container_name: scroll-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      COLLECTION_NAME: scrolls
+      API_KEY: sovereign-scroll-key-2024
+    restart: unless-stopped
+
 volumes:
   qdrant_data:

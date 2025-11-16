@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sovereign-scroll.fullname" . }}-processor
+  labels:
+    {{- include "sovereign-scroll.labels" . | nindent 4 }}
+    app.kubernetes.io/component: processor
+spec:
+  {{- if not .Values.scrollProcessor.autoscaling.enabled }}
+  replicas: {{ .Values.scrollProcessor.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "sovereign-scroll.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: processor
+  template:
+    metadata:
+      labels:
+        {{- include "sovereign-scroll.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: processor
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "sovereign-scroll.serviceAccountName" . }}
+      containers:
+      - name: processor
+        image: "{{ .Values.scrollProcessor.image.repository }}:{{ .Values.scrollProcessor.image.tag }}"
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: {{ include "sovereign-scroll.fullname" . }}-kafka:9092
+        - name: KAFKA_TOPIC
+          value: {{ .Values.scrollProcessor.kafka.topic }}
+        - name: KAFKA_GROUP_ID
+          value: {{ .Values.scrollProcessor.kafka.groupId }}
+        - name: QDRANT_HOST
+          value: {{ include "sovereign-scroll.fullname" . }}-qdrant
+        - name: QDRANT_PORT
+          value: "6333"
+        - name: OPA_URL
+          value: "http://{{ include "sovereign-scroll.fullname" . }}-opa:8181"
+        - name: EMBEDDING_SERVICE_URL
+          value: "http://{{ include "sovereign-scroll.fullname" . }}-embedding:8001"
+        resources:
+          {{- toYaml .Values.scrollProcessor.resources | nindent 10 }}

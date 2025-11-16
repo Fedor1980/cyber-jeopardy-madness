@@ -1,0 +1,77 @@
+{{- if .Values.scrollApi.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "sovereign-scroll.fullname" . }}-api
+  labels:
+    {{- include "sovereign-scroll.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "sovereign-scroll.fullname" . }}-api
+  minReplicas: {{ .Values.scrollApi.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.scrollApi.autoscaling.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.scrollApi.autoscaling.targetCPUUtilizationPercentage }}
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 75
+{{- end }}
+---
+{{- if .Values.embeddingService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "sovereign-scroll.fullname" . }}-embedding
+  labels:
+    {{- include "sovereign-scroll.labels" . | nindent 4 }}
+    app.kubernetes.io/component: embedding
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "sovereign-scroll.fullname" . }}-embedding
+  minReplicas: {{ .Values.embeddingService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.embeddingService.autoscaling.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.embeddingService.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}
+---
+{{- if .Values.scrollProcessor.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "sovereign-scroll.fullname" . }}-processor
+  labels:
+    {{- include "sovereign-scroll.labels" . | nindent 4 }}
+    app.kubernetes.io/component: processor
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "sovereign-scroll.fullname" . }}-processor
+  minReplicas: {{ .Values.scrollProcessor.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.scrollProcessor.autoscaling.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.scrollProcessor.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}

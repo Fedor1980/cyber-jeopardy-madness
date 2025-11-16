@@ -1,0 +1,236 @@
+stages:
+  - test
+  - lint
+  - security
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  REGISTRY: $CI_REGISTRY
+  IMAGE_PREFIX: $CI_REGISTRY_IMAGE
+
+# Test jobs
+test:scroll-api:
+  stage: test
+  image: python:3.13
+  script:
+    - cd scroll-api
+    - pip install -r requirements.txt
+    - pytest tests/ -v --cov=. --cov-report=xml --cov-report=term
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: scroll-api/coverage.xml
+
+test:scroll-processor:
+  stage: test
+  image: python:3.13
+  script:
+    - cd scroll-processor
+    - pip install -r requirements.txt
+    - pytest tests/ -v --cov=. --cov-report=xml --cov-report=term
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: scroll-processor/coverage.xml
+
+test:embedding-service:
+  stage: test
+  image: python:3.13
+  script:
+    - cd embedding-service
+    - pip install -r requirements.txt
+    - pytest tests/ -v --cov=. --cov-report=xml --cov-report=term
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: embedding-service/coverage.xml
+
+# Linting jobs
+lint:python:
+  stage: lint
+  image: python:3.13
+  script:
+    - pip install ruff black isort mypy
+    - ruff check scroll-api scroll-processor embedding-service
+    - black --check scroll-api scroll-processor embedding-service
+    - isort --check-only scroll-api scroll-processor embedding-service
+    - mypy scroll-api scroll-processor embedding-service
+  allow_failure: true
+
+lint:helm:
+  stage: lint
+  image: alpine/helm:3.14.0
+  script:
+    - helm lint helm/sovereign-scroll
+    - helm template test-release helm/sovereign-scroll > /dev/null
+
+# Security scanning
+security:trivy:
+  stage: security
+  image: aquasec/trivy:latest
+  script:
+    - trivy fs --exit-code 0 --format json --output trivy-report.json .
+  artifacts:
+    reports:
+      container_scanning: trivy-report.json
+
+security:bandit:
+  stage: security
+  image: python:3.13
+  script:
+    - pip install bandit
+    - bandit -r scroll-api scroll-processor embedding-service -f json -o bandit-report.json
+  artifacts:
+    reports:
+      sast: bandit-report.json
+  allow_failure: true
+
+security:opa-tests:
+  stage: security
+  image: openpolicyagent/opa:latest
+  script:
+    - cd config/opa
+    - opa test . -v
+    - cd templates
+    - opa test gdpr_article6.rego -v
+    - opa test hipaa_phi.rego -v
+    - opa test ccpa_optout.rego -v
+
+# Build Docker images
+build:scroll-api:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag="latest"
+      elif [[ "$CI_COMMIT_TAG" ]]; then
+        tag="$CI_COMMIT_TAG"
+      else
+        tag="$CI_COMMIT_SHORT_SHA"
+      fi
+    - docker build -t $IMAGE_PREFIX/scroll-api:$tag ./scroll-api
+    - docker push $IMAGE_PREFIX/scroll-api:$tag
+  only:
+    - main
+    - tags
+
+build:scroll-processor:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag="latest"
+      elif [[ "$CI_COMMIT_TAG" ]]; then
+        tag="$CI_COMMIT_TAG"
+      else
+        tag="$CI_COMMIT_SHORT_SHA"
+      fi
+    - docker build -t $IMAGE_PREFIX/scroll-processor:$tag ./scroll-processor
+    - docker push $IMAGE_PREFIX/scroll-processor:$tag
+  only:
+    - main
+    - tags
+
+build:embedding-service:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag="latest"
+      elif [[ "$CI_COMMIT_TAG" ]]; then
+        tag="$CI_COMMIT_TAG"
+      else
+        tag="$CI_COMMIT_SHORT_SHA"
+      fi
+    - docker build -t $IMAGE_PREFIX/embedding-service:$tag ./embedding-service
+    - docker push $IMAGE_PREFIX/embedding-service:$tag
+  only:
+    - main
+    - tags
+
+# Deploy to environments
+deploy:development:
+  stage: deploy
+  image: alpine/helm:3.14.0
+  before_script:
+    - kubectl config use-context ${KUBE_CONTEXT_DEV}
+  script:
+    - helm upgrade --install sovereign-scroll helm/sovereign-scroll
+        -n sovereign-scroll-dev
+        --create-namespace
+        -f helm/values-development.yaml
+        --set scrollApi.apiKey="$API_KEY_DEV"
+        --set scrollApi.openaiApiKey="$OPENAI_API_KEY"
+        --wait --timeout 10m
+  environment:
+    name: development
+    url: https://dev-api.sovereignscroll.io
+  only:
+    - main
+
+deploy:staging:
+  stage: deploy
+  image: alpine/helm:3.14.0
+  before_script:
+    - kubectl config use-context ${KUBE_CONTEXT_STAGING}
+  script:
+    - helm upgrade --install sovereign-scroll helm/sovereign-scroll
+        -n sovereign-scroll-staging
+        --create-namespace
+        -f helm/values-staging.yaml
+        --set scrollApi.apiKey="$API_KEY_STAGING"
+        --set scrollApi.openaiApiKey="$OPENAI_API_KEY"
+        --wait --timeout 10m
+  environment:
+    name: staging
+    url: https://staging-api.sovereignscroll.io
+  only:
+    - main
+  when: manual
+
+deploy:production:
+  stage: deploy
+  image: alpine/helm:3.14.0
+  before_script:
+    - kubectl config use-context ${KUBE_CONTEXT_PROD}
+  script:
+    - helm upgrade --install sovereign-scroll helm/sovereign-scroll
+        -n sovereign-scroll-prod
+        --create-namespace
+        -f helm/values-production.yaml
+        --set scrollApi.apiKey="$API_KEY_PROD"
+        --set scrollApi.openaiApiKey="$OPENAI_API_KEY"
+        --wait --timeout 10m
+    - kubectl rollout status deployment/sovereign-scroll-api -n sovereign-scroll-prod
+    - kubectl rollout status deployment/sovereign-scroll-processor -n sovereign-scroll-prod
+    - kubectl rollout status deployment/sovereign-scroll-embedding -n sovereign-scroll-prod
+  environment:
+    name: production
+    url: https://api.sovereignscroll.io
+  only:
+    - tags
+  when: manual

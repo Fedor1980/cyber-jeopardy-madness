@@ -2,15 +2,36 @@
 Sovereign Scroll API
 REST API for querying validated, consented scrolls from Qdrant.
 """
-from fastapi import FastAPI, HTTPException, Security, Depends, status
+from fastapi import FastAPI, HTTPException, Security, Depends, status, Request
 from fastapi.security import APIKeyHeader
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import os
 import requests
+import time
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
+from metrics import (
+    get_metrics,
+    scrolls_stored_total,
+    scrolls_retrieved_total,
+    scrolls_search_total,
+    rag_questions_total,
+    rag_question_duration_seconds,
+    rag_context_scrolls,
+    qdrant_operations_total,
+    qdrant_operation_duration_seconds,
+    embedding_requests_total,
+    embedding_request_duration_seconds,
+    openai_requests_total,
+    openai_request_duration_seconds,
+    openai_tokens_used,
+    errors_total,
+    http_requests_total,
+    http_request_duration_seconds,
+    active_connections
+)
 
 # Configuration
 QDRANT_HOST = os.getenv('QDRANT_HOST', 'localhost')
@@ -24,8 +45,40 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 app = FastAPI(
     title="Sovereign Scroll API",
     description="Query validated and consented scrolls with policy enforcement",
-    version="1.0.0"
+    version="2.0.0"
 )
+
+# Middleware for metrics
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    """Track HTTP request metrics"""
+    active_connections.inc()
+    start_time = time.time()
+
+    try:
+        response = await call_next(request)
+
+        # Record metrics
+        duration = time.time() - start_time
+        http_requests_total.labels(
+            method=request.method,
+            endpoint=request.url.path,
+            status_code=response.status_code
+        ).inc()
+
+        http_request_duration_seconds.labels(
+            method=request.method,
+            endpoint=request.url.path
+        ).observe(duration)
+
+        return response
+
+    except Exception as e:
+        errors_total.labels(error_type=type(e).__name__).inc()
+        raise
+
+    finally:
+        active_connections.dec()
 
 # API Key Security
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
@@ -129,6 +182,15 @@ async def health_check():
             collection_exists=False,
             total_scrolls=0
         )
+
+
+@app.get("/metrics", tags=["Monitoring"])
+async def metrics():
+    """
+    Prometheus metrics endpoint.
+    Returns metrics in Prometheus exposition format.
+    """
+    return get_metrics()
 
 @app.get("/api/scrolls", response_model=ScrollListResponse, tags=["Scrolls"])
 async def list_scrolls(

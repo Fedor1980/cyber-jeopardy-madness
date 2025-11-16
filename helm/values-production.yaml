@@ -1,0 +1,168 @@
+# Production environment overrides
+global:
+  pullPolicy: IfNotPresent
+
+# Full autoscaling for production
+scrollApi:
+  replicas: 5
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+
+embeddingService:
+  replicas: 3
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+
+scrollProcessor:
+  replicas: 5
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 75
+
+# Production-grade persistence
+qdrant:
+  replicas: 3
+  persistence:
+    enabled: true
+    size: 100Gi
+    storageClass: "fast-ssd"
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+
+kafka:
+  replicas: 3
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: "fast-ssd"
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+
+# Production ingress with TLS
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: api.sovereignscroll.io
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: scroll-api-prod-tls
+      hosts:
+        - api.sovereignscroll.io
+
+# Full monitoring stack
+monitoring:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+    retention: 30d
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "1000m"
+  grafana:
+    enabled: true
+    dashboards:
+      enabled: true
+    persistence:
+      enabled: true
+      size: 10Gi
+
+# Production resource allocation
+scrollApi:
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+embeddingService:
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+
+scrollProcessor:
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+opa:
+  replicas: 3
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# Enable all security features
+security:
+  networkPolicy:
+    enabled: true
+  podSecurityPolicy:
+    enabled: true
+  rbac:
+    create: true
+
+# Enable resource quotas
+resourceQuota:
+  enabled: true
+  requests:
+    cpu: "20"
+    memory: "40Gi"
+  limits:
+    cpu: "40"
+    memory: "80Gi"
+
+# Enable all compliance templates
+opa:
+  policies:
+    templates:
+      gdpr: true
+      hipaa: true
+      ccpa: true

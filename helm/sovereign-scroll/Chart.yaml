@@ -1,0 +1,19 @@
+apiVersion: v2
+name: sovereign-scroll
+description: Consent-based data governance platform with semantic search and RAG
+type: application
+version: 2.0.0
+appVersion: "2.0.0"
+keywords:
+  - data-governance
+  - consent-management
+  - gdpr
+  - hipaa
+  - rag
+  - semantic-search
+maintainers:
+  - name: Sovereign Scroll Team
+    email: team@sovereignscroll.io
+sources:
+  - https://github.com/Fedor1980/cyber-jeopardy-madness
+dependencies: []

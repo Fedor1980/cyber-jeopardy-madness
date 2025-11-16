@@ -1,0 +1,278 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  test-scroll-api:
+    name: Test Scroll API
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('scroll-api/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        cd scroll-api
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        cd scroll-api
+        pytest tests/ -v --cov=. --cov-report=xml
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./scroll-api/coverage.xml
+        flags: scroll-api
+
+  test-scroll-processor:
+    name: Test Scroll Processor
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('scroll-processor/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        cd scroll-processor
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        cd scroll-processor
+        pytest tests/ -v --cov=. --cov-report=xml
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./scroll-processor/coverage.xml
+        flags: scroll-processor
+
+  test-embedding-service:
+    name: Test Embedding Service
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('embedding-service/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        cd embedding-service
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        cd embedding-service
+        pytest tests/ -v --cov=. --cov-report=xml
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./embedding-service/coverage.xml
+        flags: embedding-service
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install linting tools
+      run: |
+        pip install ruff black isort mypy
+
+    - name: Run ruff
+      run: |
+        ruff check scroll-api scroll-processor embedding-service
+
+    - name: Run black
+      run: |
+        black --check scroll-api scroll-processor embedding-service
+
+    - name: Run isort
+      run: |
+        isort --check-only scroll-api scroll-processor embedding-service
+
+    - name: Run mypy
+      run: |
+        mypy scroll-api scroll-processor embedding-service
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Run Bandit security scan
+      run: |
+        pip install bandit
+        bandit -r scroll-api scroll-processor embedding-service -f json -o bandit-report.json
+
+    - name: Upload Bandit results
+      uses: actions/upload-artifact@v4
+      with:
+        name: bandit-security-report
+        path: bandit-report.json
+
+  opa-policy-tests:
+    name: Test OPA Policies
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup OPA
+      uses: open-policy-agent/setup-opa@v2
+      with:
+        version: latest
+
+    - name: Test consent policies
+      run: |
+        cd config/opa
+        opa test . -v
+
+    - name: Test GDPR policy
+      run: |
+        cd config/opa/templates
+        opa test gdpr_article6.rego -v
+
+    - name: Test HIPAA policy
+      run: |
+        cd config/opa/templates
+        opa test hipaa_phi.rego -v
+
+    - name: Test CCPA policy
+      run: |
+        cd config/opa/templates
+        opa test ccpa_optout.rego -v
+
+  helm-lint:
+    name: Lint Helm Charts
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: '3.14.0'
+
+    - name: Lint Helm chart
+      run: |
+        helm lint helm/sovereign-scroll
+
+    - name: Template Helm chart
+      run: |
+        helm template test-release helm/sovereign-scroll > /dev/null
+
+    - name: Validate Kubernetes manifests
+      run: |
+        helm template test-release helm/sovereign-scroll | kubectl apply --dry-run=client -f -
+
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [test-scroll-api, test-scroll-processor, test-embedding-service]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Start services
+      run: |
+        docker compose -f docker-compose.scroll-pipeline.yml up -d
+
+    - name: Wait for services
+      run: |
+        sleep 60
+        docker compose -f docker-compose.scroll-pipeline.yml ps
+
+    - name: Check service health
+      run: |
+        curl --retry 10 --retry-delay 5 http://localhost:8000/health
+        curl --retry 10 --retry-delay 5 http://localhost:8001/health
+
+    - name: Run integration tests
+      run: |
+        python test_semantic_rag.py
+
+    - name: Collect logs on failure
+      if: failure()
+      run: |
+        docker compose -f docker-compose.scroll-pipeline.yml logs
+
+    - name: Shutdown services
+      if: always()
+      run: |
+        docker compose -f docker-compose.scroll-pipeline.yml down -v

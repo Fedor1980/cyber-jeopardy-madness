@@ -1,0 +1,164 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      version:
+        description: 'Version to deploy (tag or branch)'
+        required: true
+        default: 'main'
+
+env:
+  HELM_CHART: ./helm/sovereign-scroll
+  RELEASE_NAME: sovereign-scroll
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.version }}
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: '3.14.0'
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v4
+
+    - name: Configure kubectl
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+
+    - name: Set deployment namespace
+      id: namespace
+      run: |
+        if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+          echo "NAMESPACE=sovereign-scroll-prod" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event.inputs.environment }}" == "staging" ]; then
+          echo "NAMESPACE=sovereign-scroll-staging" >> $GITHUB_OUTPUT
+        else
+          echo "NAMESPACE=sovereign-scroll-dev" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create namespace if not exists
+      run: |
+        kubectl create namespace ${{ steps.namespace.outputs.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Set environment-specific values
+      id: values
+      run: |
+        if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+          echo "VALUES_FILE=helm/values-production.yaml" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event.inputs.environment }}" == "staging" ]; then
+          echo "VALUES_FILE=helm/values-staging.yaml" >> $GITHUB_OUTPUT
+        else
+          echo "VALUES_FILE=helm/values-development.yaml" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Lint Helm chart
+      run: |
+        helm lint ${{ env.HELM_CHART }} -f ${{ steps.values.outputs.VALUES_FILE }}
+
+    - name: Dry run deployment
+      run: |
+        helm upgrade --install ${{ env.RELEASE_NAME }} ${{ env.HELM_CHART }} \
+          -n ${{ steps.namespace.outputs.NAMESPACE }} \
+          -f ${{ steps.values.outputs.VALUES_FILE }} \
+          --set scrollApi.apiKey="${{ secrets.API_KEY }}" \
+          --set scrollApi.openaiApiKey="${{ secrets.OPENAI_API_KEY }}" \
+          --dry-run --debug
+
+    - name: Deploy with Helm
+      run: |
+        helm upgrade --install ${{ env.RELEASE_NAME }} ${{ env.HELM_CHART }} \
+          -n ${{ steps.namespace.outputs.NAMESPACE }} \
+          -f ${{ steps.values.outputs.VALUES_FILE }} \
+          --set scrollApi.apiKey="${{ secrets.API_KEY }}" \
+          --set scrollApi.openaiApiKey="${{ secrets.OPENAI_API_KEY }}" \
+          --wait --timeout 10m
+
+    - name: Verify deployment
+      run: |
+        kubectl rollout status deployment/${{ env.RELEASE_NAME }}-api -n ${{ steps.namespace.outputs.NAMESPACE }}
+        kubectl rollout status deployment/${{ env.RELEASE_NAME }}-processor -n ${{ steps.namespace.outputs.NAMESPACE }}
+        kubectl rollout status deployment/${{ env.RELEASE_NAME }}-embedding -n ${{ steps.namespace.outputs.NAMESPACE }}
+
+    - name: Run smoke tests
+      run: |
+        # Get API endpoint
+        API_URL=$(kubectl get svc ${{ env.RELEASE_NAME }}-api -n ${{ steps.namespace.outputs.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+        # Wait for LoadBalancer IP
+        for i in {1..30}; do
+          if [ -n "$API_URL" ]; then
+            break
+          fi
+          sleep 10
+          API_URL=$(kubectl get svc ${{ env.RELEASE_NAME }}-api -n ${{ steps.namespace.outputs.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        done
+
+        # Test health endpoint
+        curl -f -H "X-API-Key: ${{ secrets.API_KEY }}" http://$API_URL:8000/health || exit 1
+
+    - name: Post deployment summary
+      if: always()
+      run: |
+        echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment**: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Version**: ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Namespace**: ${{ steps.namespace.outputs.NAMESPACE }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Deployed Resources" >> $GITHUB_STEP_SUMMARY
+        kubectl get all -n ${{ steps.namespace.outputs.NAMESPACE }} -l app.kubernetes.io/instance=${{ env.RELEASE_NAME }} >> $GITHUB_STEP_SUMMARY
+
+  rollback:
+    name: Rollback on failure
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: '3.14.0'
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v4
+
+    - name: Configure kubectl
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+
+    - name: Set deployment namespace
+      id: namespace
+      run: |
+        if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+          echo "NAMESPACE=sovereign-scroll-prod" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event.inputs.environment }}" == "staging" ]; then
+          echo "NAMESPACE=sovereign-scroll-staging" >> $GITHUB_OUTPUT
+        else
+          echo "NAMESPACE=sovereign-scroll-dev" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Rollback Helm release
+      run: |
+        helm rollback ${{ env.RELEASE_NAME }} -n ${{ steps.namespace.outputs.NAMESPACE }}

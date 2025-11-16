@@ -1,0 +1,164 @@
+===============================================================================
+   SOVEREIGN SCROLL PLATFORM - Successfully Deployed!
+===============================================================================
+
+Release Name: {{ .Release.Name }}
+Namespace:    {{ .Release.Namespace }}
+
+Your Sovereign Scroll Platform is now deploying. It may take a few minutes
+for all services to become ready.
+
+-------------------------------------------------------------------------------
+1. VERIFY DEPLOYMENT STATUS
+-------------------------------------------------------------------------------
+
+Check pod status:
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+Watch deployment progress:
+  kubectl get pods -n {{ .Release.Namespace }} -w
+
+-------------------------------------------------------------------------------
+2. ACCESS THE API
+-------------------------------------------------------------------------------
+
+{{- if .Values.ingress.enabled }}
+Your API is accessible via Ingress at:
+
+{{- range .Values.ingress.hosts }}
+  https://{{ .host }}
+{{- end }}
+
+{{- else if eq .Values.scrollApi.service.type "LoadBalancer" }}
+Get the LoadBalancer IP:
+  kubectl get svc {{ include "sovereign-scroll.fullname" . }}-api -n {{ .Release.Namespace }}
+
+Access the API:
+  export SERVICE_IP=$(kubectl get svc {{ include "sovereign-scroll.fullname" . }}-api -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  curl -H "X-API-Key: {{ .Values.scrollApi.apiKey }}" http://$SERVICE_IP:{{ .Values.scrollApi.service.port }}/health
+
+{{- else }}
+Port-forward to access the API locally:
+  kubectl port-forward svc/{{ include "sovereign-scroll.fullname" . }}-api {{ .Values.scrollApi.service.port }}:{{ .Values.scrollApi.service.port }} -n {{ .Release.Namespace }}
+
+Then access:
+  curl -H "X-API-Key: {{ .Values.scrollApi.apiKey }}" http://localhost:{{ .Values.scrollApi.service.port }}/health
+{{- end }}
+
+-------------------------------------------------------------------------------
+3. API ENDPOINTS
+-------------------------------------------------------------------------------
+
+Health check:      /health
+API documentation: /docs
+Metrics:          /metrics
+
+Core operations:
+  POST /api/scrolls              - Store a new scroll
+  GET  /api/scrolls              - List all scrolls
+  GET  /api/scrolls/{id}         - Get scroll by ID
+  POST /api/scrolls/semantic-search - Semantic search
+  POST /api/scrolls/ask          - RAG question answering
+
+-------------------------------------------------------------------------------
+4. AUTHENTICATION
+-------------------------------------------------------------------------------
+
+API Key: {{ .Values.scrollApi.apiKey }}
+
+{{- if eq .Values.scrollApi.apiKey "CHANGE_ME_IN_PRODUCTION" }}
+
+⚠️  WARNING: You are using the default API key!
+   Please update the API key in production:
+
+   helm upgrade {{ .Release.Name }} ./sovereign-scroll \
+     --set scrollApi.apiKey="$(openssl rand -hex 32)" \
+     --reuse-values
+{{- end }}
+
+All API requests require the X-API-Key header:
+  curl -H "X-API-Key: {{ .Values.scrollApi.apiKey }}" <URL>
+
+-------------------------------------------------------------------------------
+5. MONITORING
+-------------------------------------------------------------------------------
+
+{{- if .Values.monitoring.prometheus.enabled }}
+Prometheus metrics are enabled. Access Prometheus:
+  kubectl port-forward svc/{{ .Release.Name }}-prometheus 9090:9090 -n {{ .Release.Namespace }}
+  Open: http://localhost:9090
+{{- end }}
+
+{{- if .Values.monitoring.grafana.enabled }}
+Grafana dashboards are enabled. Access Grafana:
+  kubectl port-forward svc/{{ .Release.Name }}-grafana 3000:80 -n {{ .Release.Namespace }}
+  Open: http://localhost:3000
+
+Get Grafana admin password:
+  kubectl get secret {{ .Release.Name }}-grafana -n {{ .Release.Namespace }} -o jsonpath="{.data.admin-password}" | base64 --decode
+{{- end }}
+
+-------------------------------------------------------------------------------
+6. COMPONENT STATUS
+-------------------------------------------------------------------------------
+
+Services deployed:
+{{- if .Values.kafka.enabled }}
+  ✓ Kafka (Message Streaming)
+{{- end }}
+{{- if .Values.opa.enabled }}
+  ✓ OPA (Policy Engine)
+{{- end }}
+{{- if .Values.qdrant.enabled }}
+  ✓ Qdrant (Vector Database)
+{{- end }}
+{{- if .Values.embeddingService.enabled }}
+  ✓ Embedding Service (Semantic Vectors)
+{{- end }}
+{{- if .Values.scrollProcessor.enabled }}
+  ✓ Scroll Processor (Event Processing)
+{{- end }}
+{{- if .Values.scrollApi.enabled }}
+  ✓ Scroll API (REST Interface)
+{{- end }}
+
+{{- if .Values.scrollApi.autoscaling.enabled }}
+Auto-scaling enabled:
+  - API: {{ .Values.scrollApi.autoscaling.minReplicas }}-{{ .Values.scrollApi.autoscaling.maxReplicas }} replicas
+{{- end }}
+{{- if .Values.embeddingService.autoscaling.enabled }}
+  - Embedding: {{ .Values.embeddingService.autoscaling.minReplicas }}-{{ .Values.embeddingService.autoscaling.maxReplicas }} replicas
+{{- end }}
+{{- if .Values.scrollProcessor.autoscaling.enabled }}
+  - Processor: {{ .Values.scrollProcessor.autoscaling.minReplicas }}-{{ .Values.scrollProcessor.autoscaling.maxReplicas }} replicas
+{{- end }}
+
+-------------------------------------------------------------------------------
+7. TROUBLESHOOTING
+-------------------------------------------------------------------------------
+
+View logs:
+  kubectl logs -l app.kubernetes.io/component=api -n {{ .Release.Namespace }}
+  kubectl logs -l app.kubernetes.io/component=processor -n {{ .Release.Namespace }}
+
+Describe pods for errors:
+  kubectl describe pods -l app.kubernetes.io/instance={{ .Release.Name }} -n {{ .Release.Namespace }}
+
+Check events:
+  kubectl get events -n {{ .Release.Namespace }} --sort-by='.lastTimestamp'
+
+-------------------------------------------------------------------------------
+8. NEXT STEPS
+-------------------------------------------------------------------------------
+
+1. Verify all pods are running
+2. Test the API endpoints
+3. Configure compliance policies in OPA
+4. Set up monitoring dashboards
+5. Review security settings
+
+For more information:
+  Documentation: https://docs.sovereignscroll.io
+  Issues: https://github.com/Fedor1980/cyber-jeopardy-madness/issues
+
+===============================================================================

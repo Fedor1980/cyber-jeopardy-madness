@@ -1,0 +1,95 @@
+{{- if .Values.qdrant.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sovereign-scroll.fullname" . }}-qdrant
+  labels:
+    {{- include "sovereign-scroll.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qdrant
+spec:
+  type: {{ .Values.qdrant.service.type }}
+  clusterIP: None
+  ports:
+  - port: {{ .Values.qdrant.service.httpPort }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  - port: {{ .Values.qdrant.service.grpcPort }}
+    targetPort: grpc
+    protocol: TCP
+    name: grpc
+  selector:
+    {{- include "sovereign-scroll.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: qdrant
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sovereign-scroll.fullname" . }}-qdrant
+  labels:
+    {{- include "sovereign-scroll.labels" . | nindent 4 }}
+    app.kubernetes.io/component: qdrant
+spec:
+  serviceName: {{ include "sovereign-scroll.fullname" . }}-qdrant
+  replicas: {{ .Values.qdrant.replicas }}
+  selector:
+    matchLabels:
+      {{- include "sovereign-scroll.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: qdrant
+  template:
+    metadata:
+      labels:
+        {{- include "sovereign-scroll.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: qdrant
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "6333"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "sovereign-scroll.serviceAccountName" . }}
+      containers:
+      - name: qdrant
+        image: "{{ .Values.qdrant.image.repository }}:{{ .Values.qdrant.image.tag }}"
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 6333
+          protocol: TCP
+        - name: grpc
+          containerPort: 6334
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.qdrant.resources | nindent 10 }}
+        volumeMounts:
+        - name: storage
+          mountPath: /qdrant/storage
+  {{- if .Values.qdrant.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.qdrant.persistence.storageClass }}
+      storageClassName: {{ .Values.qdrant.persistence.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.qdrant.persistence.size }}
+  {{- else }}
+      volumes:
+      - name: storage
+        emptyDir: {}
+  {{- end }}
+{{- end }}

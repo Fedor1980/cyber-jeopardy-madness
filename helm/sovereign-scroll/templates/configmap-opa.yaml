@@ -1,0 +1,208 @@
+{{- if .Values.opa.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sovereign-scroll.fullname" . }}-opa-policies
+  labels:
+    {{- include "sovereign-scroll.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opa
+data:
+  consent_policy.rego: |
+    package scrolls.consent
+
+    import future.keywords.if
+    import future.keywords.in
+
+    # Load the mock consent data
+    consents := data.consents
+
+    # Default deny - consent must be explicitly granted
+    default allow := false
+
+    # Allow if consent_id exists and status is CONSENTED
+    allow if {
+        some consent in consents
+        consent.consent_id == input.consent_id
+        consent.status == "CONSENTED"
+    }
+
+    # Deny reasons for debugging
+    deny_reason["consent_not_found"] if {
+        not has_consent_id
+    }
+
+    deny_reason["consent_denied"] if {
+        has_consent_id
+        not is_consented
+    }
+
+    # Helper rules
+    has_consent_id if {
+        some consent in consents
+        consent.consent_id == input.consent_id
+    }
+
+    is_consented if {
+        some consent in consents
+        consent.consent_id == input.consent_id
+        consent.status == "CONSENTED"
+    }
+
+  {{- if .Values.opa.policies.templates.gdpr }}
+  gdpr_article6.rego: |
+    package scrolls.consent.gdpr
+
+    import future.keywords.if
+    import future.keywords.in
+
+    consents := data.consents
+
+    default allow := false
+
+    # GDPR Article 6 - Lawfulness of processing
+    allow if {
+        consent := consents[_]
+        consent.consent_id == input.consent_id
+        consent.status == "CONSENTED"
+        gdpr_lawful_basis_valid(consent)
+        not consent_expired(consent)
+        purpose_specified(consent)
+    }
+
+    # Validate GDPR lawful basis (Article 6.1)
+    gdpr_lawful_basis_valid(consent) if {
+        consent.lawful_basis in [
+            "consent",              # (a) Data subject consent
+            "contract",             # (b) Contract performance
+            "legal_obligation",     # (c) Legal obligation
+            "vital_interests",      # (d) Vital interests
+            "public_task",          # (e) Public task
+            "legitimate_interests"  # (f) Legitimate interests
+        ]
+    }
+
+    # Check consent expiration
+    consent_expired(consent) if {
+        time.parse_rfc3339_ns(consent.expiration_date) < time.now_ns()
+    }
+
+    # Verify purpose limitation (Article 5.1.b)
+    purpose_specified(consent) if {
+        count(consent.purposes) > 0
+        input.purpose in consent.purposes
+    }
+
+    # GDPR rights compliance checks
+    right_to_erasure_requested(consent) if {
+        consent.erasure_requested == true
+    }
+
+    right_to_restriction_active(consent) if {
+        consent.processing_restricted == true
+    }
+  {{- end }}
+
+  {{- if .Values.opa.policies.templates.hipaa }}
+  hipaa_phi.rego: |
+    package scrolls.consent.hipaa
+
+    import future.keywords.if
+    import future.keywords.in
+
+    consents := data.consents
+
+    default allow := false
+
+    # HIPAA Privacy Rule - Authorization for use/disclosure of PHI
+    allow if {
+        consent := consents[_]
+        consent.consent_id == input.consent_id
+        consent.authorization_type == "HIPAA"
+        consent.patient_signature
+        purpose_permitted(consent, input.purpose)
+        not authorization_revoked(consent)
+        not authorization_expired(consent)
+    }
+
+    # HIPAA required authorization elements (45 CFR § 164.508)
+    purpose_permitted(consent, requested_purpose) if {
+        consent.permitted_purposes[_] == requested_purpose
+    }
+
+    authorization_revoked(consent) if {
+        consent.revoked == true
+    }
+
+    authorization_expired(consent) if {
+        consent.expiration_date != "indefinite"
+        time.parse_rfc3339_ns(consent.expiration_date) < time.now_ns()
+    }
+
+    # Minimum necessary standard (45 CFR § 164.502(b))
+    minimum_necessary_compliant(consent) if {
+        consent.minimum_necessary_analysis == true
+        consent.requested_phi_elements
+    }
+  {{- end }}
+
+  {{- if .Values.opa.policies.templates.ccpa }}
+  ccpa_optout.rego: |
+    package scrolls.consent.ccpa
+
+    import future.keywords.if
+    import future.keywords.in
+
+    consents := data.consents
+
+    # CCPA is opt-out by default (opposite of GDPR)
+    default allow := true
+
+    # Deny if consumer opted out of sale (CCPA § 1798.120)
+    allow if {
+        consent := consents[_]
+        consent.consent_id == input.consent_id
+        not opted_out_of_sale(consent)
+        not opted_out_of_sharing(consent)
+        purpose_compliant(input.purpose)
+    }
+
+    opted_out_of_sale(consent) if {
+        consent.ccpa_opt_out_sale == true
+    }
+
+    opted_out_of_sharing(consent) if {
+        consent.ccpa_opt_out_sharing == true
+    }
+
+    # CCPA business purpose exemptions (§ 1798.140(e))
+    purpose_compliant(purpose) if {
+        purpose in [
+            "service_provider_contract",
+            "legal_compliance",
+            "security",
+            "debugging",
+            "transient_use"
+        ]
+    }
+
+    # CCPA right to know compliance
+    disclosure_required(consent) if {
+        consent.right_to_know_requested == true
+    }
+  {{- end }}
+
+  mock_consents.json: |
+    {
+      "consents": [
+        {
+          "consent_id": "0xAb1C2D3E4F5a6B7c8D9e0F1a2B3c4D5e6F7a8B9c",
+          "status": "CONSENTED",
+          "timestamp": "2024-01-15T10:30:00Z",
+          "source": "DLT_Blockchain_Mainnet",
+          "lawful_basis": "consent",
+          "purposes": ["analytics", "marketing"],
+          "expiration_date": "2025-01-15T10:30:00Z"
+        }
+      ]
+    }
+{{- end }}

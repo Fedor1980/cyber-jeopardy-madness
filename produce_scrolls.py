@@ -33,7 +33,7 @@ def generate_mock_scrolls():
         {
             "scroll_id": "doc-invalid-schema-002",
             "source_system": "HR_Memo",
-            "consent_id="0xAb1C2D3E4F5a6B7c8D9e0F1a2B3c4D5e6F7a8B9c"
+            "consent_id": "0xAb1C2D3E4F5a6B7c8D9e0F1a2B3c4D5e6F7a8B9c"
             # The 'content' field is deliberately missing
         },
 

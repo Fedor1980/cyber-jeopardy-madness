@@ -71,12 +71,9 @@ services:
       dockerfile: Dockerfile
     container_name: scroll-processor
     depends_on:
-      kafka:
-        condition: service_healthy
-      opa:
-        condition: service_healthy
-      qdrant:
-        condition: service_healthy
+      - kafka
+      - opa
+      - qdrant
     environment:
       KAFKA_BROKER: kafka:29092
       KAFKA_TOPIC: scrolls.raw

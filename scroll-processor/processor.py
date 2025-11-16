@@ -2,6 +2,7 @@ import json
 import time
 import os
 import sys
+import uuid
 from kafka import KafkaConsumer
 from pydantic import BaseModel, Field, ValidationError
 import requests
@@ -83,8 +84,11 @@ def store_in_qdrant(client, scroll_data: dict):
         # Create a simple dummy vector (in production, this would be from an embedding model)
         dummy_vector = [0.1] * 384
 
+        # Generate a deterministic UUID from the scroll_id
+        point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, scroll_data['scroll_id']))
+
         point = PointStruct(
-            id=scroll_data['scroll_id'],
+            id=point_id,
             vector=dummy_vector,
             payload={
                 'scroll_id': scroll_data['scroll_id'],

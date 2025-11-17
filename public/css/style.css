@@ -392,9 +392,13 @@ body {
     font-family: 'Orbitron', 'Arial Black', sans-serif;
     font-size: 3.5rem;
     color: var(--text-gold);
-    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8),
-                 0 0 30px rgba(255, 204, 0, 0.4),
-                 0 0 60px rgba(0, 255, 240, 0.3);
+    /* Improved text shadow for better readability */
+    text-shadow:
+        3px 3px 0px rgba(0, 0, 0, 1),
+        -1px -1px 0px rgba(0, 0, 0, 1),
+        1px -1px 0px rgba(0, 0, 0, 1),
+        -1px 1px 0px rgba(0, 0, 0, 1),
+        0 0 20px rgba(255, 204, 0, 0.8);
     letter-spacing: 0.3rem;
     margin-bottom: 0.5rem;
     font-weight: 900;
@@ -403,6 +407,12 @@ body {
     justify-content: center;
     gap: 1rem;
     flex-wrap: wrap;
+    /* Add a semi-transparent dark background for better contrast */
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    position: relative;
+    z-index: 2;
 }
 
 .infinity {

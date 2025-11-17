@@ -306,15 +306,23 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 4rem;
             color: var(--jeopardy-gold);
+            /* Improved text shadow for better readability */
             text-shadow:
-                0 0 4px rgba(0, 0, 0, 0.9),
-                0 0 12px rgba(0, 0, 0, 0.9),
-                0 0 24px rgba(255, 204, 0, 0.6);
+                3px 3px 0px rgba(0, 0, 0, 1),
+                -1px -1px 0px rgba(0, 0, 0, 1),
+                1px -1px 0px rgba(0, 0, 0, 1),
+                -1px 1px 0px rgba(0, 0, 0, 1),
+                0 0 20px rgba(255, 204, 0, 0.8);
             letter-spacing: 0.35rem;
             margin-bottom: 0.75rem;
             font-weight: 900;
             position: relative;
             z-index: 2;
+            /* Add a semi-transparent dark background for better contrast */
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            display: inline-block;
         }
 
         .infinity {
@@ -1598,6 +1606,8 @@
                 this.dailyDoubles = [];
                 this.timerInterval = null;
                 this.buzzTimerInterval = null;
+                this.roundTimerInterval = null;
+                this.roundTimeRemaining = 480; // 8 minutes in seconds
                 this.buzzerActive = false;
                 this.buzzedPlayers = new Set();
                 this.aiEnabled = false;
@@ -1608,6 +1618,7 @@
                 this.gridLines = [];
                 this.bgmPlaying = false;
                 this.settings = { volume: 0.7, animations: true, voice: null };
+                this.audioContext = null;
 
                 this.init();
             }
@@ -1616,9 +1627,163 @@
                 this.loadSettings();
                 this.applyAnimationSetting();
                 this.initCanvas();
+                this.initAudio();
                 this.initAI();
                 this.setupEventListeners();
                 this.showScreen('setup');
+            }
+
+            initAudio() {
+                // Initialize Web Audio API for sound effects
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (error) {
+                    console.warn('Web Audio API not supported:', error);
+                }
+            }
+
+            playSound(type) {
+                if (!this.audioContext) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                // Configure sound based on type
+                switch(type) {
+                    case 'correct':
+                        oscillator.frequency.setValueAtTime(523.25, this.audioContext.currentTime); // C5
+                        oscillator.frequency.setValueAtTime(659.25, this.audioContext.currentTime + 0.1); // E5
+                        oscillator.frequency.setValueAtTime(783.99, this.audioContext.currentTime + 0.2); // G5
+                        gainNode.gain.setValueAtTime(this.settings.volume * 0.3, this.audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
+                        oscillator.start(this.audioContext.currentTime);
+                        oscillator.stop(this.audioContext.currentTime + 0.4);
+                        break;
+                    case 'wrong':
+                        oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(this.settings.volume * 0.3, this.audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+                        oscillator.start(this.audioContext.currentTime);
+                        oscillator.stop(this.audioContext.currentTime + 0.5);
+                        break;
+                    case 'buzz':
+                        oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime);
+                        oscillator.type = 'square';
+                        gainNode.gain.setValueAtTime(this.settings.volume * 0.2, this.audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+                        oscillator.start(this.audioContext.currentTime);
+                        oscillator.stop(this.audioContext.currentTime + 0.2);
+                        break;
+                    case 'timeout':
+                        oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+                        oscillator.type = 'sawtooth';
+                        gainNode.gain.setValueAtTime(this.settings.volume * 0.25, this.audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.6);
+                        oscillator.start(this.audioContext.currentTime);
+                        oscillator.stop(this.audioContext.currentTime + 0.6);
+                        break;
+                    case 'dailydouble':
+                        // Play ascending notes
+                        for (let i = 0; i < 3; i++) {
+                            const osc = this.audioContext.createOscillator();
+                            const gain = this.audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(this.audioContext.destination);
+                            osc.frequency.setValueAtTime(400 + (i * 100), this.audioContext.currentTime + (i * 0.15));
+                            gain.gain.setValueAtTime(this.settings.volume * 0.25, this.audioContext.currentTime + (i * 0.15));
+                            gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + (i * 0.15) + 0.3);
+                            osc.start(this.audioContext.currentTime + (i * 0.15));
+                            osc.stop(this.audioContext.currentTime + (i * 0.15) + 0.3);
+                        }
+                        break;
+                }
+            }
+
+            startRoundTimer() {
+                // Clear any existing round timer
+                if (this.roundTimerInterval) {
+                    clearInterval(this.roundTimerInterval);
+                }
+
+                this.roundTimeRemaining = 480; // Reset to 8 minutes
+                this.updateRoundTimerDisplay();
+
+                this.roundTimerInterval = setInterval(() => {
+                    this.roundTimeRemaining--;
+                    this.updateRoundTimerDisplay();
+
+                    if (this.roundTimeRemaining <= 0) {
+                        this.endRoundByTime();
+                    }
+                }, 1000);
+            }
+
+            stopRoundTimer() {
+                if (this.roundTimerInterval) {
+                    clearInterval(this.roundTimerInterval);
+                    this.roundTimerInterval = null;
+                }
+            }
+
+            updateRoundTimerDisplay() {
+                const minutes = Math.floor(this.roundTimeRemaining / 60);
+                const seconds = this.roundTimeRemaining % 60;
+                const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                // Update round timer display (we'll add this element to the UI)
+                const roundTitle = document.getElementById('round-title');
+                if (roundTitle) {
+                    const timerSpan = document.getElementById('round-timer-display') || (() => {
+                        const span = document.createElement('span');
+                        span.id = 'round-timer-display';
+                        span.style.cssText = 'font-size: 0.6em; margin-left: 1rem; color: var(--captg-green);';
+                        roundTitle.parentElement.appendChild(span);
+                        return span;
+                    })();
+                    timerSpan.textContent = `⏱ ${timeString}`;
+
+                    // Warning color when under 1 minute
+                    if (this.roundTimeRemaining <= 60) {
+                        timerSpan.style.color = 'var(--error-red)';
+                    } else {
+                        timerSpan.style.color = 'var(--captg-green)';
+                    }
+                }
+            }
+
+            endRoundByTime() {
+                this.stopRoundTimer();
+                this.playSound('timeout');
+
+                // Clear any active question
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+                if (this.buzzTimerInterval) {
+                    clearInterval(this.buzzTimerInterval);
+                    this.buzzTimerInterval = null;
+                }
+
+                // Close any open modals
+                document.getElementById('question-modal').classList.remove('active');
+                document.getElementById('result-modal').classList.remove('active');
+                document.getElementById('dd-modal').classList.remove('active');
+
+                // Advance to next round or end game
+                if (this.currentRound === 1) {
+                    this.currentRound = 2;
+                    this.answeredQuestions.clear();
+                    this.generateDailyDoubles();
+                    this.buildBoard();
+                    this.updatePodiums();
+                    this.updateScoreHUD();
+                    this.startRoundTimer(); // Start timer for round 2
+                } else {
+                    this.showWinner();
+                }
             }
 
             applyAnimationSetting() {
@@ -1849,6 +2014,7 @@
                 this.updateScoreHUD();
                 this.showScreen('game');
                 document.getElementById('score-hud').classList.remove('hidden');
+                this.startRoundTimer(); // Start 8-minute round timer
             }
 
             generateDailyDoubles() {
@@ -1939,6 +2105,8 @@
             }
 
             showDailyDouble() {
+                this.playSound('dailydouble'); // Play Daily Double sound
+
                 let maxWager = this.currentPlayer.score > 0
                     ? this.currentPlayer.score
                     : (this.currentRound === 1 ? 1000 : 2000);
@@ -2059,6 +2227,7 @@
             }
 
             handleCorrectAnswer() {
+                this.playSound('correct'); // Play correct answer sound
                 this.currentPlayer.score += this.currentQuestion.value;
                 this.updatePodiums();
                 this.updateScoreHUD();
@@ -2068,6 +2237,7 @@
             }
 
             handleIncorrectAnswer() {
+                this.playSound('wrong'); // Play wrong answer sound
                 this.currentPlayer.score -= this.currentQuestion.value;
                 this.updatePodiums();
                 this.updateScoreHUD();
@@ -2139,6 +2309,8 @@
             handleBuzz(playerIndex) {
                 if (!this.buzzerActive || this.buzzedPlayers.has(playerIndex)) return;
 
+                this.playSound('buzz'); // Play buzz-in sound
+
                 clearInterval(this.buzzTimerInterval);
                 this.buzzTimerInterval = null;
                 this.buzzerActive = false;
@@ -2185,12 +2357,14 @@
                 const totalQuestions = 30;
                 if (this.answeredQuestions.size >= totalQuestions) {
                     if (this.currentRound === 1) {
+                        this.stopRoundTimer(); // Stop round 1 timer
                         this.currentRound = 2;
                         this.answeredQuestions.clear();
                         this.generateDailyDoubles();
                         this.buildBoard();
                         this.updatePodiums();
                         this.updateScoreHUD();
+                        this.startRoundTimer(); // Start round 2 timer
                     } else {
                         this.showWinner();
                     }
@@ -2294,6 +2468,8 @@
             }
 
             showWinner() {
+                this.stopRoundTimer(); // Stop the round timer
+
                 const sorted = [...this.players].sort((a, b) => b.score - a.score);
                 const winner = sorted[0];
 

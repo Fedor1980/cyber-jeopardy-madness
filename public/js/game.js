@@ -195,10 +195,16 @@ class CyberJeopardyGame {
     async loadGameData() {
         try {
             const response = await fetch('../game_questions.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             this.gameData = await response.json();
-            console.log('Game data loaded successfully');
+            // Game data loaded successfully
         } catch (error) {
-            console.error('Error loading game data:', error);
+            // Only log errors in development
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.error('Error loading game data:', error);
+            }
             alert('Error loading game questions. Please refresh the page.');
         }
     }
@@ -1216,7 +1222,10 @@ class CyberJeopardyGame {
             }
 
         } catch (error) {
-            console.error('AI Hint Error:', error);
+            // Only log errors in development
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.error('AI Hint Error:', error);
+            }
             this.showAIHint('❌ Unable to fetch hint. Please check your API key.');
             this.elements.aiHintBtn.disabled = false;
         }
@@ -1268,7 +1277,10 @@ class CyberJeopardyGame {
             this.elements.bgmToggle.classList.remove('playing');
         } else {
             this.bgmAudio.play().catch(err => {
-                console.log('BGM playback failed:', err);
+                // Silently handle playback failures (user interaction may be required)
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.log('BGM playback failed:', err);
+                }
             });
             this.bgmPlaying = true;
             this.elements.bgmToggle.classList.add('playing');
@@ -1291,7 +1303,10 @@ class CyberJeopardyGame {
         if (sfx) {
             sfx.currentTime = 0;
             sfx.play().catch(err => {
-                console.log('SFX playback failed:', err);
+                // Silently handle playback failures (user interaction may be required)
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.log('SFX playback failed:', err);
+                }
             });
         }
     }

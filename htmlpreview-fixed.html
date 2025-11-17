@@ -300,10 +300,7 @@
 				const isGitHub = url.hostname.includes('github.com');
 				const isBitBucket = url.hostname.includes('bitbucket.org');
 
-				if (!isGitHub && !isBitBucket) {
-					// You can optionally warn users, but still allow it
-					console.warn('Note: This service is optimized for GitHub and BitBucket URLs');
-				}
+				// Service is optimized for GitHub and BitBucket but supports other hosts
 
 				// Properly encode the URL for the query parameter
 				// Issue #10 FIXED - Using encodeURIComponent for security
@@ -326,7 +323,7 @@
 			});
 
 			// Issue #7 FIXED - Fallback is no longer needed since form is visible by default
-			console.log('HTML Preview form loaded successfully');
+			// Form initialization complete
 		})();
 	</script>
 </body>

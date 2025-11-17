@@ -1,13 +1,15 @@
 {
   "name": "cyber-jeopardy-madness",
-  "version": "1.0.0",
-  "description": "A team-based cybersecurity awareness training game built for Federal Credit Unions",
+  "version": "2.0.0",
+  "description": "Enterprise-grade Cybersecurity Jeopardy Training Platform for Federal Credit Unions and Financial Institutions",
   "main": "index.js",
   "scripts": {
     "start": "npx http-server public -p 8080 -o",
     "dev": "npx http-server public -p 8080 -o",
     "build": "echo 'Static site - no build required'",
-    "test": "echo 'Tests not yet implemented'"
+    "test": "echo 'Static HTML version - see frontend/backend for tests'",
+    "lint": "echo 'Linting frontend and backend...' && cd frontend && npm run lint && cd ../backend && npm run lint",
+    "typecheck": "echo 'Type checking...' && cd frontend && npm run typecheck && cd ../backend && npm run typecheck"
   },
   "keywords": [
     "cybersecurity",

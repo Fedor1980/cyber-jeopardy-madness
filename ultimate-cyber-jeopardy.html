@@ -240,17 +240,17 @@
 
         @keyframes glitchTop {
             0%, 92%, 100% { transform: translate(0, 0); }
-            93%, 95% { transform: translate(-3px, -2px); color: var(--cyber-cyan); text-shadow: 2px 0 var(--cyber-red); }
+            93%, 95% { transform: translate(-1px, -1px); color: var(--cyber-cyan); text-shadow: 1px 0 var(--cyber-red); }
         }
 
         @keyframes glitchBottom {
             0%, 94%, 100% { transform: translate(0, 0); }
-            95%, 97% { transform: translate(3px, 2px); color: var(--cyber-red); text-shadow: -2px 0 var(--cyber-cyan); }
+            95%, 97% { transform: translate(1px, 1px); color: var(--cyber-red); text-shadow: -1px 0 var(--cyber-cyan); }
         }
 
         @keyframes glitchSkew {
             0%, 98%, 100% { transform: skew(0deg); }
-            99% { transform: skew(2deg); }
+            99% { transform: skew(1deg); }
         }
 
         /* ===================================
@@ -276,6 +276,16 @@
             overflow: hidden;
         }
 
+        .show-title-inner {
+            position: relative;
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            z-index: 1;
+        }
+
         .show-title::before {
             content: '';
             position: absolute;
@@ -294,14 +304,17 @@
 
         .omega-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem;
+            font-size: 4rem;
             color: var(--jeopardy-gold);
-            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 204, 0, 0.4);
-            letter-spacing: 0.3rem;
-            margin-bottom: 0.5rem;
+            text-shadow:
+                0 0 4px rgba(0, 0, 0, 0.9),
+                0 0 12px rgba(0, 0, 0, 0.9),
+                0 0 24px rgba(255, 204, 0, 0.6);
+            letter-spacing: 0.35rem;
+            margin-bottom: 0.75rem;
             font-weight: 900;
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
         .infinity {
@@ -1217,6 +1230,26 @@
             50% { transform: translateY(-20px); }
         }
 
+        @keyframes buzz {
+            0%   { transform: translateX(0); }
+            25%  { transform: translateX(-4px); }
+            50%  { transform: translateX(4px); }
+            75%  { transform: translateX(-4px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Animations Off State */
+        [data-animations="off"] .ai-pulse,
+        [data-animations="off"] .glitch,
+        [data-animations="off"] .show-title::before,
+        [data-animations="off"] .infinity,
+        [data-animations="off"] .winner-title,
+        [data-animations="off"] .dd-title,
+        [data-animations="off"] .bgm-control.playing .bgm-icon,
+        [data-animations="off"] .buzzer-prompt {
+            animation: none !important;
+        }
+
         .champion-display {
             font-size: 3rem;
             color: var(--success);
@@ -1249,13 +1282,20 @@
         /* Responsive */
         @media (max-width: 1200px) {
             .game-board {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .game-board {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
 
         @media (max-width: 768px) {
             .omega-title {
-                font-size: 2rem;
+                font-size: 2.4rem;
+                letter-spacing: 0.2rem;
             }
 
             .game-board {
@@ -1307,11 +1347,13 @@
     <div id="setup-screen" class="screen active">
         <div class="setup-container">
             <div class="show-title">
-                <h1 class="omega-title">
-                    <span class="glitch" data-text="ULTIMATE CYBER JEOPARDY">ULTIMATE CYBER JEOPARDY</span>
-                    <span class="infinity">∞</span>
-                </h1>
-                <p class="tagline">Elite Federal Credit Union | Cybersecurity Training Excellence</p>
+                <div class="show-title-inner">
+                    <h1 class="omega-title">
+                        <span class="glitch" data-text="ULTIMATE CYBER JEOPARDY">ULTIMATE CYBER JEOPARDY</span>
+                        <span class="infinity">∞</span>
+                    </h1>
+                    <p class="tagline">Elite Federal Credit Union | Cybersecurity Training Excellence</p>
+                </div>
             </div>
 
             <div class="setup-card">
@@ -1572,10 +1614,20 @@
 
             init() {
                 this.loadSettings();
+                this.applyAnimationSetting();
                 this.initCanvas();
                 this.initAI();
                 this.setupEventListeners();
                 this.showScreen('setup');
+            }
+
+            applyAnimationSetting() {
+                const root = document.documentElement;
+                if (this.settings.animations) {
+                    root.removeAttribute('data-animations');
+                } else {
+                    root.setAttribute('data-animations', 'off');
+                }
             }
 
             initCanvas() {
@@ -1615,6 +1667,8 @@
             animateCanvas() {
                 if (!this.ctx || !this.canvas) return;
 
+                const animationsOff = document.documentElement.getAttribute('data-animations') === 'off';
+
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
                 this.gridLines.forEach(line => {
@@ -1625,19 +1679,26 @@
                     if (line.type === 'horizontal') {
                         this.ctx.moveTo(0, line.y);
                         this.ctx.lineTo(this.canvas.width, line.y);
-                        line.y += line.speed;
-                        if (line.y > this.canvas.height) line.y = 0;
+                        if (!animationsOff) {
+                            line.y += line.speed;
+                            if (line.y > this.canvas.height) line.y = 0;
+                        }
                     } else {
                         this.ctx.moveTo(line.x, 0);
                         this.ctx.lineTo(line.x, this.canvas.height);
-                        line.x += line.speed;
-                        if (line.x > this.canvas.width) line.x = 0;
+                        if (!animationsOff) {
+                            line.x += line.speed;
+                            if (line.x > this.canvas.width) line.x = 0;
+                        }
                     }
 
                     this.ctx.stroke();
                 });
 
-                requestAnimationFrame(() => this.animateCanvas());
+                // Only loop if animations are enabled
+                if (!animationsOff) {
+                    requestAnimationFrame(() => this.animateCanvas());
+                }
             }
 
             initAI() {
@@ -1712,7 +1773,24 @@
                 document.getElementById('animations-toggle').addEventListener('change', (e) => {
                     this.settings.animations = e.target.checked;
                     this.saveSettings();
+                    this.applyAnimationSetting();
+                    // Restart canvas animation if turning animations back on
+                    if (this.settings.animations) {
+                        this.animateCanvas();
+                    }
                 });
+
+                // Voice selection
+                const voiceSelect = document.getElementById('voice-select');
+                if (voiceSelect) {
+                    voiceSelect.addEventListener('change', (e) => {
+                        const index = parseInt(e.target.value, 10);
+                        if (!Number.isNaN(index)) {
+                            this.settings.voice = index;
+                            this.saveSettings();
+                        }
+                    });
+                }
 
                 // Keyboard shortcuts for buzzing
                 document.addEventListener('keydown', (e) => {
@@ -1793,7 +1871,12 @@
                 board.innerHTML = '';
 
                 const categories = Object.keys(fcuQuestions);
-                const values = this.currentRound === 1 ? [100, 200, 300, 400, 500] : [200, 400, 600, 800, 1000];
+
+                // Round 1 uses base values directly. Round 2 doubles them for scoring.
+                const baseValues = [100, 200, 300, 400, 500];
+                const displayValues = this.currentRound === 1
+                    ? baseValues
+                    : baseValues.map(v => v * 2);
 
                 document.getElementById('round-title').textContent = `ROUND ${this.currentRound}`;
                 document.getElementById('round-title').setAttribute('data-text', `ROUND ${this.currentRound}`);
@@ -1807,11 +1890,11 @@
                 });
 
                 // Question tiles
-                values.forEach((value, qIndex) => {
+                displayValues.forEach((displayValue, qIndex) => {
                     categories.forEach((cat, catIndex) => {
                         const tile = document.createElement('div');
                         tile.className = 'question-tile';
-                        tile.textContent = value; // Display correct value for current round
+                        tile.textContent = displayValue;
                         tile.dataset.category = catIndex;
                         tile.dataset.question = qIndex;
 
@@ -1832,9 +1915,10 @@
             selectQuestion(catIndex, qIndex) {
                 const categories = Object.keys(fcuQuestions);
                 const category = categories[catIndex];
-                const values = this.currentRound === 1 ? [100, 200, 300, 400, 500] : [200, 400, 600, 800, 1000];
-                const value = values[qIndex];
-                const baseValue = [100, 200, 300, 400, 500][qIndex];
+                const baseValues = [100, 200, 300, 400, 500];
+
+                const baseValue = baseValues[qIndex];
+                const displayValue = this.currentRound === 1 ? baseValue : baseValue * 2;
 
                 const pos = `${catIndex}-${qIndex}`;
                 if (this.answeredQuestions.has(pos)) return;
@@ -1842,7 +1926,7 @@
                 this.answeredQuestions.add(pos);
                 this.currentQuestion = {
                     category,
-                    value,
+                    value: displayValue,
                     data: fcuQuestions[category][baseValue],
                     isDailyDouble: this.dailyDoubles.includes(pos)
                 };
@@ -1855,26 +1939,35 @@
             }
 
             showDailyDouble() {
-                // Correct Jeopardy rules: If player has positive score, max = score
-                // If zero or negative, max = board's highest value (1000 or 2000)
-                const maxWager = this.currentPlayer.score > 0
+                let maxWager = this.currentPlayer.score > 0
                     ? this.currentPlayer.score
                     : (this.currentRound === 1 ? 1000 : 2000);
 
+                // Safety fallback
+                if (maxWager < 5) maxWager = 5;
+
+                const wagerInput = document.getElementById('wager-input');
+
                 document.getElementById('dd-info').textContent = `${this.currentPlayer.name}, you found a Daily Double!`;
-                document.getElementById('wager-input').value = Math.min(maxWager, 500);
-                document.getElementById('wager-input').max = maxWager;
+                wagerInput.value = Math.min(maxWager, 500);
+                wagerInput.max = String(maxWager);
                 document.getElementById('dd-max').textContent = `Max Wager: $${maxWager}`;
 
                 document.getElementById('dd-modal').classList.add('active');
             }
 
             submitWager() {
-                const wager = parseInt(document.getElementById('wager-input').value);
-                const max = parseInt(document.getElementById('wager-input').max);
+                const wagerInput = document.getElementById('wager-input');
+                const wager = parseInt(wagerInput.value, 10);
+                const max = parseInt(wagerInput.max, 10);
+
+                if (Number.isNaN(wager)) {
+                    alert('Please enter a numeric wager.');
+                    return;
+                }
 
                 if (wager < 5 || wager > max) {
-                    alert(`Please enter a wager between $5 and $${max}`);
+                    alert(`Please enter a wager between $5 and $${max}.`);
                     return;
                 }
 
@@ -1914,22 +2007,31 @@
             }
 
             startTimer(seconds) {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+
                 let timeLeft = seconds;
-                document.getElementById('timer-text').textContent = timeLeft;
-                document.getElementById('timer-fill').style.width = '100%';
-                document.getElementById('timer-fill').classList.remove('warning');
+                const timerText = document.getElementById('timer-text');
+                const timerFill = document.getElementById('timer-fill');
+
+                timerText.textContent = timeLeft;
+                timerFill.style.width = '100%';
+                timerFill.classList.remove('warning');
 
                 this.timerInterval = setInterval(() => {
                     timeLeft--;
-                    document.getElementById('timer-text').textContent = timeLeft;
-                    document.getElementById('timer-fill').style.width = ((timeLeft / seconds) * 100) + '%';
+                    timerText.textContent = timeLeft;
+                    timerFill.style.width = ((timeLeft / seconds) * 100) + '%';
 
                     if (timeLeft <= 5) {
-                        document.getElementById('timer-fill').classList.add('warning');
+                        timerFill.classList.add('warning');
                     }
 
                     if (timeLeft <= 0) {
                         clearInterval(this.timerInterval);
+                        this.timerInterval = null;
                         if (!this.buzzerActive) {
                             this.activateBuzzer();
                         }
@@ -1938,7 +2040,10 @@
             }
 
             selectAnswer(answerIndex) {
-                if (this.timerInterval) clearInterval(this.timerInterval);
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
 
                 const isCorrect = answerIndex === this.currentQuestion.data.correct;
                 const buttons = document.querySelectorAll('.answer-btn');
@@ -2008,15 +2113,22 @@
             }
 
             startBuzzTimer() {
+                if (this.buzzTimerInterval) {
+                    clearInterval(this.buzzTimerInterval);
+                    this.buzzTimerInterval = null;
+                }
+
                 let timeLeft = 7;
-                document.getElementById('buzz-timer').textContent = timeLeft;
+                const buzzTimerEl = document.getElementById('buzz-timer');
+                buzzTimerEl.textContent = timeLeft;
 
                 this.buzzTimerInterval = setInterval(() => {
                     timeLeft--;
-                    document.getElementById('buzz-timer').textContent = timeLeft;
+                    buzzTimerEl.textContent = timeLeft;
 
                     if (timeLeft <= 0) {
                         clearInterval(this.buzzTimerInterval);
+                        this.buzzTimerInterval = null;
                         this.buzzerActive = false;
                         document.getElementById('question-modal').classList.remove('active');
                         this.showResult(false, "Time's up!");
@@ -2028,6 +2140,7 @@
                 if (!this.buzzerActive || this.buzzedPlayers.has(playerIndex)) return;
 
                 clearInterval(this.buzzTimerInterval);
+                this.buzzTimerInterval = null;
                 this.buzzerActive = false;
 
                 this.currentPlayer = this.players[playerIndex];
@@ -2089,9 +2202,15 @@
             async requestAIHint() {
                 if (!this.aiEnabled || !this.aiKey || this.hintsRemaining <= 0) return;
 
-                document.getElementById('ai-hint-btn').disabled = true;
-                document.getElementById('ai-hint-display').textContent = '🔄 Analyzing question...';
-                document.getElementById('ai-hint-display').classList.remove('hidden');
+                const hintBtn = document.getElementById('ai-hint-btn');
+                const hintDisplay = document.getElementById('ai-hint-display');
+
+                hintBtn.disabled = true;
+                hintDisplay.textContent = '🔄 Analyzing question...';
+                hintDisplay.classList.remove('hidden');
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
                 try {
                     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -2103,32 +2222,45 @@
                         body: JSON.stringify({
                             model: 'gpt-4o-mini',
                             messages: [
-                                { role: 'system', content: 'You are a helpful cybersecurity training assistant. Provide brief, educational hints about cybersecurity questions without giving away the answer directly. Keep responses under 100 words.' },
-                                { role: 'user', content: `Question: ${this.currentQuestion.data.question}\n\nProvide a helpful hint about this cybersecurity concept without revealing the answer.` }
+                                {
+                                    role: 'system',
+                                    content: 'You are a helpful cybersecurity training assistant. Provide a short hint (1–3 sentences) that helps the player reason toward the correct answer without explicitly stating it.'
+                                },
+                                {
+                                    role: 'user',
+                                    content: `Question: ${this.currentQuestion.data.question}\nOptions: ${this.currentQuestion.data.options.join(', ')}\n\nGive a concise hint that nudges toward the correct concept but does NOT reveal the exact answer.`
+                                }
                             ],
-                            max_tokens: 150,
-                            temperature: 0.7
-                        })
+                            max_tokens: 120,
+                            temperature: 0.6
+                        }),
+                        signal: controller.signal
                     });
 
-                    if (!response.ok) throw new Error('API request failed');
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) throw new Error(`API request failed: ${response.status}`);
 
                     const data = await response.json();
-                    const hint = data.choices[0].message.content;
+                    const hint = data.choices?.[0]?.message?.content?.trim();
+
+                    if (!hint) throw new Error('No hint content returned');
 
                     this.hintsRemaining--;
                     document.getElementById('hints-remaining').textContent = this.hintsRemaining;
-                    document.getElementById('ai-hint-display').textContent = `💡 ${hint}`;
+                    hintDisplay.textContent = `💡 ${hint}`;
 
                     if (this.hintsRemaining === 0) {
-                        document.getElementById('ai-hint-btn').disabled = true;
+                        hintBtn.disabled = true;
                     } else {
-                        document.getElementById('ai-hint-btn').disabled = false;
+                        hintBtn.disabled = false;
                     }
                 } catch (error) {
                     console.error('AI Hint Error:', error);
-                    document.getElementById('ai-hint-display').textContent = '❌ Unable to fetch hint. Check API key.';
-                    document.getElementById('ai-hint-btn').disabled = false;
+                    hintDisplay.textContent = '❌ Unable to fetch hint. Please verify your API key and internet connection.';
+                    hintBtn.disabled = false;
+                } finally {
+                    clearTimeout(timeoutId);
                 }
             }
 
@@ -2181,7 +2313,17 @@
             }
 
             resetGame() {
-                // Reset game state while keeping settings and leaderboard
+                // Clear timers
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+                if (this.buzzTimerInterval) {
+                    clearInterval(this.buzzTimerInterval);
+                    this.buzzTimerInterval = null;
+                }
+
+                // Reset game state
                 this.players = [];
                 this.currentPlayer = null;
                 this.currentRound = 1;
@@ -2192,13 +2334,14 @@
                 this.buzzerActive = false;
                 this.hintsRemaining = 3;
 
-                // Clear player inputs
+                // Clear UI pieces
                 document.getElementById('player-inputs').innerHTML = '';
-
-                // Hide score HUD
                 document.getElementById('score-hud').classList.add('hidden');
+                document.getElementById('question-modal').classList.remove('active');
+                document.getElementById('result-modal').classList.remove('active');
+                document.getElementById('dd-modal').classList.remove('active');
 
-                // Return to setup screen
+                // Back to setup screen
                 this.showScreen('setup');
             }
 
@@ -2291,24 +2434,29 @@
             toggleBGM() {
                 const toggle = document.getElementById('bgm-toggle');
                 const bgm = document.getElementById('bgm');
+                if (!bgm) return;
+
+                const hasSource = !!bgm.currentSrc && bgm.currentSrc !== window.location.href;
+
+                if (!hasSource) {
+                    // No valid audio source; prevent toggling into "playing" visual
+                    console.warn('BGM: No audio source configured. Add a <source> element to enable music.');
+                    return;
+                }
+
                 this.bgmPlaying = !this.bgmPlaying;
 
                 if (this.bgmPlaying) {
                     toggle.classList.add('playing');
-                    // Try to play audio if source is loaded
-                    if (bgm && bgm.src && bgm.src !== window.location.href) {
-                        bgm.volume = this.settings.volume;
-                        bgm.play().catch(err => {
-                            console.log('BGM playback failed:', err);
-                            this.bgmPlaying = false;
-                            toggle.classList.remove('playing');
-                        });
-                    }
+                    bgm.volume = this.settings.volume;
+                    bgm.play().catch(err => {
+                        console.log('BGM playback failed:', err);
+                        this.bgmPlaying = false;
+                        toggle.classList.remove('playing');
+                    });
                 } else {
                     toggle.classList.remove('playing');
-                    if (bgm) {
-                        bgm.pause();
-                    }
+                    bgm.pause();
                 }
             }
 

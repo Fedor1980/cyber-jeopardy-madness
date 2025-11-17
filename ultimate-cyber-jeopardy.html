@@ -1489,7 +1489,8 @@
 
     <!-- Audio -->
     <audio id="bgm" loop>
-        <source src="data:audio/mpeg;base64," type="audio/mpeg">
+        <!-- Audio file removed - empty base64 causes decoding errors -->
+        <!-- Add your own background music here if desired -->
     </audio>
 
     <script>
@@ -1679,7 +1680,7 @@
                 document.getElementById('view-settings-btn').addEventListener('click', () => this.showSettings());
                 document.getElementById('back-from-leaderboard-btn').addEventListener('click', () => this.showScreen('setup'));
                 document.getElementById('back-from-settings-btn').addEventListener('click', () => this.showScreen('setup'));
-                document.getElementById('new-game-btn').addEventListener('click', () => location.reload());
+                document.getElementById('new-game-btn').addEventListener('click', () => this.resetGame());
 
                 // Game controls
                 document.getElementById('continue-btn').addEventListener('click', () => this.closeResultModal());
@@ -1743,7 +1744,12 @@
             startGame() {
                 const inputs = document.querySelectorAll('.player-name-input');
                 if (inputs.length === 0) {
-                    alert('Please select number of players first!');
+                    // Visual feedback instead of alert
+                    const playerCountBtns = document.querySelectorAll('.player-count-btn');
+                    playerCountBtns.forEach(btn => {
+                        btn.style.animation = 'buzz 0.3s ease';
+                        setTimeout(() => btn.style.animation = '', 300);
+                    });
                     return;
                 }
 
@@ -1805,7 +1811,7 @@
                     categories.forEach((cat, catIndex) => {
                         const tile = document.createElement('div');
                         tile.className = 'question-tile';
-                        tile.textContent = this.currentRound === 1 ? value : value;
+                        tile.textContent = value; // Display correct value for current round
                         tile.dataset.category = catIndex;
                         tile.dataset.question = qIndex;
 
@@ -1849,7 +1855,11 @@
             }
 
             showDailyDouble() {
-                const maxWager = Math.max(this.currentPlayer.score, this.currentRound === 1 ? 1000 : 2000);
+                // Correct Jeopardy rules: If player has positive score, max = score
+                // If zero or negative, max = board's highest value (1000 or 2000)
+                const maxWager = this.currentPlayer.score > 0
+                    ? this.currentPlayer.score
+                    : (this.currentRound === 1 ? 1000 : 2000);
 
                 document.getElementById('dd-info').textContent = `${this.currentPlayer.name}, you found a Daily Double!`;
                 document.getElementById('wager-input').value = Math.min(maxWager, 500);
@@ -1968,6 +1978,14 @@
             }
 
             activateBuzzer() {
+                // Check if any players are left who haven't buzzed
+                if (this.buzzedPlayers.size >= this.players.length) {
+                    // All players have already attempted - end the question
+                    document.getElementById('question-modal').classList.remove('active');
+                    this.showResult(false, "No correct answers!");
+                    return;
+                }
+
                 document.getElementById('answer-options').innerHTML = '';
 
                 const buzzerPanel = document.getElementById('buzzer-panel');
@@ -2013,6 +2031,8 @@
                 this.buzzerActive = false;
 
                 this.currentPlayer = this.players[playerIndex];
+                this.updatePodiums(); // Update visual highlight for active player
+                this.updatePickerDisplay(); // Update picker name
                 document.getElementById('buzzer-panel').classList.add('hidden');
 
                 // Show answer options again
@@ -2056,6 +2076,8 @@
                         this.answeredQuestions.clear();
                         this.generateDailyDoubles();
                         this.buildBoard();
+                        this.updatePodiums();
+                        this.updateScoreHUD();
                     } else {
                         this.showWinner();
                     }
@@ -2079,7 +2101,7 @@
                             'Authorization': `Bearer ${this.aiKey}`
                         },
                         body: JSON.stringify({
-                            model: 'gpt-3.5-turbo',
+                            model: 'gpt-4o-mini',
                             messages: [
                                 { role: 'system', content: 'You are a helpful cybersecurity training assistant. Provide brief, educational hints about cybersecurity questions without giving away the answer directly. Keep responses under 100 words.' },
                                 { role: 'user', content: `Question: ${this.currentQuestion.data.question}\n\nProvide a helpful hint about this cybersecurity concept without revealing the answer.` }
@@ -2158,6 +2180,28 @@
                 document.getElementById('score-hud').classList.add('hidden');
             }
 
+            resetGame() {
+                // Reset game state while keeping settings and leaderboard
+                this.players = [];
+                this.currentPlayer = null;
+                this.currentRound = 1;
+                this.answeredQuestions.clear();
+                this.buzzedPlayers.clear();
+                this.dailyDoubles = [];
+                this.currentQuestion = null;
+                this.buzzerActive = false;
+                this.hintsRemaining = 3;
+
+                // Clear player inputs
+                document.getElementById('player-inputs').innerHTML = '';
+
+                // Hide score HUD
+                document.getElementById('score-hud').classList.add('hidden');
+
+                // Return to setup screen
+                this.showScreen('setup');
+            }
+
             showLeaderboard() {
                 const leaderboard = this.loadLeaderboard();
                 const content = document.getElementById('leaderboard-content');
@@ -2204,18 +2248,25 @@
                 }
             }
 
-            showSettings() {
-                // Populate voice select
+            populateVoiceSelect() {
+                // Populate voice selector with available voices
                 const voices = speechSynthesis.getVoices();
                 const voiceSelect = document.getElementById('voice-select');
-                voiceSelect.innerHTML = voices.map((voice, i) =>
-                    `<option value="${i}">${voice.name} (${voice.lang})</option>`
-                ).join('');
 
-                if (this.settings.voice !== null) {
-                    voiceSelect.value = this.settings.voice;
+                if (voices.length > 0) {
+                    voiceSelect.innerHTML = voices.map((voice, i) =>
+                        `<option value="${i}">${voice.name} (${voice.lang})</option>`
+                    ).join('');
+
+                    if (this.settings.voice !== null && this.settings.voice < voices.length) {
+                        voiceSelect.value = this.settings.voice;
+                    }
                 }
+            }
 
+            showSettings() {
+                // Populate voice select when opening settings
+                this.populateVoiceSelect();
                 this.showScreen('settings');
             }
 
@@ -2239,12 +2290,25 @@
 
             toggleBGM() {
                 const toggle = document.getElementById('bgm-toggle');
+                const bgm = document.getElementById('bgm');
                 this.bgmPlaying = !this.bgmPlaying;
 
                 if (this.bgmPlaying) {
                     toggle.classList.add('playing');
+                    // Try to play audio if source is loaded
+                    if (bgm && bgm.src && bgm.src !== window.location.href) {
+                        bgm.volume = this.settings.volume;
+                        bgm.play().catch(err => {
+                            console.log('BGM playback failed:', err);
+                            this.bgmPlaying = false;
+                            toggle.classList.remove('playing');
+                        });
+                    }
                 } else {
                     toggle.classList.remove('playing');
+                    if (bgm) {
+                        bgm.pause();
+                    }
                 }
             }
 
@@ -2255,14 +2319,22 @@
         }
 
         // Initialize game when DOM is ready
+        let gameInstance; // Global reference for voice loading
         document.addEventListener('DOMContentLoaded', () => {
-            const game = new UltimateCyberJeopardy();
+            gameInstance = new UltimateCyberJeopardy();
 
             // Initialize speech synthesis voices
             if ('speechSynthesis' in window) {
                 speechSynthesis.onvoiceschanged = () => {
-                    // Voices loaded
+                    // Populate voice selector when voices become available
+                    if (gameInstance) {
+                        gameInstance.populateVoiceSelect();
+                    }
                 };
+                // Try to load voices immediately (some browsers load them synchronously)
+                if (gameInstance) {
+                    gameInstance.populateVoiceSelect();
+                }
             }
         });
     </script>

@@ -1,4 +1,5 @@
-import axios from 'axios';
+import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import { QuestionModel } from '../models/Question';
 import { AIHintRequest, HintType } from '../types';
 import { NotFoundError, ValidationError } from '../utils/errors';
@@ -56,32 +57,25 @@ export class AIService {
   ): Promise<string> {
     const prompt = this.buildPrompt(questionText, correctAnswer, hintType);
 
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a cybersecurity training assistant helping students learn.',
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        max_tokens: 200,
-        temperature: 0.7,
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const openai = new OpenAI({ apiKey });
 
-    return response.data.choices[0].message.content;
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a cybersecurity training assistant helping students learn. Provide clear, concise, and educational hints.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_tokens: 200,
+      temperature: 0.7,
+    });
+
+    return completion.choices[0]?.message?.content || 'Unable to generate hint at this time.';
   }
 
   /**
@@ -95,28 +89,21 @@ export class AIService {
   ): Promise<string> {
     const prompt = this.buildPrompt(questionText, correctAnswer, hintType);
 
-    const response = await axios.post(
-      'https://api.anthropic.com/v1/messages',
-      {
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 200,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-      },
-      {
-        headers: {
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const anthropic = new Anthropic({ apiKey });
 
-    return response.data.content[0].text;
+    const message = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 200,
+      messages: [
+        {
+          role: 'user',
+          content: `You are a cybersecurity training assistant. ${prompt}`,
+        },
+      ],
+    });
+
+    const content = message.content[0];
+    return content.type === 'text' ? content.text : 'Unable to generate hint at this time.';
   }
 
   /**

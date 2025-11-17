@@ -2,6 +2,8 @@ import { Router } from 'express';
 import authRoutes from './auth';
 import gameRoutes from './game';
 import aiRoutes from './ai';
+import leaderboardRoutes from './leaderboard';
+import buzzRoutes from './buzz';
 import { checkDatabaseHealth } from '../config/database';
 
 const router = Router();
@@ -21,5 +23,7 @@ router.get('/health', async (_req, res) => {
 router.use('/auth', authRoutes);
 router.use('/game', gameRoutes);
 router.use('/ai', aiRoutes);
+router.use('/leaderboard', leaderboardRoutes);
+router.use('/buzz', buzzRoutes);
 
 export default router;

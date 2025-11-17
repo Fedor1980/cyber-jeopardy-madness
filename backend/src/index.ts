@@ -1,4 +1,5 @@
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -10,8 +11,13 @@ import { logger } from './utils/logger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { apiLimiter } from './middleware/rateLimiter';
 import routes from './routes';
+import { webSocketService } from './services/WebSocketService';
 
 const app = express();
+const httpServer = createServer(app);
+
+// Initialize WebSocket server
+webSocketService.initialize(httpServer);
 
 // Security middleware
 app.use(helmet());
@@ -38,10 +44,11 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Start server
-const server = app.listen(config.PORT, () => {
+const server = httpServer.listen(config.PORT, () => {
   logger.info(`Server running on port ${config.PORT}`, {
     environment: config.NODE_ENV,
     apiVersion: config.API_VERSION,
+    webSocket: 'enabled',
   });
 });
 

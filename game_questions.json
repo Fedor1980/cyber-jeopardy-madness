@@ -273,6 +273,141 @@
               "timeLimit": 30
             }
           ]
+        },
+        {
+          "name": "Web Application Security",
+          "questions": [
+            {
+              "points": 100,
+              "question": "What does HTTPS indicate about a website?",
+              "options": ["It's very fast", "It uses encrypted connections", "It's government-run", "It has no ads"],
+              "answer": "It uses encrypted connections",
+              "explanation": "HTTPS indicates the website uses SSL/TLS encryption to protect data transmitted between your browser and the server.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What is SQL injection?",
+              "options": ["Updating database software", "Inserting malicious database queries", "Backing up databases", "Deleting old records"],
+              "answer": "Inserting malicious database queries",
+              "explanation": "SQL injection attacks insert malicious SQL code into input fields to manipulate or access database information.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What does XSS stand for in web security?",
+              "options": ["Extra Secure System", "Cross-Site Scripting", "External Security Service", "Extended Safety Standard"],
+              "answer": "Cross-Site Scripting",
+              "explanation": "XSS attacks inject malicious scripts into trusted websites, potentially stealing user data or hijacking sessions.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What is the OWASP Top 10?",
+              "options": ["Best security products", "Most critical web security risks", "Top security companies", "Fastest firewalls"],
+              "answer": "Most critical web security risks",
+              "explanation": "OWASP Top 10 is a regularly updated list of the most critical web application security risks, used as a security standard.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What security measure helps prevent CSRF attacks?",
+              "options": ["Strong passwords", "Anti-CSRF tokens", "Faster servers", "Bigger databases"],
+              "answer": "Anti-CSRF tokens",
+              "explanation": "Cross-Site Request Forgery tokens validate that requests originate from legitimate users, preventing unauthorized actions.",
+              "timeLimit": 30
+            }
+          ]
+        },
+        {
+          "name": "IoT & Smart Devices",
+          "questions": [
+            {
+              "points": 100,
+              "question": "What should you do first when setting up a new smart device?",
+              "options": ["Use it immediately", "Change default password", "Connect all devices", "Share on social media"],
+              "answer": "Change default password",
+              "explanation": "Default passwords are publicly known and commonly exploited. Always change them immediately to secure your device.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What is a major security risk of IoT devices?",
+              "options": ["They're too expensive", "Often lack security updates", "Use too much power", "Take up space"],
+              "answer": "Often lack security updates",
+              "explanation": "Many IoT devices receive infrequent or no security updates, leaving known vulnerabilities unpatched and exploitable.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What network security practice helps protect IoT devices?",
+              "options": ["Connecting everything together", "Segmenting IoT on separate network", "Using public Wi-Fi", "Turning off encryption"],
+              "answer": "Segmenting IoT on separate network",
+              "explanation": "Network segmentation isolates IoT devices, limiting potential damage if they're compromised and can't access critical systems.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What was the Mirai botnet primarily composed of?",
+              "options": ["Laptops", "Compromised IoT devices", "Smartphones", "Servers"],
+              "answer": "Compromised IoT devices",
+              "explanation": "Mirai infected hundreds of thousands of IoT devices with weak security to create a massive botnet for DDoS attacks.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What protocol is designed specifically for IoT device security?",
+              "options": ["HTTP", "FTP", "MQTT with TLS", "Telnet"],
+              "answer": "MQTT with TLS",
+              "explanation": "MQTT (Message Queuing Telemetry Transport) with TLS provides lightweight, encrypted messaging ideal for IoT devices.",
+              "timeLimit": 30
+            }
+          ]
+        },
+        {
+          "name": "Threat Intelligence",
+          "questions": [
+            {
+              "points": 100,
+              "question": "What does APT stand for in cybersecurity?",
+              "options": ["Automatic Protection Tool", "Advanced Persistent Threat", "Application Performance Test", "Annual Privacy Training"],
+              "answer": "Advanced Persistent Threat",
+              "explanation": "APTs are sophisticated, long-term targeted attacks typically conducted by well-funded groups or nation-states.",
+              "timeLimit": 30
+            },
+            {
+              "points": 200,
+              "question": "What is threat intelligence?",
+              "options": ["Smart firewalls", "Information about potential security threats", "AI-powered antivirus", "Network speed data"],
+              "answer": "Information about potential security threats",
+              "explanation": "Threat intelligence is analyzed information about current and emerging threats used to make informed security decisions.",
+              "timeLimit": 30
+            },
+            {
+              "points": 300,
+              "question": "What is an Indicator of Compromise (IoC)?",
+              "options": ["Performance metrics", "Evidence of security breach", "Network speed test", "User login count"],
+              "answer": "Evidence of security breach",
+              "explanation": "IoCs are forensic artifacts that indicate a system has been compromised, like suspicious file hashes or IP addresses.",
+              "timeLimit": 30
+            },
+            {
+              "points": 400,
+              "question": "What is threat hunting?",
+              "options": ["Waiting for alerts", "Proactively searching for threats", "Hunting viruses only", "Automatic scanning"],
+              "answer": "Proactively searching for threats",
+              "explanation": "Threat hunting involves actively searching networks for threats that evade automated detection systems.",
+              "timeLimit": 30
+            },
+            {
+              "points": 500,
+              "question": "What framework helps categorize adversary tactics and techniques?",
+              "options": ["OWASP", "MITRE ATT&CK", "ISO 27001", "PCI DSS"],
+              "answer": "MITRE ATT&CK",
+              "explanation": "MITRE ATT&CK is a comprehensive knowledge base of adversary tactics, techniques, and procedures used in cyberattacks.",
+              "timeLimit": 30
+            }
+          ]
         }
       ]
     },
@@ -546,6 +681,96 @@
               "options": ["Laziness", "Trust and authority", "Intelligence", "Strength"],
               "answer": "Trust and authority",
               "explanation": "Social engineers exploit our natural tendency to trust authority figures and help others, bypassing technical security controls.",
+              "timeLimit": 45
+            }
+          ]
+        },
+        {
+          "name": "Security Operations",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What does SOC stand for in cybersecurity?",
+              "options": ["System Operating Center", "Security Operations Center", "Software Optimization Code", "Service Organization Control"],
+              "answer": "Security Operations Center",
+              "explanation": "A SOC is a centralized team that monitors, detects, analyzes, and responds to cybersecurity incidents 24/7.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "What does SIEM software do?",
+              "options": ["Sends emails", "Aggregates and analyzes security logs", "Creates backups", "Manages passwords"],
+              "answer": "Aggregates and analyzes security logs",
+              "explanation": "SIEM (Security Information and Event Management) collects, correlates, and analyzes security events from across the network.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "What is the primary goal of security monitoring?",
+              "options": ["Increase network speed", "Detect and respond to threats quickly", "Reduce costs", "Train employees"],
+              "answer": "Detect and respond to threats quickly",
+              "explanation": "Security monitoring enables early detection of threats, reducing response time and minimizing potential damage.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "What is a security playbook?",
+              "options": ["Training manual", "Documented response procedures", "Gaming guide", "Network diagram"],
+              "answer": "Documented response procedures",
+              "explanation": "Security playbooks provide standardized procedures for responding to specific types of security incidents.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What metric measures the average time to detect a security incident?",
+              "options": ["MTTR", "MTTD", "MTBF", "SLA"],
+              "answer": "MTTD",
+              "explanation": "Mean Time To Detect (MTTD) measures how long it takes to identify a security incident, critical for minimizing damage.",
+              "timeLimit": 45
+            }
+          ]
+        },
+        {
+          "name": "Emerging Threats & AI",
+          "questions": [
+            {
+              "points": 200,
+              "question": "What is a deepfake?",
+              "options": ["Deep sea exploration", "AI-generated fake media", "Cryptocurrency scam", "Network protocol"],
+              "answer": "AI-generated fake media",
+              "explanation": "Deepfakes use AI to create realistic but fake audio, video, or images, posing threats for fraud and misinformation.",
+              "timeLimit": 45
+            },
+            {
+              "points": 400,
+              "question": "How can AI be weaponized by cybercriminals?",
+              "options": ["It can't be weaponized", "Automating and scaling attacks", "Making computers faster", "Creating better graphics"],
+              "answer": "Automating and scaling attacks",
+              "explanation": "AI enables attackers to automate sophisticated attacks, generate convincing phishing content, and evade detection at scale.",
+              "timeLimit": 45
+            },
+            {
+              "points": 600,
+              "question": "What is adversarial machine learning?",
+              "options": ["AI training methods", "Techniques to fool AI systems", "Competitive gaming", "Network protocols"],
+              "answer": "Techniques to fool AI systems",
+              "explanation": "Adversarial ML involves crafting inputs designed to trick AI systems into making incorrect predictions or classifications.",
+              "timeLimit": 45
+            },
+            {
+              "points": 800,
+              "question": "What emerging threat targets cryptocurrency and blockchain systems?",
+              "options": ["Paper fraud", "51% attacks and smart contract exploits", "Physical theft only", "Email phishing only"],
+              "answer": "51% attacks and smart contract exploits",
+              "explanation": "Blockchain threats include 51% attacks (controlling majority of network) and exploiting vulnerabilities in smart contracts.",
+              "timeLimit": 45
+            },
+            {
+              "points": 1000,
+              "question": "What is quantum computing's threat to current encryption?",
+              "options": ["Makes encryption faster", "Could break current encryption methods", "No threat at all", "Only affects passwords"],
+              "answer": "Could break current encryption methods",
+              "explanation": "Quantum computers could potentially break current public-key encryption, requiring development of quantum-resistant cryptography.",
               "timeLimit": 45
             }
           ]

@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download model during build (faster startup)
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+# Note: Model will be downloaded on first run
+# (Pre-download commented out to avoid build issues)
 
 # Copy application code
 COPY main.py .

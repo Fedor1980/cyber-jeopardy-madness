@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#000f1a">
     <meta name="description" content="Ultimate Cyber Jeopardy - Elite Federal Credit Union Cybersecurity Training Game">
     <title>ULTIMATE CYBER JEOPARDY ∞ - Elite FCU Training</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23005487'/><text x='50' y='70' text-anchor='middle' font-size='60' font-family='Arial' font-weight='bold' fill='%23FFD700'>J</text></svg>">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -107,45 +108,6 @@
             font-weight: 700;
             color: var(--cyber-cyan);
             letter-spacing: 0.1rem;
-        }
-
-        /* BGM Toggle */
-        .bgm-control {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 9999;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid var(--captg-purple);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .bgm-control:hover {
-            border-color: var(--captg-green);
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(114, 189, 68, 0.6);
-        }
-
-        .bgm-icon {
-            font-size: 1.5rem;
-            color: var(--jeopardy-gold);
-        }
-
-        .bgm-control.playing .bgm-icon {
-            animation: musicNote 1s ease infinite;
-        }
-
-        @keyframes musicNote {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
         }
 
         /* Score HUD */
@@ -644,13 +606,21 @@
         .game-board {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: auto repeat(5, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
             padding: 1rem;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
+        }
+
+        .category-column {
+            display: grid;
+            grid-template-rows: auto repeat(5, 1fr);
+            height: 100%;
+            background: rgba(0, 20, 40, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .category-header {
@@ -660,7 +630,7 @@
             text-align: center;
             font-family: 'Rajdhani', sans-serif;
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: clamp(0.8rem, 2vw, 1rem);
             text-transform: uppercase;
             border-radius: 5px;
             display: flex;
@@ -739,6 +709,15 @@
         .modal.active {
             display: flex;
             animation: fadeIn 0.3s ease;
+        }
+
+        .modal.buzzer-active {
+            animation: buzzerPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes buzzerPulse {
+            0%, 100% { background: rgba(0, 0, 0, 0.95); }
+            50% { background: rgba(114, 189, 68, 0.2); }
         }
 
         .modal-content {
@@ -1111,7 +1090,7 @@
 
         .leaderboard-entry {
             display: grid;
-            grid-template-columns: 60px 1fr 120px;
+            grid-template-columns: 60px 1fr 120px 140px;
             gap: 1rem;
             padding: 1rem;
             margin: 0.5rem 0;
@@ -1143,6 +1122,13 @@
             font-weight: bold;
             color: var(--success);
             text-align: right;
+        }
+
+        .leaderboard-date {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            text-align: right;
+            font-family: 'Share Tech Mono', monospace;
         }
 
         /* Settings Screen */
@@ -1260,7 +1246,6 @@
         [data-animations="off"] .infinity,
         [data-animations="off"] .winner-title,
         [data-animations="off"] .dd-title,
-        [data-animations="off"] .bgm-control.playing .bgm-icon,
         [data-animations="off"] .buzzer-prompt {
             animation: none !important;
         }
@@ -1295,26 +1280,10 @@
         }
 
         /* Responsive */
-        @media (max-width: 1200px) {
-            .game-board {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (max-width: 900px) {
-            .game-board {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
         @media (max-width: 768px) {
             .omega-title {
                 font-size: 2.4rem;
                 letter-spacing: 0.2rem;
-            }
-
-            .game-board {
-                grid-template-columns: repeat(2, 1fr);
             }
 
             .question-tile {
@@ -1344,11 +1313,6 @@
         <div class="ai-pulse"></div>
         <span class="ai-label">AI</span>
     </div>
-
-    <!-- BGM Toggle -->
-    <button id="bgm-toggle" class="bgm-control">
-        <span class="bgm-icon">♪</span>
-    </button>
 
     <!-- Score HUD -->
     <div id="score-hud" class="score-hud hidden">
@@ -1544,12 +1508,6 @@
         </div>
     </div>
 
-    <!-- Audio -->
-    <audio id="bgm" loop>
-        <!-- Audio file removed - empty base64 causes decoding errors -->
-        <!-- Add your own background music here if desired -->
-    </audio>
-
     <script>
         /**
          * ULTIMATE CYBER JEOPARDY - GAME ENGINE
@@ -1623,7 +1581,6 @@
                 this.canvas = null;
                 this.ctx = null;
                 this.gridLines = [];
-                this.bgmPlaying = false;
                 this.settings = { volume: 0.7, animations: true, voice: null };
                 this.audioContext = null;
 
@@ -1753,7 +1710,7 @@
 
                     // Warning color when under 1 minute
                     if (this.roundTimeRemaining <= 60) {
-                        timerSpan.style.color = 'var(--error-red)';
+                        timerSpan.style.color = 'var(--error)';
                     } else {
                         timerSpan.style.color = 'var(--captg-green)';
                     }
@@ -1840,6 +1797,7 @@
                 if (!this.ctx || !this.canvas) return;
 
                 const animationsOff = document.documentElement.getAttribute('data-animations') === 'off';
+                const pageHidden = document.hidden;
 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -1851,14 +1809,14 @@
                     if (line.type === 'horizontal') {
                         this.ctx.moveTo(0, line.y);
                         this.ctx.lineTo(this.canvas.width, line.y);
-                        if (!animationsOff) {
+                        if (!animationsOff && !pageHidden) {
                             line.y += line.speed;
                             if (line.y > this.canvas.height) line.y = 0;
                         }
                     } else {
                         this.ctx.moveTo(line.x, 0);
                         this.ctx.lineTo(line.x, this.canvas.height);
-                        if (!animationsOff) {
+                        if (!animationsOff && !pageHidden) {
                             line.x += line.speed;
                             if (line.x > this.canvas.width) line.x = 0;
                         }
@@ -1867,8 +1825,8 @@
                     this.ctx.stroke();
                 });
 
-                // Only loop if animations are enabled
-                if (!animationsOff) {
+                // Only loop if animations are enabled and page is visible
+                if (!animationsOff && !pageHidden) {
                     requestAnimationFrame(() => this.animateCanvas());
                 }
             }
@@ -1932,9 +1890,6 @@
                 });
                 document.getElementById('ai-hint-btn').addEventListener('click', () => this.requestAIHint());
 
-                // BGM
-                document.getElementById('bgm-toggle').addEventListener('click', () => this.toggleBGM());
-
                 // Settings
                 document.getElementById('volume-control').addEventListener('input', (e) => {
                     this.settings.volume = e.target.value / 100;
@@ -1972,6 +1927,13 @@
                         if (playerIndex !== undefined && playerIndex < this.players.length && !this.buzzedPlayers.has(playerIndex)) {
                             this.handleBuzz(playerIndex);
                         }
+                    }
+                });
+
+                // Pause/resume canvas animation when tab visibility changes
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && this.settings.animations) {
+                        this.animateCanvas();
                     }
                 });
             }
@@ -2054,20 +2016,20 @@
                 document.getElementById('round-title').textContent = `ROUND ${this.currentRound}`;
                 document.getElementById('round-title').setAttribute('data-text', `ROUND ${this.currentRound}`);
 
-                // Category headers
-                categories.forEach(cat => {
+                // Build vertical category columns
+                categories.forEach((cat, catIndex) => {
+                    const column = document.createElement('div');
+                    column.className = 'category-column';
+
                     const header = document.createElement('div');
                     header.className = 'category-header';
                     header.textContent = cat;
-                    board.appendChild(header);
-                });
+                    column.appendChild(header);
 
-                // Question tiles
-                displayValues.forEach((displayValue, qIndex) => {
-                    categories.forEach((cat, catIndex) => {
+                    displayValues.forEach((displayValue, qIndex) => {
                         const tile = document.createElement('div');
                         tile.className = 'question-tile';
-                        tile.textContent = displayValue;
+                        tile.textContent = `$${displayValue.toLocaleString('en-US')}`;
                         tile.dataset.category = catIndex;
                         tile.dataset.question = qIndex;
 
@@ -2077,9 +2039,10 @@
                         } else {
                             tile.addEventListener('click', () => this.selectQuestion(catIndex, qIndex));
                         }
-
-                        board.appendChild(tile);
+                        column.appendChild(tile);
                     });
+
+                    board.appendChild(column);
                 });
 
                 this.updatePickerDisplay();
@@ -2114,19 +2077,16 @@
             showDailyDouble() {
                 this.playSound('dailydouble'); // Play Daily Double sound
 
-                let maxWager = this.currentPlayer.score > 0
-                    ? this.currentPlayer.score
-                    : (this.currentRound === 1 ? 1000 : 2000);
-
-                // Safety fallback
-                if (maxWager < 5) maxWager = 5;
+                const clueValue = this.currentQuestion.value;
+                const maxWager = Math.max(this.currentPlayer.score, clueValue);
 
                 const wagerInput = document.getElementById('wager-input');
+                wagerInput.min = "5";
+                wagerInput.max = maxWager;
+                wagerInput.value = maxWager; // default to all-in, standard for experienced players
 
                 document.getElementById('dd-info').textContent = `${this.currentPlayer.name}, you found a Daily Double!`;
-                wagerInput.value = Math.min(maxWager, 500);
-                wagerInput.max = String(maxWager);
-                document.getElementById('dd-max').textContent = `Max Wager: $${maxWager}`;
+                document.getElementById('dd-max').textContent = `Max wager: $${maxWager.toLocaleString('en-US')}`;
 
                 document.getElementById('dd-modal').classList.add('active');
             }
@@ -2179,6 +2139,24 @@
                 document.getElementById('question-modal').classList.add('active');
 
                 this.startTimer(15);
+
+                // Speech synthesis for question
+                setTimeout(() => {
+                    if ('speechSynthesis' in window) {
+                        speechSynthesis.cancel();
+                        const text = `In ${this.currentQuestion.category} for $${this.currentQuestion.value}. The question is: ${this.currentQuestion.data.question}`;
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.volume = this.settings.volume;
+                        utterance.rate = 0.9;
+
+                        const voices = speechSynthesis.getVoices();
+                        if (voices.length > 0 && this.settings.voice !== null && this.settings.voice < voices.length) {
+                            utterance.voice = voices[this.settings.voice];
+                        }
+
+                        speechSynthesis.speak(utterance);
+                    }
+                }, 600);
             }
 
             startTimer(seconds) {
@@ -2279,12 +2257,14 @@
                     btn.className = 'buzz-btn';
                     btn.innerHTML = `<span class="buzz-name">${player.name}</span>`;
                     btn.disabled = this.buzzedPlayers.has(index);
+                    btn.setAttribute('aria-label', `Buzz in for ${player.name}`);
                     btn.addEventListener('click', () => this.handleBuzz(index));
                     buzzerButtons.appendChild(btn);
                 });
 
                 buzzerPanel.classList.remove('hidden');
                 this.buzzerActive = true;
+                document.getElementById('question-modal').classList.add('buzzer-active');
 
                 this.startBuzzTimer();
             }
@@ -2307,7 +2287,7 @@
                         clearInterval(this.buzzTimerInterval);
                         this.buzzTimerInterval = null;
                         this.buzzerActive = false;
-                        document.getElementById('question-modal').classList.remove('active');
+                        document.getElementById('question-modal').classList.remove('active', 'buzzer-active');
                         this.showResult(false, "Time's up!");
                     }
                 }, 1000);
@@ -2326,6 +2306,7 @@
                 this.updatePodiums(); // Update visual highlight for active player
                 this.updatePickerDisplay(); // Update picker name
                 document.getElementById('buzzer-panel').classList.add('hidden');
+                document.getElementById('question-modal').classList.remove('buzzer-active');
 
                 // Show answer options again
                 const optionsContainer = document.getElementById('answer-options');
@@ -2350,10 +2331,18 @@
 
                 const explanation = document.getElementById('result-explanation');
                 explanation.innerHTML = isCorrect
-                    ? `<strong>${this.currentPlayer.name} +$${this.currentQuestion.value}</strong><br><br>${this.currentQuestion.data.explanation}`
+                    ? `<strong>${this.currentPlayer.name} +$${this.currentQuestion.value.toLocaleString('en-US')}</strong><br><br>${this.currentQuestion.data.explanation}`
                     : `Correct answer: ${this.currentQuestion.data.options[this.currentQuestion.data.correct]}<br><br>${this.currentQuestion.data.explanation}`;
 
                 document.getElementById('result-modal').classList.add('active');
+
+                // Speech synthesis for result
+                if ('speechSynthesis' in window) {
+                    const resultText = isCorrect ? 'Correct!' : 'Incorrect!';
+                    const resultUtter = new SpeechSynthesisUtterance(resultText);
+                    resultUtter.volume = this.settings.volume * 0.8;
+                    speechSynthesis.speak(resultUtter);
+                }
             }
 
             closeResultModal() {
@@ -2454,7 +2443,7 @@
                     podium.className = 'podium' + (player === this.currentPlayer ? ' active' : '');
                     podium.innerHTML = `
                         <div class="contestant-name-display">${player.name}</div>
-                        <div class="contestant-score${player.score < 0 ? ' negative' : ''}">$${player.score}</div>
+                        <div class="contestant-score${player.score < 0 ? ' negative' : ''}">$${player.score.toLocaleString('en-US')}</div>
                     `;
                     container.appendChild(podium);
                 });
@@ -2469,7 +2458,7 @@
                 hud.innerHTML = this.players.map(p => `
                     <div class="hud-contestant">
                         <span class="hud-name">${p.name}</span>
-                        <span class="hud-score" style="color: ${p.score < 0 ? '#ef4444' : '#72bd44'}">$${p.score}</span>
+                        <span class="hud-score" style="color: ${p.score < 0 ? '#ef4444' : '#72bd44'}">$${p.score.toLocaleString('en-US')}</span>
                     </div>
                 `).join('');
             }
@@ -2480,13 +2469,13 @@
                 const sorted = [...this.players].sort((a, b) => b.score - a.score);
                 const winner = sorted[0];
 
-                document.getElementById('champion-display').textContent = `${winner.name} - $${winner.score}`;
+                document.getElementById('champion-display').textContent = `${winner.name} - $${winner.score.toLocaleString('en-US')}`;
 
                 const standings = document.getElementById('final-standings');
                 standings.innerHTML = sorted.map((p, i) => `
                     <div class="standing-item${i === 0 ? ' first' : ''}">
                         <span>${i + 1}. ${p.name}</span>
-                        <span>$${p.score}</span>
+                        <span>$${p.score.toLocaleString('en-US')}</span>
                     </div>
                 `).join('');
 
@@ -2539,7 +2528,8 @@
                         <div class="leaderboard-entry">
                             <div class="leaderboard-rank">#${index + 1}</div>
                             <div class="leaderboard-name">${entry.name}</div>
-                            <div class="leaderboard-score">$${entry.score}</div>
+                            <div class="leaderboard-score">$${entry.score.toLocaleString('en-US')}</div>
+                            <div class="leaderboard-date">${new Date(entry.date).toLocaleDateString()}</div>
                         </div>
                     `).join('');
                 }
@@ -2612,35 +2602,6 @@
 
             saveSettings() {
                 localStorage.setItem('ultimate-cyber-jeopardy-settings', JSON.stringify(this.settings));
-            }
-
-            toggleBGM() {
-                const toggle = document.getElementById('bgm-toggle');
-                const bgm = document.getElementById('bgm');
-                if (!bgm) return;
-
-                const hasSource = !!bgm.currentSrc && bgm.currentSrc !== window.location.href;
-
-                if (!hasSource) {
-                    // No valid audio source; prevent toggling into "playing" visual
-                    console.warn('BGM: No audio source configured. Add a <source> element to enable music.');
-                    return;
-                }
-
-                this.bgmPlaying = !this.bgmPlaying;
-
-                if (this.bgmPlaying) {
-                    toggle.classList.add('playing');
-                    bgm.volume = this.settings.volume;
-                    bgm.play().catch(err => {
-                        console.log('BGM playback failed:', err);
-                        this.bgmPlaying = false;
-                        toggle.classList.remove('playing');
-                    });
-                } else {
-                    toggle.classList.remove('playing');
-                    bgm.pause();
-                }
             }
 
             showScreen(screenName) {

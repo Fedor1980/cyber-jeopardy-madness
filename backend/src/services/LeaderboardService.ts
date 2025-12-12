@@ -55,9 +55,9 @@ export class LeaderboardService {
     params.push(limit, offset);
 
     try {
-      const result = await query(sql, params);
+      const result = await query<any>(sql, params);
 
-      return result.rows.map((row) => ({
+      return result.map((row) => ({
         teamId: row.team_id,
         teamName: row.team_name,
         score: row.score,
@@ -94,9 +94,9 @@ export class LeaderboardService {
     `;
 
     try {
-      const result = await query(sql, [sessionId]);
+      const result = await query<any>(sql, [sessionId]);
 
-      return result.rows.map((row) => ({
+      return result.map((row) => ({
         teamId: row.team_id,
         teamName: row.team_name,
         score: row.score,
@@ -141,9 +141,9 @@ export class LeaderboardService {
     `;
 
     try {
-      const result = await query(sql, [teamId]);
+      const result = await query<any>(sql, [teamId]);
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return {
           totalGames: 0,
           totalScore: 0,
@@ -156,7 +156,7 @@ export class LeaderboardService {
         };
       }
 
-      const row = result.rows[0];
+      const row = result[0];
       const totalAttempts = row.total_correct + row.total_incorrect;
       const accuracy = totalAttempts > 0 ? (row.total_correct / totalAttempts) * 100 : 0;
 
@@ -196,10 +196,10 @@ export class LeaderboardService {
       WHERE gs.industry_pack = $1 AND gs.status = 'completed'
     `;
 
-    try {
-      const result = await query(sql, [industryPack]);
+    try{
+      const result = await query<any>(sql, [industryPack]);
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return {
           totalGames: 0,
           totalPlayers: 0,
@@ -208,7 +208,7 @@ export class LeaderboardService {
         };
       }
 
-      const row = result.rows[0];
+      const row = result[0];
 
       return {
         totalGames: parseInt(row.total_games) || 0,

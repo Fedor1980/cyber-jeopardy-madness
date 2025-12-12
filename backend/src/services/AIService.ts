@@ -132,7 +132,7 @@ export class AIService {
   /**
    * Generate basic hint without AI
    */
-  private static generateBasicHint(questionText: string, hintType: HintType): string {
+  private static generateBasicHint(_questionText: string, hintType: HintType): string {
     switch (hintType) {
       case HintType.BASIC:
         return 'Think about the fundamental security principles: Confidentiality, Integrity, and Availability. Which one applies here?';
@@ -172,8 +172,6 @@ export class AIService {
     // Generate AI explanation if key provided
     if (apiKey) {
       try {
-        const prompt = `Question: "${question.question_text}"\nSelected Answer: "${selectedAnswer}"\nCorrect Answer: "${question.correct_answer}"\n\nExplain why the ${isCorrect ? 'selected answer is correct' : 'correct answer is right and the selected answer is wrong'}, providing educational context and real-world examples.`;
-
         if (apiKey.startsWith('sk-ant-')) {
           return await this.generateAnthropicHint(
             apiKey,

@@ -14,7 +14,6 @@ import {
   SubmitFinalJeopardyRequest,
 } from '../types';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors';
-import { transaction } from '../config/database';
 
 export class GameService {
   /**
@@ -208,7 +207,7 @@ export class GameService {
    */
   static async submitFinalJeopardy(
     request: SubmitFinalJeopardyRequest,
-    questionId: string,
+    _questionId: string,
     isCorrect: boolean
   ): Promise<{
     isCorrect: boolean;

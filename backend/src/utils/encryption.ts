@@ -35,8 +35,8 @@ export const generateAccessToken = (
   };
 
   return jwt.sign(payload, config.JWT_SECRET, {
-    expiresIn: config.JWT_EXPIRES_IN,
-  });
+    expiresIn: config.JWT_EXPIRES_IN as string,
+  } as jwt.SignOptions);
 };
 
 /**
@@ -54,8 +54,8 @@ export const generateRefreshToken = (
   };
 
   return jwt.sign(payload, config.JWT_REFRESH_SECRET, {
-    expiresIn: config.JWT_REFRESH_EXPIRES_IN,
-  });
+    expiresIn: config.JWT_REFRESH_EXPIRES_IN as string,
+  } as jwt.SignOptions);
 };
 
 /**
